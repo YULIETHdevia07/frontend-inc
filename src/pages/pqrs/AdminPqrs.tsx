@@ -23,7 +23,8 @@ const AdminPqrs = () => {
     const [pqrs, setPqrs] = useState<Pqr[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [successPqrId, setSuccessPqrId] = useState<number | null>(null);
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
         {}
     );
@@ -201,11 +202,13 @@ const AdminPqrs = () => {
 
         try {
             setError("");
-            setSuccess("");
+            setSuccessMessage("");
+            setSuccessPqrId(null);
 
             await updatePqrStatus(pqrId, newStatus);
 
-            setSuccess("Estado actualizado correctamente.");
+            setSuccessMessage("Estado actualizado correctamente.");
+            setSuccessPqrId(pqrId);
 
             await loadAllPqrs();
 
@@ -237,11 +240,13 @@ const AdminPqrs = () => {
 
         try {
             setError("");
-            setSuccess("");
+            setSuccessMessage("");
+            setSuccessPqrId(null);
 
             await respondPqr(pqrId, responseText);
 
-            setSuccess("PQR respondida correctamente.");
+            setSuccessMessage("PQR respondida correctamente.");
+            setSuccessPqrId(pqrId);
 
             await loadAllPqrs();
 
@@ -293,11 +298,6 @@ const AdminPqrs = () => {
                     {error}
                 </Alert>
             )}
-            {success && (
-                <Alert severity="success" sx={{ mb: 2 }}>
-                    {success}
-                </Alert>
-            )}
 
             {pqrs.length === 0 ? (
                 <Paper sx={style.empty}>
@@ -313,6 +313,12 @@ const AdminPqrs = () => {
                 <Box sx={style.list}>
                     {pqrs.map((pqr) => (
                         <Paper key={pqr.id} sx={style.card}>
+                            {successPqrId === pqr.id && successMessage && (
+                                <Alert severity="success" sx={{ mb: 2 }}>
+                                    {successMessage}
+                                </Alert>
+                            )}
+
                             <Box sx={style.cardHeader}>
                                 <Box>
                                     <Typography variant="h6" sx={style.cardTitle}>
