@@ -1,0 +1,424 @@
+import { useEffect, useState } from "react";
+import {
+    Alert,
+    Box,
+    Chip,
+    CircularProgress,
+    Paper,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
+    Typography,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import type { Pqr, PqrStatus } from "../../services/pqrService";
+import { getAllPqrs, updatePqrStatus, respondPqr } from "../../services/pqrService";
+
+const AdminPqrs = () => {
+    const theme = useTheme();
+
+    const [pqrs, setPqrs] = useState<Pqr[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
+        {}
+    );
+    const [responseTexts, setResponseTexts] = useState<Record<number, string>>({});
+
+    const style = {
+        container: {
+            width: "100%",
+        },
+
+        header: {
+            mb: 3,
+        },
+
+        title: {
+            fontWeight: 700,
+            color: theme.palette.text.primary,
+        },
+
+        subtitle: {
+            color: theme.palette.text.secondary,
+            mt: 0.5,
+        },
+
+        list: {
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+        },
+
+        card: {
+            p: 3,
+            borderRadius: 3,
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: "0 8px 30px rgba(15, 23, 42, 0.08)",
+            border: `1px solid ${theme.palette.primary.light}`,
+        },
+
+        cardHeader: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: 2,
+            mb: 1,
+        },
+
+        cardTitle: {
+            fontWeight: 700,
+            color: theme.palette.text.primary,
+        },
+
+        description: {
+            color: theme.palette.text.secondary,
+            mt: 1,
+            lineHeight: 1.7,
+        },
+
+        userBox: {
+            mt: 2,
+            p: 2,
+            borderRadius: 2,
+            backgroundColor: theme.palette.background.default,
+            border: `1px solid ${theme.palette.primary.light}`,
+        },
+
+        responseBox: {
+            mt: 2,
+            p: 2,
+            borderRadius: 2,
+            backgroundColor: theme.palette.primary.light,
+        },
+
+        date: {
+            mt: 1,
+            color: theme.palette.text.secondary,
+            fontSize: "0.85rem",
+        },
+
+        empty: {
+            p: 4,
+            borderRadius: 3,
+            textAlign: "center",
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: "0 8px 30px rgba(15, 23, 42, 0.08)",
+        },
+        actionsBox: {
+            mt: 2,
+            display: "flex",
+            gap: 2,
+            alignItems: "center",
+            flexWrap: "wrap",
+        },
+
+        select: {
+            minWidth: "220px",
+        },
+
+        button: {
+            borderRadius: 2,
+            fontWeight: 600,
+            px: 3,
+        },
+        responseForm: {
+            mt: 2,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+        },
+
+        responseButton: {
+            alignSelf: "flex-start",
+            borderRadius: 2,
+            fontWeight: 600,
+            px: 3,
+        },
+    };
+
+    const getStatusColor = (status: PqrStatus) => {
+        switch (status) {
+            case "PENDIENTE":
+                return "warning";
+
+            case "EN_PROCESO":
+                return "info";
+
+            case "RESPONDIDA":
+                return "success";
+
+            case "CERRADA":
+                return "default";
+
+            default:
+                return "default";
+        }
+    };
+
+    const formatDate = (date: string) => {
+        return new Date(date).toLocaleDateString("es-CO", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    };
+
+    const loadAllPqrs = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const response = await getAllPqrs();
+
+            setPqrs(response.pqrs);
+        } catch (error) {
+            console.error(error);
+            setError("Error al cargar las PQR. Verifica que el usuario tenga rol ADMIN.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleStatusChange = (pqrId: number, status: PqrStatus) => {
+        setStatusChanges((prev) => ({
+            ...prev,
+            [pqrId]: status,
+        }));
+    };
+
+    const handleUpdateStatus = async (pqrId: number) => {
+        const newStatus = statusChanges[pqrId];
+
+        if (!newStatus) {
+            setError("Debes seleccionar un estado antes de guardar.");
+            return;
+        }
+
+        try {
+            setError("");
+            setSuccess("");
+
+            await updatePqrStatus(pqrId, newStatus);
+
+            setSuccess("Estado actualizado correctamente.");
+
+            await loadAllPqrs();
+
+            setStatusChanges((prev) => {
+                const updated = { ...prev };
+                delete updated[pqrId];
+                return updated;
+            });
+        } catch (error) {
+            console.error(error);
+            setError("Error al actualizar el estado de la PQR.");
+        }
+    };
+
+    const handleResponseTextChange = (pqrId: number, value: string) => {
+        setResponseTexts((prev) => ({
+            ...prev,
+            [pqrId]: value,
+        }));
+    };
+
+    const handleRespondPqr = async (pqrId: number) => {
+        const responseText = responseTexts[pqrId];
+
+        if (!responseText || responseText.trim() === "") {
+            setError("Debes escribir una respuesta antes de enviarla.");
+            return;
+        }
+
+        try {
+            setError("");
+            setSuccess("");
+
+            await respondPqr(pqrId, responseText);
+
+            setSuccess("PQR respondida correctamente.");
+
+            await loadAllPqrs();
+
+            setResponseTexts((prev) => {
+                const updated = { ...prev };
+                delete updated[pqrId];
+                return updated;
+            });
+        } catch (error) {
+            console.error(error);
+            setError("Error al responder la PQR.");
+        }
+    };
+
+    useEffect(() => {
+        loadAllPqrs();
+    }, []);
+
+    if (loading) {
+        return (
+            <Box
+                sx={{
+                    minHeight: "300px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    return (
+        <Box sx={style.container}>
+            <Box sx={style.header}>
+                <Typography variant="h5" sx={style.title}>
+                    Todas las PQR
+                </Typography>
+
+                <Typography variant="body2" sx={style.subtitle}>
+                    Administra y revisa las peticiones, quejas, reclamos o solicitudes
+                    registradas por los usuarios.
+                </Typography>
+            </Box>
+
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
+            {success && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                    {success}
+                </Alert>
+            )}
+
+            {pqrs.length === 0 ? (
+                <Paper sx={style.empty}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        No hay PQR registradas
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary">
+                        Cuando los usuarios creen PQR, aparecerán en este espacio.
+                    </Typography>
+                </Paper>
+            ) : (
+                <Box sx={style.list}>
+                    {pqrs.map((pqr) => (
+                        <Paper key={pqr.id} sx={style.card}>
+                            <Box sx={style.cardHeader}>
+                                <Box>
+                                    <Typography variant="h6" sx={style.cardTitle}>
+                                        {pqr.title}
+                                    </Typography>
+
+                                    <Typography variant="body2" sx={style.date}>
+                                        Creada el {formatDate(pqr.createdAt)}
+                                    </Typography>
+                                </Box>
+
+                                <Chip
+                                    label={pqr.status.replace("_", " ")}
+                                    color={getStatusColor(pqr.status)}
+                                    size="small"
+                                    sx={{ fontWeight: 600 }}
+                                />
+                            </Box>
+
+                            <Typography variant="body2" sx={style.description}>
+                                {pqr.description}
+                            </Typography>
+
+                            <Box sx={style.userBox}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                    Usuario solicitante
+                                </Typography>
+
+                                <Typography variant="body2" color="text.secondary">
+                                    Nombre: {pqr.user?.name || "No disponible"}
+                                </Typography>
+
+                                <Typography variant="body2" color="text.secondary">
+                                    Correo: {pqr.user?.email || "No disponible"}
+                                </Typography>
+
+                                <Typography variant="body2" color="text.secondary">
+                                    Rol: {pqr.user?.role || "No disponible"}
+                                </Typography>
+                            </Box>
+                            <Box sx={style.actionsBox}>
+                                <FormControl size="small" sx={style.select}>
+                                    <InputLabel>Estado</InputLabel>
+
+                                    <Select
+                                        label="Estado"
+                                        value={statusChanges[pqr.id] || pqr.status}
+                                        onChange={(e) =>
+                                            handleStatusChange(pqr.id, e.target.value as PqrStatus)
+                                        }
+                                    >
+                                        <MenuItem value="PENDIENTE">PENDIENTE</MenuItem>
+                                        <MenuItem value="EN_PROCESO">EN PROCESO</MenuItem>
+                                        <MenuItem value="RESPONDIDA">RESPONDIDA</MenuItem>
+                                        <MenuItem value="CERRADA">CERRADA</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                <Button
+                                    variant="contained"
+                                    sx={style.button}
+                                    onClick={() => handleUpdateStatus(pqr.id)}
+                                >
+                                    Guardar estado
+                                </Button>
+                            </Box>
+                            {pqr.status !== "RESPONDIDA" && (
+                                <Box sx={style.responseForm}>
+                                    <TextField
+                                        label="Respuesta para el usuario"
+                                        placeholder="Escribe aquí la respuesta de la PQR..."
+                                        value={responseTexts[pqr.id] || ""}
+                                        onChange={(e) => handleResponseTextChange(pqr.id, e.target.value)}
+                                        fullWidth
+                                        multiline
+                                        minRows={3}
+                                    />
+
+                                    <Button
+                                        variant="outlined"
+                                        sx={style.responseButton}
+                                        onClick={() => handleRespondPqr(pqr.id)}
+                                    >
+                                        Responder PQR
+                                    </Button>
+                                </Box>
+                            )}
+
+                            {pqr.response && (
+                                <Box sx={style.responseBox}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{ fontWeight: 700, mb: 0.5 }}
+                                    >
+                                        Respuesta registrada
+                                    </Typography>
+
+                                    <Typography variant="body2">{pqr.response}</Typography>
+                                </Box>
+                            )}
+                        </Paper>
+                    ))}
+                </Box>
+            )}
+        </Box>
+    );
+};
+
+export default AdminPqrs;
