@@ -23,6 +23,8 @@ const AdminPqrs = () => {
     const [pqrs, setPqrs] = useState<Pqr[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [cardErrorMessage, setCardErrorMessage] = useState("");
+    const [cardErrorPqrId, setCardErrorPqrId] = useState<number | null>(null);
     const [successMessage, setSuccessMessage] = useState("");
     const [successPqrId, setSuccessPqrId] = useState<number | null>(null);
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
@@ -196,7 +198,8 @@ const AdminPqrs = () => {
         const newStatus = statusChanges[pqrId];
 
         if (!newStatus) {
-            setError("Debes seleccionar un estado antes de guardar.");
+            setCardErrorMessage("Debes seleccionar un estado antes de guardar.");
+            setCardErrorPqrId(pqrId);
             return;
         }
 
@@ -219,7 +222,8 @@ const AdminPqrs = () => {
             });
         } catch (error) {
             console.error(error);
-            setError("Error al actualizar el estado de la PQR.");
+            setCardErrorMessage("Error al actualizar el estado de la PQR.");
+            setCardErrorPqrId(pqrId);
         }
     };
 
@@ -234,12 +238,15 @@ const AdminPqrs = () => {
         const responseText = responseTexts[pqrId];
 
         if (!responseText || responseText.trim() === "") {
-            setError("Debes escribir una respuesta antes de enviarla.");
+            setCardErrorMessage("Debes escribir una respuesta antes de enviarla.");
+            setCardErrorPqrId(pqrId);
             return;
         }
 
         try {
             setError("");
+            setCardErrorMessage("");
+            setCardErrorPqrId(null);
             setSuccessMessage("");
             setSuccessPqrId(null);
 
@@ -257,10 +264,10 @@ const AdminPqrs = () => {
             });
         } catch (error) {
             console.error(error);
-            setError("Error al responder la PQR.");
+            setCardErrorMessage("Error al responder la PQR.");
+            setCardErrorPqrId(pqrId);
         }
     };
-
     useEffect(() => {
         loadAllPqrs();
     }, []);
@@ -396,6 +403,11 @@ const AdminPqrs = () => {
                                         multiline
                                         minRows={3}
                                     />
+                                    {cardErrorPqrId === pqr.id && cardErrorMessage && (
+                                        <Alert severity="error" sx={{ mb: 2 }}>
+                                            {cardErrorMessage}
+                                        </Alert>
+                                    )}
 
                                     <Button
                                         variant="outlined"
