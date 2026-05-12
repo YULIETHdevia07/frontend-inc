@@ -8,7 +8,13 @@ const DashboardLayout = () => {
   const [openSidebar, setOpenSidebar] = useState(true);
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        display: "flex",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
       <SidebarMenu openSidebar={openSidebar} />
 
       <Box
@@ -17,6 +23,7 @@ const DashboardLayout = () => {
           display: "flex",
           flexDirection: "column",
           backgroundColor: "background.default",
+          overflow: "hidden",
         }}
       >
         <Header
@@ -28,6 +35,7 @@ const DashboardLayout = () => {
           component="main"
           sx={{
             flex: 1,
+            overflowY: "auto",
             p: 3,
           }}
         >
