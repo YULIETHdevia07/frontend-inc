@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography, Link } from "@mui/material";
+import { Box, Button, TextField, Typography, Link, Alert } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
@@ -12,6 +12,7 @@ const Login = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const style = {
     container: {
@@ -79,6 +80,13 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    setErrorMessage("");
+
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       const response = await api.post("/users/login", {
         email,
@@ -92,7 +100,9 @@ const Login = () => {
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
-      alert("Error al iniciar sesión");
+      setErrorMessage(
+        "Correo o contraseña incorrectos."
+      );
     }
   };
 
@@ -126,6 +136,7 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
           sx={style.input}
           fullWidth
+          required
         />
 
         <TextField
@@ -135,13 +146,43 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           sx={style.input}
           fullWidth
+          required
         />
+
+        {errorMessage && (
+          <Alert
+            severity="error"
+            sx={{
+              width: "100%",
+              borderRadius: "10px",
+              fontSize: "0.9rem",
+              alignItems: "center",
+            }}
+          >
+            {errorMessage}
+          </Alert>
+        )}
 
         <Button type="submit" variant="contained" sx={style.button}>
           Iniciar sesión
         </Button>
 
         <Link sx={style.link}>¿Olvidaste tu contraseña?</Link>
+
+        <Typography
+          sx={{
+            fontSize: "0.9rem",
+            color: theme.palette.text.secondary,
+          }}
+        >
+          ¿No tienes una cuenta?{" "}
+          <Link
+            onClick={() => navigate("/register")}
+            sx={style.link}
+          >
+            Regístrate aquí
+          </Link>
+        </Typography>
       </Box>
     </Box>
   );
