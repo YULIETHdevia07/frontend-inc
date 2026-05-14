@@ -7,6 +7,8 @@ export interface CreatePqrData {
 
 export type PqrStatus = "PENDIENTE" | "EN_PROCESO" | "RESPONDIDA" | "CERRADA";
 
+export type PqrCaseType = "SAP" | "DANO_EQUIPO" | "INSTALACION" | "OTRO";
+
 export interface Pqr {
   id: number;
   caseType: string;

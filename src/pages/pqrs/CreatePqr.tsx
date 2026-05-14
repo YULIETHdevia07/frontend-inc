@@ -4,20 +4,14 @@ import {
     Alert,
     Box,
     Button,
-    FormControl,
-    FormHelperText,
-    IconButton,
-    InputLabel,
-    MenuItem,
     Paper,
-    Select,
     TextField,
     Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import { createPqr } from "../../services/pqrService";
 import { createPqrSchema } from "../../validations/pqrValidation";
+import ClearableSelect from "../../components/ClearableSelect";
 
 const CreatePqr = () => {
     const theme = useTheme();
@@ -199,37 +193,15 @@ const CreatePqr = () => {
 
 
                 <Box component="form" sx={style.form} onSubmit={handleCreatePqr}>
-                    <FormControl fullWidth required error={!!formErrors.caseType}>
-                        <InputLabel>Tipo de caso</InputLabel>
-
-                        <Select
-                            label="Tipo de caso"
-                            value={caseType}
-                            required
-                            onChange={(e) => handleInputChange("caseType", e.target.value)}
-                        >
-
-                            {pqrCaseTypes.map((type) => (
-                                <MenuItem key={type.value} value={type.value}>
-                                    {type.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        {caseType && (
-                            <IconButton
-                                size="small"
-                                onMouseDown={(e) => e.preventDefault()}
-                                onClick={() => handleInputChange("caseType", "")}
-                                sx={style.iconSelect}
-                            >
-                                <CloseIcon fontSize="small" />
-                            </IconButton>
-                        )}
-
-                        {formErrors.caseType && (
-                            <FormHelperText>{formErrors.caseType}</FormHelperText>
-                        )}
-                    </FormControl>
+                    <ClearableSelect
+                        label="Tipo de caso"
+                        value={caseType}
+                        required
+                        clearable
+                        options={pqrCaseTypes}
+                        error={formErrors.caseType}
+                        onChange={(value) => handleInputChange("caseType", value)}
+                    />
 
                     <TextField
                         label="Descripción"

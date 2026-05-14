@@ -7,10 +7,6 @@ import {
     CircularProgress,
     Paper,
     Button,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
     TextField,
     Typography,
 } from "@mui/material";
@@ -18,9 +14,29 @@ import { useTheme } from "@mui/material/styles";
 import type { Pqr, PqrStatus } from "../../services/pqrService";
 import { getAllPqrs, updatePqrStatus, respondPqr } from "../../services/pqrService";
 import { responsePqrSchema } from "../../validations/pqrValidation";
+import ClearableSelect from "../../components/ClearableSelect";
 
 const AdminPqrs = () => {
     const theme = useTheme();
+
+    const pqrStatusOptions = [
+        {
+            label: "PENDIENTE",
+            value: "PENDIENTE",
+        },
+        {
+            label: "EN PROCESO",
+            value: "EN_PROCESO",
+        },
+        {
+            label: "RESPONDIDA",
+            value: "RESPONDIDA",
+        },
+        {
+            label: "CERRADA",
+            value: "CERRADA",
+        },
+    ];
 
     const [pqrs, setPqrs] = useState<Pqr[]>([]);
     const [loading, setLoading] = useState(true);
@@ -123,10 +139,6 @@ const AdminPqrs = () => {
             flexWrap: "wrap",
         },
 
-        select: {
-            minWidth: "220px",
-        },
-
         button: {
             borderRadius: 2,
             fontWeight: 600,
@@ -190,11 +202,21 @@ const AdminPqrs = () => {
         }
     };
 
-    const handleStatusChange = (pqrId: number, status: PqrStatus) => {
-        setStatusChanges((prev) => ({
-            ...prev,
-            [pqrId]: status,
-        }));
+    const handleStatusChange = (pqrId: number, status: string) => {
+        setStatusChanges((prev) => {
+            const updated = { ...prev };
+
+            if (!status) {
+                delete updated[pqrId];
+                return updated;
+            }
+
+            updated[pqrId] = status as PqrStatus;
+            return updated;
+        });
+
+        setStatusErrorMessage("");
+        setStatusErrorPqrId(null);
     };
 
     const handleUpdateStatus = async (pqrId: number) => {
@@ -387,22 +409,20 @@ const AdminPqrs = () => {
                                 </Typography>
                             </Box>
                             <Box sx={style.actionsBox}>
-                                <FormControl size="small" sx={style.select}>
-                                    <InputLabel>Estado</InputLabel>
-
-                                    <Select
-                                        label="Estado"
-                                        value={statusChanges[pqr.id] || pqr.status}
-                                        onChange={(e) =>
-                                            handleStatusChange(pqr.id, e.target.value as PqrStatus)
-                                        }
-                                    >
-                                        <MenuItem value="PENDIENTE">PENDIENTE</MenuItem>
-                                        <MenuItem value="EN_PROCESO">EN PROCESO</MenuItem>
-                                        <MenuItem value="RESPONDIDA">RESPONDIDA</MenuItem>
-                                        <MenuItem value="CERRADA">CERRADA</MenuItem>
-                                    </Select>
-                                </FormControl>
+                                <ClearableSelect
+                                    label="Estado"
+                                    value={statusChanges[pqr.id] || pqr.status}
+                                    required
+                                    size="small"
+                                    minWidth="220px"
+                                    options={pqrStatusOptions}
+                                    error={
+                                        statusErrorPqrId === pqr.id
+                                            ? statusErrorMessage
+                                            : ""
+                                    }
+                                    onChange={(value) => handleStatusChange(pqr.id, value)}
+                                />
 
                                 <Button
                                     variant="contained"
