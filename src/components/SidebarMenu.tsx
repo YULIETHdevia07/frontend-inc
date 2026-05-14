@@ -20,9 +20,10 @@ import { menuItems } from "../data/menuItems";
 
 interface SidebarMenuProps {
     openSidebar: boolean;
+    onClose?: () => void;
 }
 
-const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
+const SidebarMenu = ({ openSidebar, onClose }: SidebarMenuProps) => {
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
@@ -33,13 +34,15 @@ const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
     const style = {
         container: {
             width: openSidebar ? "280px" : "76px",
-            minHeight: "100vh",
+            maxWidth: "100vw",
+            height: "100vh",
             backgroundColor: theme.palette.background.paper,
             color: theme.palette.text.primary,
             borderRight: `1px solid ${theme.palette.divider}`,
-            padding: "18px 10px",
+            padding: openSidebar ? "18px 10px" : "18px 8px",
             transition: "width 0.3s ease",
-            overflow: "hidden",
+            overflowX: "hidden",
+            overflowY: "auto",
             boxShadow: "3px 0 14px rgba(0,0,0,0.06)",
         },
 
@@ -56,6 +59,7 @@ const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
             borderRadius: "14px",
             padding: openSidebar ? "10px 12px" : "10px",
             justifyContent: openSidebar ? "flex-start" : "center",
+            overflow: "hidden",
             color: isModuleOpen
                 ? theme.palette.primary.main
                 : theme.palette.text.secondary,
@@ -78,10 +82,14 @@ const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
 
         moduleText: {
             marginLeft: "10px",
+            minWidth: 0,
+            overflow: "hidden",
             "& .MuiListItemText-primary": {
                 fontSize: "0.95rem",
                 fontWeight: 800,
                 whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
             },
         },
 
@@ -101,6 +109,7 @@ const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
             minHeight: 42,
             borderRadius: "12px",
             padding: "8px 10px",
+            overflow: "hidden",
             color: isSubmoduleOpen
                 ? theme.palette.primary.main
                 : theme.palette.text.secondary,
@@ -120,10 +129,14 @@ const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
         },
 
         submoduleText: {
+            minWidth: 0,
+            overflow: "hidden",
             "& .MuiListItemText-primary": {
                 fontSize: "0.88rem",
                 fontWeight: 700,
                 whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
             },
         },
 
@@ -137,6 +150,7 @@ const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
             borderRadius: "10px",
             padding: "7px 10px",
             marginBottom: "4px",
+            overflow: "hidden",
             color: isActive
                 ? theme.palette.primary.main
                 : theme.palette.text.secondary,
@@ -160,10 +174,14 @@ const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
         }),
 
         optionText: (isActive: boolean) => ({
+            minWidth: 0,
+            overflow: "hidden",
             "& .MuiListItemText-primary": {
                 fontSize: "0.84rem",
                 fontWeight: isActive ? 800 : 500,
                 whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
             },
         }),
 
@@ -279,7 +297,10 @@ const SidebarMenu = ({ openSidebar }: SidebarMenuProps) => {
                                                             return (
                                                                 <ListItemButton
                                                                     key={option.path}
-                                                                    onClick={() => navigate(option.path)}
+                                                                    onClick={() => {
+                                                                        navigate(option.path);
+                                                                        onClose?.();
+                                                                    }}
                                                                     sx={style.optionButton(isActive)}
                                                                 >
                                                                     <RadioButtonUncheckedIcon
