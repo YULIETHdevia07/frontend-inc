@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ValidationError } from "yup";
 import {
     Alert,
     Box,
@@ -16,6 +17,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import type { Pqr, PqrStatus } from "../../services/pqrService";
 import { getAllPqrs, updatePqrStatus, respondPqr } from "../../services/pqrService";
+import { responsePqrSchema } from "../../validations/pqrValidation";
 
 const AdminPqrs = () => {
     const theme = useTheme();
@@ -23,14 +25,15 @@ const AdminPqrs = () => {
     const [pqrs, setPqrs] = useState<Pqr[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [cardErrorMessage, setCardErrorMessage] = useState("");
-    const [cardErrorPqrId, setCardErrorPqrId] = useState<number | null>(null);
+    const [statusErrorMessage, setStatusErrorMessage] = useState("");
+    const [statusErrorPqrId, setStatusErrorPqrId] = useState<number | null>(null);
     const [successMessage, setSuccessMessage] = useState("");
     const [successPqrId, setSuccessPqrId] = useState<number | null>(null);
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
         {}
     );
     const [responseTexts, setResponseTexts] = useState<Record<number, string>>({});
+    const [responseErrors, setResponseErrors] = useState<Record<number, string>>({});
 
     const style = {
         container: {
@@ -198,13 +201,15 @@ const AdminPqrs = () => {
         const newStatus = statusChanges[pqrId];
 
         if (!newStatus) {
-            setCardErrorMessage("Debes seleccionar un estado antes de guardar.");
-            setCardErrorPqrId(pqrId);
+            setStatusErrorMessage("Debes seleccionar un estado antes de guardar.");
+            setStatusErrorPqrId(pqrId);
             return;
         }
 
         try {
             setError("");
+            setStatusErrorMessage("");
+            setStatusErrorPqrId(null);
             setSuccessMessage("");
             setSuccessPqrId(null);
 
@@ -222,8 +227,8 @@ const AdminPqrs = () => {
             });
         } catch (error) {
             console.error(error);
-            setCardErrorMessage("Error al actualizar el estado de la PQR.");
-            setCardErrorPqrId(pqrId);
+            setStatusErrorMessage("Error al actualizar el estado de la PQR.");
+            setStatusErrorPqrId(pqrId);
         }
     };
 
@@ -232,25 +237,29 @@ const AdminPqrs = () => {
             ...prev,
             [pqrId]: value,
         }));
+
+        setResponseErrors((prev) => ({
+            ...prev,
+            [pqrId]: "",
+        }));
     };
 
     const handleRespondPqr = async (pqrId: number) => {
-        const responseText = responseTexts[pqrId];
-
-        if (!responseText || responseText.trim() === "") {
-            setCardErrorMessage("Debes escribir una respuesta antes de enviarla.");
-            setCardErrorPqrId(pqrId);
-            return;
-        }
+        const responseText = responseTexts[pqrId] || "";
 
         try {
+            await responsePqrSchema.validate(responseText);
+
             setError("");
-            setCardErrorMessage("");
-            setCardErrorPqrId(null);
             setSuccessMessage("");
             setSuccessPqrId(null);
 
-            await respondPqr(pqrId, responseText);
+            setResponseErrors((prev) => ({
+                ...prev,
+                [pqrId]: "",
+            }));
+
+            await respondPqr(pqrId, responseText.trim());
 
             setSuccessMessage("PQR respondida correctamente.");
             setSuccessPqrId(pqrId);
@@ -262,12 +271,23 @@ const AdminPqrs = () => {
                 delete updated[pqrId];
                 return updated;
             });
-        } catch (error) {
+        } catch (error: unknown) {
+            if (error instanceof ValidationError) {
+                setResponseErrors((prev) => ({
+                    ...prev,
+                    [pqrId]: error.message,
+                }));
+                return;
+            }
+
             console.error(error);
-            setCardErrorMessage("Error al responder la PQR.");
-            setCardErrorPqrId(pqrId);
+            setResponseErrors((prev) => ({
+                ...prev,
+                [pqrId]: "Error al responder la PQR.",
+            }));
         }
     };
+
     useEffect(() => {
         loadAllPqrs();
     }, []);
@@ -329,7 +349,7 @@ const AdminPqrs = () => {
                             <Box sx={style.cardHeader}>
                                 <Box>
                                     <Typography variant="h6" sx={style.cardTitle}>
-                                        {pqr.title}
+                                        {pqr.caseType}
                                     </Typography>
 
                                     <Typography variant="body2" sx={style.date}>
@@ -391,6 +411,11 @@ const AdminPqrs = () => {
                                 >
                                     Guardar estado
                                 </Button>
+                                {statusErrorPqrId === pqr.id && statusErrorMessage && (
+                                    <Alert severity="error" sx={{ width: "100%", mt: 1 }}>
+                                        {statusErrorMessage}
+                                    </Alert>
+                                )}
                             </Box>
                             {pqr.status !== "RESPONDIDA" && (
                                 <Box sx={style.responseForm}>
@@ -402,13 +427,18 @@ const AdminPqrs = () => {
                                         fullWidth
                                         multiline
                                         minRows={3}
+                                        slotProps={{
+                                            htmlInput: {
+                                                maxLength: 500,
+                                            },
+                                        }}
+                                        error={!!responseErrors[pqr.id]}
+                                        helperText={
+                                            responseErrors[pqr.id]
+                                                ? responseErrors[pqr.id]
+                                                : `${responseTexts[pqr.id]?.length || 0}/500`
+                                        }
                                     />
-                                    {cardErrorPqrId === pqr.id && cardErrorMessage && (
-                                        <Alert severity="error" sx={{ mb: 2 }}>
-                                            {cardErrorMessage}
-                                        </Alert>
-                                    )}
-
                                     <Button
                                         variant="outlined"
                                         sx={style.responseButton}

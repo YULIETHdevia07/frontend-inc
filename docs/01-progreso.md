@@ -348,6 +348,30 @@ MainContent
 - Separación visual de contenido
 - Escalabilidad de vistas privadas
 
+---
+
+# 16. Instalación de Yup
+
+Se instaló Yup para manejar validaciones de formularios de manera estructurada y reutilizable dentro del frontend.
+
+### Dependencia instalada
+
+- yup
+
+### Comando ejecutado
+
+```bash
+npm install yup
+```
+
+### Funcionalidades implementadas
+
+- Validación de formularios
+- Validación de campos requeridos
+- Validación de longitud mínima y máxima
+- Validación de correos electrónicos
+- Manejo centralizado de reglas de validación
+- Preparación para integración con formularios React
 
 ---
  ## Documentación Frontend: Autenticación, Rutas Privadas y Layout Administrativo

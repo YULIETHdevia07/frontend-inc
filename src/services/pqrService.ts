@@ -1,7 +1,7 @@
 import api from "../api/axios";
 
 export interface CreatePqrData {
-  title: string;
+  caseType: string;
   description: string;
 }
 
@@ -9,7 +9,7 @@ export type PqrStatus = "PENDIENTE" | "EN_PROCESO" | "RESPONDIDA" | "CERRADA";
 
 export interface Pqr {
   id: number;
-  title: string;
+  caseType: string;
   description: string;
   status: PqrStatus;
   response: string | null;

@@ -111,6 +111,25 @@ const MyPqrs = () => {
         }
     };
 
+    const getCaseTypeLabel = (caseType: string) => {
+    switch (caseType) {
+        case "SAP":
+            return "SAP";
+
+        case "DANO_EQUIPO":
+            return "Daño de equipo";
+
+        case "INSTALACION":
+            return "Instalación";
+
+        case "OTRO":
+            return "Otro";
+
+        default:
+            return caseType;
+    }
+};
+
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString("es-CO", {
             year: "numeric",
@@ -189,7 +208,7 @@ const MyPqrs = () => {
                             <Box sx={style.cardHeader}>
                                 <Box>
                                     <Typography variant="h6" sx={style.cardTitle}>
-                                        {pqr.title}
+                                        {getCaseTypeLabel(pqr.caseType)}
                                     </Typography>
 
                                     <Typography variant="body2" sx={style.date}>
