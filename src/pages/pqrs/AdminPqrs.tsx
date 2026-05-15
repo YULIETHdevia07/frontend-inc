@@ -41,8 +41,6 @@ const AdminPqrs = () => {
     const [pqrs, setPqrs] = useState<Pqr[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [statusErrorMessage, setStatusErrorMessage] = useState("");
-    const [statusErrorPqrId, setStatusErrorPqrId] = useState<number | null>(null);
     const [successMessage, setSuccessMessage] = useState("");
     const [successPqrId, setSuccessPqrId] = useState<number | null>(null);
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
@@ -214,24 +212,17 @@ const AdminPqrs = () => {
             updated[pqrId] = status as PqrStatus;
             return updated;
         });
-
-        setStatusErrorMessage("");
-        setStatusErrorPqrId(null);
     };
 
     const handleUpdateStatus = async (pqrId: number) => {
         const newStatus = statusChanges[pqrId];
-
+        
         if (!newStatus) {
-            setStatusErrorMessage("Debes seleccionar un estado antes de guardar.");
-            setStatusErrorPqrId(pqrId);
             return;
         }
 
         try {
             setError("");
-            setStatusErrorMessage("");
-            setStatusErrorPqrId(null);
             setSuccessMessage("");
             setSuccessPqrId(null);
 
@@ -249,8 +240,6 @@ const AdminPqrs = () => {
             });
         } catch (error) {
             console.error(error);
-            setStatusErrorMessage("Error al actualizar el estado de la PQR.");
-            setStatusErrorPqrId(pqrId);
         }
     };
 
@@ -416,11 +405,6 @@ const AdminPqrs = () => {
                                     size="small"
                                     minWidth="220px"
                                     options={pqrStatusOptions}
-                                    error={
-                                        statusErrorPqrId === pqr.id
-                                            ? statusErrorMessage
-                                            : ""
-                                    }
                                     onChange={(value) => handleStatusChange(pqr.id, value)}
                                 />
 
@@ -431,11 +415,7 @@ const AdminPqrs = () => {
                                 >
                                     Guardar estado
                                 </Button>
-                                {statusErrorPqrId === pqr.id && statusErrorMessage && (
-                                    <Alert severity="error" sx={{ width: "100%", mt: 1 }}>
-                                        {statusErrorMessage}
-                                    </Alert>
-                                )}
+
                             </Box>
                             {pqr.status !== "RESPONDIDA" && (
                                 <Box sx={style.responseForm}>
