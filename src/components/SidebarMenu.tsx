@@ -17,6 +17,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ArticleIcon from "@mui/icons-material/Article";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { menuItems } from "../data/menuItems";
+import { useAuth } from "../context/AuthContext";
 
 interface SidebarMenuProps {
     openSidebar: boolean;
@@ -27,6 +28,9 @@ const SidebarMenu = ({ openSidebar, onClose }: SidebarMenuProps) => {
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
+    const { user } = useAuth();
+
+    const userRole = user?.role ?? "USER";
 
     const [openModules, setOpenModules] = useState<Record<string, boolean>>({});
     const [openSubmodules, setOpenSubmodules] = useState<Record<string, boolean>>({});
@@ -208,11 +212,33 @@ const SidebarMenu = ({ openSidebar, onClose }: SidebarMenuProps) => {
         }));
     };
 
+    // Verifica si el rol del usuario tiene permiso
+    const hasRole = (roles: string[]) => {
+        return roles.includes(userRole);
+    };
+
+    // Filtra el menú según el rol del usuario
+    const filteredMenuItems = menuItems
+        .filter((module) => hasRole(module.roles))
+        .map((module) => ({
+            ...module,
+            submodules: module.submodules
+                .filter((submodule) => hasRole(submodule.roles))
+                .map((submodule) => ({
+                    ...submodule,
+                    options: submodule.options.filter((option) =>
+                        hasRole(option.roles)
+                    ),
+                }))
+                .filter((submodule) => submodule.options.length > 0),
+        }))
+        .filter((module) => module.submodules.length > 0);
+
     return (
         <Box sx={style.container}>
 
             <List sx={style.list}>
-                {menuItems.map((module) => {
+                {filteredMenuItems.map((module) => {
                     const isModuleOpen = openModules[module.module];
 
                     return (
