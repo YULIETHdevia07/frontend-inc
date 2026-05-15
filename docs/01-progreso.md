@@ -106,11 +106,16 @@ src/
 ├── api/
 ├── components/
 ├── context/
+├── data/
 ├── hooks/
 ├── layouts/
 ├── pages/
 ├── routes/
+├── services/
 ├── styles/
+├── theme/
+├── utils/
+├── validations/
 │
 ├── App.tsx
 ├── main.tsx

@@ -8,8 +8,13 @@ import {
     Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import type { Pqr, PqrStatus } from "../../services/pqrService";
+import type { Pqr } from "../../services/pqrService";
 import { getMyPqrs } from "../../services/pqrService";
+import {
+    getStatusColor,
+    getCaseTypeLabel,
+    formatDate,
+} from "../../utils/pqrUtils";
 
 const MyPqrs = () => {
     const theme = useTheme();
@@ -92,52 +97,7 @@ const MyPqrs = () => {
         },
     };
 
-    const getStatusColor = (status: PqrStatus) => {
-        switch (status) {
-            case "PENDIENTE":
-                return "warning";
-
-            case "EN_PROCESO":
-                return "info";
-
-            case "RESPONDIDA":
-                return "success";
-
-            case "CERRADA":
-                return "default";
-
-            default:
-                return "default";
-        }
-    };
-
-    const getCaseTypeLabel = (caseType: string) => {
-    switch (caseType) {
-        case "SAP":
-            return "SAP";
-
-        case "DANO_EQUIPO":
-            return "Daño de equipo";
-
-        case "INSTALACION":
-            return "Instalación";
-
-        case "OTRO":
-            return "Otro";
-
-        default:
-            return caseType;
-    }
-};
-
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString("es-CO", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-    };
-
+    // Carga las PQR del usuario autenticado.
     const loadMyPqrs = async () => {
         try {
             setLoading(true);
@@ -154,6 +114,7 @@ const MyPqrs = () => {
         }
     };
 
+    // Carga las PQR al abrir la vista.
     useEffect(() => {
         loadMyPqrs();
     }, []);

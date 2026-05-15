@@ -15,28 +15,10 @@ import type { Pqr, PqrStatus } from "../../services/pqrService";
 import { getAllPqrs, updatePqrStatus, respondPqr } from "../../services/pqrService";
 import { responsePqrSchema } from "../../validations/pqrValidation";
 import ClearableSelect from "../../components/ClearableSelect";
+import { pqrStatusOptions, getStatusColor, formatDate, getCaseTypeLabel } from "../../utils/pqrUtils";
 
 const AdminPqrs = () => {
     const theme = useTheme();
-
-    const pqrStatusOptions = [
-        {
-            label: "PENDIENTE",
-            value: "PENDIENTE",
-        },
-        {
-            label: "EN PROCESO",
-            value: "EN_PROCESO",
-        },
-        {
-            label: "RESPONDIDA",
-            value: "RESPONDIDA",
-        },
-        {
-            label: "CERRADA",
-            value: "CERRADA",
-        },
-    ];
 
     const [pqrs, setPqrs] = useState<Pqr[]>([]);
     const [loading, setLoading] = useState(true);
@@ -157,33 +139,7 @@ const AdminPqrs = () => {
         },
     };
 
-    const getStatusColor = (status: PqrStatus) => {
-        switch (status) {
-            case "PENDIENTE":
-                return "warning";
-
-            case "EN_PROCESO":
-                return "info";
-
-            case "RESPONDIDA":
-                return "success";
-
-            case "CERRADA":
-                return "default";
-
-            default:
-                return "default";
-        }
-    };
-
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString("es-CO", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-    };
-
+    // Carga todas las PQR para el administrador.
     const loadAllPqrs = async () => {
         try {
             setLoading(true);
@@ -200,6 +156,7 @@ const AdminPqrs = () => {
         }
     };
 
+    // Guarda el estado seleccionado de una PQR.
     const handleStatusChange = (pqrId: number, status: string) => {
         setStatusChanges((prev) => {
             const updated = { ...prev };
@@ -214,9 +171,10 @@ const AdminPqrs = () => {
         });
     };
 
+    // Actualiza el estado de una PQR.
     const handleUpdateStatus = async (pqrId: number) => {
         const newStatus = statusChanges[pqrId];
-        
+
         if (!newStatus) {
             return;
         }
@@ -243,6 +201,7 @@ const AdminPqrs = () => {
         }
     };
 
+    // Guarda el texto escrito como respuesta.
     const handleResponseTextChange = (pqrId: number, value: string) => {
         setResponseTexts((prev) => ({
             ...prev,
@@ -255,6 +214,7 @@ const AdminPqrs = () => {
         }));
     };
 
+    // Valida y envía la respuesta de la PQR.
     const handleRespondPqr = async (pqrId: number) => {
         const responseText = responseTexts[pqrId] || "";
 
@@ -299,6 +259,7 @@ const AdminPqrs = () => {
         }
     };
 
+    // Carga las PQR al abrir la vista.
     useEffect(() => {
         loadAllPqrs();
     }, []);
@@ -360,7 +321,7 @@ const AdminPqrs = () => {
                             <Box sx={style.cardHeader}>
                                 <Box>
                                     <Typography variant="h6" sx={style.cardTitle}>
-                                        {pqr.caseType}
+                                        {getCaseTypeLabel(pqr.caseType)}
                                     </Typography>
 
                                     <Typography variant="body2" sx={style.date}>
