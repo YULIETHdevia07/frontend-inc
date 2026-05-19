@@ -16,8 +16,8 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ArticleIcon from "@mui/icons-material/Article";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import { menuItems } from "../data/menuItems";
-import { useAuth } from "../context/AuthContext";
+import { menuItems } from "../../data/menuItems";
+import { useAuth } from "../../context/AuthContext";
 
 interface SidebarMenuProps {
     openSidebar: boolean;

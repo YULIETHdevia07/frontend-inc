@@ -9,7 +9,7 @@ import {
     Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 import MenuIcon from "@mui/icons-material/Menu";

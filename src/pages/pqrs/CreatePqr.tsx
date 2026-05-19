@@ -11,7 +11,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { createPqr } from "../../services/pqrService";
 import { createPqrSchema } from "../../validations/pqrValidation";
-import ClearableSelect from "../../components/ClearableSelect";
+import ClearableSelect from "../../components/common/ClearableSelect";
 
 const CreatePqr = () => {
     const theme = useTheme();

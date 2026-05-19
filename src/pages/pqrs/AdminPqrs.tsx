@@ -14,7 +14,7 @@ import { useTheme } from "@mui/material/styles";
 import type { Pqr, PqrStatus } from "../../services/pqrService";
 import { getAllPqrs, updatePqrStatus, respondPqr } from "../../services/pqrService";
 import { responsePqrSchema } from "../../validations/pqrValidation";
-import ClearableSelect from "../../components/ClearableSelect";
+import ClearableSelect from "../../components/common/ClearableSelect";
 import { pqrStatusOptions, getStatusColor, formatDate, getCaseTypeLabel } from "../../utils/pqrUtils";
 
 const AdminPqrs = () => {

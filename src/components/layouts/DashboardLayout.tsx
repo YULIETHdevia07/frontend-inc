@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Box, Drawer, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import Header from "../components/Header";
-import SidebarMenu from "../components/SidebarMenu";
+import Header from "../common/Header";
+import SidebarMenu from "../common/SidebarMenu";
 import { Outlet } from "react-router-dom";
 
 const DashboardLayout = () => {
