@@ -8,6 +8,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import CreatePqr from "../pages/pqrs/CreatePqr";
 import MyPqrs from "../pages/pqrs/MyPqrs";
 import AdminPqrs from "../pages/pqrs/AdminPqrs";
+import AdminUsers from "../pages/user/AdminUsers";
 
 const AppRoutes = () => {
   return (
@@ -23,6 +24,8 @@ const AppRoutes = () => {
           <Route path="/dashboard/pqrs/my" element={<MyPqrs />} />
           <Route path="/dashboard/pqrs/create" element={<CreatePqr />} />
           <Route path="/dashboard/pqrs" element={<AdminPqrs />} />
+          {/* Usuario */}
+          <Route path="/users" element={<AdminUsers />} />
         </Route>
       </Route>
     </Routes>

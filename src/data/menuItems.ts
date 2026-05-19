@@ -42,13 +42,8 @@ export const menuItems = [
         roles: ["ADMIN"],
         options: [
           {
-            label: "Listar usuarios",
-            path: "/dashboard/users",
-            roles: ["ADMIN"],
-          },
-          {
-            label: "Crear usuario",
-            path: "/dashboard/users/create",
+            label: "Gestionar usuarios",
+            path: "/users",
             roles: ["ADMIN"],
           },
         ],

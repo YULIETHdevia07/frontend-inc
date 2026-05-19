@@ -238,7 +238,7 @@ const SidebarMenu = ({ openSidebar, onClose }: SidebarMenuProps) => {
         <Box sx={style.container}>
 
             <List sx={style.list}>
-                {filteredMenuItems.map((module) => {
+                {menuItems.map((module) => {
                     const isModuleOpen = openModules[module.module];
 
                     return (
