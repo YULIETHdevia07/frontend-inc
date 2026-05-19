@@ -5,6 +5,10 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  InputAdornment,
+  MenuItem,
+  Select,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -12,9 +16,12 @@ import {
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import type { User } from "../../interfaces/user.interface";
 
 import { useAdminUsers } from "../../hooks/useAdminUsers";
+import { userRoles } from "../../data/userRoles";
+import { getUserRoleLabel } from "../../utils/userRoleUtils";
 
 import PageHeader from "../../components/common/PageHeader";
 import LoadingBox from "../../components/common/LoadingBox";
@@ -32,15 +39,12 @@ const AdminUser = () => {
     loading,
     error,
     updatingUserId,
-
     selectedUser,
     selectedRole,
     openDialog,
-
     message,
     messageType,
     openMessage,
-
     loadUsers,
     openChangeRoleDialog,
     closeChangeRoleDialog,
@@ -53,12 +57,14 @@ const AdminUser = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // Cambia la página actual de la tabla
+  // Estado para búsqueda y filtro de rol
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("ALL");
+
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  // Cambia la cantidad de registros visibles por página
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -66,18 +72,34 @@ const AdminUser = () => {
     setPage(0);
   };
 
-  // Define las columnas de la tabla de usuarios
+  // Resetea la página al cambiar filtros para no quedar en una página vacía
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+    setPage(0);
+  };
+
+  const handleRoleFilterChange = (value: string) => {
+    setRoleFilter(value);
+    setPage(0);
+  };
+
+  // Filtra usuarios por nombre/correo y rol
+  const filteredUsers = users.filter((user) => {
+    const query = search.toLowerCase().trim();
+    const matchesSearch =
+      !query ||
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query);
+    const matchesRole = roleFilter === "ALL" || user.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
+
   const columns: DataTableColumn<User>[] = [
     {
       id: "number",
       label: "#",
       render: (_user, index) => (
-        <Typography
-          sx={{
-            color: "#64748b",
-            fontWeight: 700,
-          }}
-        >
+        <Typography sx={{ color: "#64748b", fontWeight: 700 }}>
           {index + 1}
         </Typography>
       ),
@@ -86,12 +108,7 @@ const AdminUser = () => {
       id: "name",
       label: "Nombre",
       render: (user) => (
-        <Typography
-          sx={{
-            fontWeight: 700,
-            color: "text.primary",
-          }}
-        >
+        <Typography sx={{ fontWeight: 700, color: "text.primary" }}>
           {user.name}
         </Typography>
       ),
@@ -121,9 +138,7 @@ const AdminUser = () => {
                 backgroundColor: "#eff6ff",
                 color: "primary.main",
                 borderRadius: "12px",
-                "&:hover": {
-                  backgroundColor: "#dbeafe",
-                },
+                "&:hover": { backgroundColor: "#dbeafe" },
               }}
             >
               <EditOutlinedIcon />
@@ -133,17 +148,10 @@ const AdminUser = () => {
     },
   ];
 
-  if (loading) {
-    return <LoadingBox />;
-  }
+  if (loading) return <LoadingBox />;
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        minHeight: "100%",
-      }}
-    >
+    <Box sx={{ width: "100%", minHeight: "100%" }}>
       <PageHeader
         title="Gestión de usuarios"
         subtitle="Administra los usuarios registrados y sus roles dentro del sistema."
@@ -172,9 +180,7 @@ const AdminUser = () => {
                   borderRadius: "12px",
                   backgroundColor: "#f1f5f9",
                   color: "#334155",
-                  "&:hover": {
-                    backgroundColor: "#e2e8f0",
-                  },
+                  "&:hover": { backgroundColor: "#e2e8f0" },
                 }}
               >
                 <RefreshOutlinedIcon />
@@ -184,21 +190,70 @@ const AdminUser = () => {
         }
       />
 
+      {/* Barra de búsqueda y filtro de rol */}
+      <Box
+        sx={{
+          display: "flex",
+          gap: "12px",
+          marginBottom: "16px",
+          flexWrap: "wrap",
+        }}
+      >
+        <TextField
+          placeholder="Buscar por nombre o correo..."
+          size="small"
+          value={search}
+          onChange={handleSearchChange}
+          sx={{ flex: 1, minWidth: "220px" }}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchOutlinedIcon sx={{ fontSize: 18, color: "#94a3b8" }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+
+        <Select
+          size="small"
+          value={roleFilter}
+          onChange={(e) => handleRoleFilterChange(e.target.value)}
+          sx={{ minWidth: "160px" }}
+        >
+          <MenuItem value="ALL">Todos los roles</MenuItem>
+          {userRoles.map((role) => (
+            <MenuItem key={role} value={role}>
+              {getUserRoleLabel(role)}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+
       {error && (
         <Alert severity="error" sx={{ marginBottom: "16px" }}>
           {error}
         </Alert>
       )}
 
-      {users.length === 0 ? (
+      {filteredUsers.length === 0 ? (
         <EmptyState
-          title="No hay usuarios registrados"
-          description="Cuando existan usuarios en el sistema, aparecerán en esta tabla."
+          title={
+            search || roleFilter !== "ALL"
+              ? "Sin resultados"
+              : "No hay usuarios registrados"
+          }
+          description={
+            search || roleFilter !== "ALL"
+              ? "Intenta con otro nombre, correo o rol."
+              : "Cuando existan usuarios en el sistema, aparecerán en esta tabla."
+          }
         />
       ) : (
         <DataTable
           columns={columns}
-          rows={users}
+          rows={filteredUsers}
           page={page}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}

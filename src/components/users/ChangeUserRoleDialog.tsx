@@ -1,5 +1,4 @@
 import {
-    Avatar,
     Box,
     Button,
     Dialog,
@@ -52,74 +51,79 @@ const ChangeUserRoleDialog = ({
             slotProps={{
                 paper: {
                     sx: {
-                        borderRadius: "22px",
-                        padding: "4px",
+                        borderRadius: "24px",
+                        padding: 0,
                     },
                 },
             }}
         >
             <DialogTitle
                 sx={{
-                    fontWeight: 800,
-                    paddingBottom: "8px",
+                    fontSize: "18px",
+                    fontWeight: 500,
+                    padding: "28px 28px 0",
+                    lineHeight: 1.3,
                 }}
             >
-                Cambiar rol de usuario
+                Cambiar rol
             </DialogTitle>
 
-            <DialogContent>
+            <DialogContent
+                sx={{
+                    padding: "24px 28px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "24px",
+                    "&.MuiDialogContent-root": {
+                        paddingTop: "24px",
+                    },
+                }}
+            >
                 {selectedUser && (
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "18px",
-                            marginTop: "8px",
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "12px",
-                                padding: "16px",
-                                borderRadius: "16px",
-                                backgroundColor: "#f8fafc",
-                                border: "1px solid #e5e7eb",
-                            }}
-                        >
-                            <Avatar
+                    <>
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                            <Typography
                                 sx={{
-                                    width: 36,
-                                    height: 36,
-                                    backgroundColor: "#e8f1ff",
-                                    color: "primary.main",
-                                    fontSize: "15px",
-                                    fontWeight: 700,
+                                    fontSize: "11px",
+                                    letterSpacing: "0.07em",
+                                    textTransform: "uppercase",
+                                    fontWeight: 500,
+                                    color: "text.disabled",
                                 }}
                             >
-                                {selectedUser.name.charAt(0).toUpperCase()}
-                            </Avatar>
+                                Usuario
+                            </Typography>
 
-                            <Box>
-                                <Typography sx={{ fontWeight: 800 }}>
-                                    {selectedUser.name}
-                                </Typography>
+                            <Typography
+                                sx={{
+                                    fontSize: "15px",
+                                    fontWeight: 500,
+                                    color: "text.primary",
+                                }}
+                            >
+                                {selectedUser.name}
+                            </Typography>
 
-                                <Typography variant="body2" color="text.secondary">
-                                    {selectedUser.email}
-                                </Typography>
-                            </Box>
+                            <Typography
+                                sx={{
+                                    fontSize: "13px",
+                                    color: "text.secondary",
+                                }}
+                            >
+                                {selectedUser.email}
+                            </Typography>
                         </Box>
 
                         <Divider />
 
                         <Box>
                             <Typography
-                                variant="body2"
                                 sx={{
-                                    color: "#64748b",
-                                    marginBottom: "8px",
+                                    fontSize: "11px",
+                                    letterSpacing: "0.07em",
+                                    textTransform: "uppercase",
+                                    fontWeight: 500,
+                                    color: "text.disabled",
                                 }}
                             >
                                 Rol actual
@@ -128,12 +132,14 @@ const ChangeUserRoleDialog = ({
                             <UserRoleChip role={selectedUser.role} />
                         </Box>
 
-                        <Box>
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             <Typography
-                                variant="body2"
                                 sx={{
-                                    color: "#64748b",
-                                    marginBottom: "8px",
+                                    fontSize: "11px",
+                                    letterSpacing: "0.07em",
+                                    textTransform: "uppercase",
+                                    fontWeight: 500,
+                                    color: "text.disabled",
                                 }}
                             >
                                 Nuevo rol
@@ -145,9 +151,12 @@ const ChangeUserRoleDialog = ({
                                 value={selectedRole}
                                 onChange={handleRoleChange}
                                 sx={{
-                                    minWidth: "170px",
-                                    backgroundColor: "background.paper",
-                                    borderRadius: "12px",
+                                    fontSize: "14px",
+                                    borderRadius: "8px",
+                                    backgroundColor: "action.hover",
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: "divider",
+                                    },
                                 }}
                             >
                                 {userRoles.map((role) => (
@@ -157,22 +166,28 @@ const ChangeUserRoleDialog = ({
                                 ))}
                             </Select>
                         </Box>
-                    </Box>
+                    </>
                 )}
             </DialogContent>
 
             <DialogActions
                 sx={{
-                    padding: "16px 24px 20px",
+                    padding: "0 28px 28px",
+                    gap: "10px",
                 }}
             >
                 <Button
                     onClick={onClose}
                     sx={{
+                        flex: 1,
                         textTransform: "none",
-                        borderRadius: "12px",
-                        fontWeight: 700,
-                        color: "#64748b",
+                        borderRadius: "8px",
+                        fontWeight: 500,
+                        fontSize: "13px",
+                        color: "text.secondary",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        padding: "10px",
                     }}
                 >
                     Cancelar
@@ -183,14 +198,18 @@ const ChangeUserRoleDialog = ({
                     onClick={onSave}
                     disabled={
                         !selectedUser ||
-                        selectedRole === selectedUser.role ||
-                        updatingUserId === selectedUser.id
+                        selectedRole === selectedUser?.role ||
+                        updatingUserId === selectedUser?.id
                     }
                     sx={{
+                        flex: 2,
                         textTransform: "none",
-                        borderRadius: "12px",
-                        fontWeight: 700,
+                        borderRadius: "8px",
+                        fontWeight: 500,
+                        fontSize: "13px",
+                        padding: "10px",
                         boxShadow: "none",
+                        "&:hover": { boxShadow: "none" },
                     }}
                 >
                     {updatingUserId === selectedUser?.id
