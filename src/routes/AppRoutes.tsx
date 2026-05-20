@@ -9,6 +9,7 @@ import CreatePqr from "../pages/pqrs/CreatePqr";
 import MyPqrs from "../pages/pqrs/MyPqrs";
 import AdminPqrs from "../pages/pqrs/AdminPqrs";
 import AdminUser from "../pages/user/AdminUser";
+import AgentPqrs from "../pages/agent/AgentPqrs";
 
 const AppRoutes = () => {
   return (
@@ -26,6 +27,8 @@ const AppRoutes = () => {
           <Route path="/dashboard/pqrs" element={<AdminPqrs />} />
           {/* Usuario */}
           <Route path="/users" element={<AdminUser />} />
+          {/* Agent */}
+          <Route path="/agent/pqrs" element={<AgentPqrs />} />
         </Route>
       </Route>
     </Routes>

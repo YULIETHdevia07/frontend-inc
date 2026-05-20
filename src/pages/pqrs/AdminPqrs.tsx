@@ -11,11 +11,12 @@ import {
     Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import type { Pqr, PqrStatus } from "../../services/pqrService";
+import type { Pqr, PqrStatus } from "../../interfaces/pqr.interface";
 import { getAllPqrs, updatePqrStatus, respondPqr } from "../../services/pqrService";
 import { responsePqrSchema } from "../../validations/pqrValidation";
 import ClearableSelect from "../../components/common/ClearableSelect";
 import { pqrStatusOptions, getStatusColor, formatDate, getCaseTypeLabel } from "../../utils/pqrUtils";
+import PageHeader from "../../components/common/PageHeader";
 
 const AdminPqrs = () => {
     const theme = useTheme();
@@ -34,20 +35,6 @@ const AdminPqrs = () => {
     const style = {
         container: {
             width: "100%",
-        },
-
-        header: {
-            mb: 3,
-        },
-
-        title: {
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-        },
-
-        subtitle: {
-            color: theme.palette.text.secondary,
-            mt: 0.5,
         },
 
         list: {
@@ -281,19 +268,13 @@ const AdminPqrs = () => {
 
     return (
         <Box sx={style.container}>
-            <Box sx={style.header}>
-                <Typography variant="h5" sx={style.title}>
-                    Todas las PQR
-                </Typography>
-
-                <Typography variant="body2" sx={style.subtitle}>
-                    Administra y revisa las peticiones, quejas, reclamos o solicitudes
-                    registradas por los usuarios.
-                </Typography>
-            </Box>
-
+            <PageHeader
+                title="Todas las PQR"
+                subtitle="Administra y revisa las peticiones, quejas, reclamos o solicitudes
+                    registradas por los usuarios."
+            />
             {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
+                <Alert severity="error" sx={{ marginBottom: "16px" }}>
                     {error}
                 </Alert>
             )}

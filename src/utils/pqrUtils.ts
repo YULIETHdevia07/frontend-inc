@@ -1,5 +1,5 @@
 import type { ChipProps } from "@mui/material";
-import type { PqrStatus } from "../services/pqrService";
+import type { PqrStatus } from "../interfaces/pqr.interface";
 
 // Opciones disponibles para los estados de una PQR.
 export const pqrStatusOptions = [

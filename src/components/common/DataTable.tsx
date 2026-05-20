@@ -150,10 +150,9 @@ const DataTable = <T,>({
                         {visibleRows.map((row, index) => (
                             <TableRow
                                 key={index}
-                                hover
                                 sx={{
                                     "&:hover": {
-                                        backgroundColor: "#f8fafc",
+                                        backgroundColor: "primary.light",
                                     },
                                 }}
                             >

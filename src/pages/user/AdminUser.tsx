@@ -5,6 +5,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  InputAdornment,
   Menu,
   MenuItem,
   Select,
@@ -27,7 +28,6 @@ import { useAdminUsers } from "../../hooks/useAdminUsers";
 import { userRoles } from "../../data/userRoles";
 import { getUserRoleLabel } from "../../utils/userRoleUtils";
 
-import PageHeader from "../../components/common/PageHeader";
 import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
 import CustomSnackbar from "../../components/common/CustomSnackbar";
@@ -236,7 +236,7 @@ const AdminUsers = () => {
           subtitle="Administra los usuarios registrados y sus roles dentro del sistema."
           actions={
             <>
-              {showSearch && (
+              {showSearch ? (
                 <TextField
                   placeholder="Buscar nombre o correo"
                   value={searchTerm}
@@ -246,35 +246,31 @@ const AdminUsers = () => {
                   sx={{
                     width: {
                       xs: "100%",
-                      sm: "260px",
+                      sm: "280px",
                     },
                     "& .MuiOutlinedInput-root": {
                       borderRadius: "12px",
                       backgroundColor: "#f8fafc",
                     },
                   }}
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchOutlinedIcon fontSize="small" />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton size="small" onClick={clearSearch}>
+                            <CloseOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
                 />
-              )}
-
-              {showSearch && searchTerm && (
-                <Tooltip title="Limpiar búsqueda">
-                  <IconButton
-                    onClick={clearSearch}
-                    sx={{
-                      borderRadius: "12px",
-                      backgroundColor: "#f1f5f9",
-                      color: "#334155",
-                      "&:hover": {
-                        backgroundColor: "#e2e8f0",
-                      },
-                    }}
-                  >
-                    <CloseOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-
-              {!showSearch && (
+              ) : (
                 <Tooltip title="Buscar usuario">
                   <IconButton
                     onClick={toggleSearch}
