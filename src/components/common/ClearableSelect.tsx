@@ -21,6 +21,7 @@ interface ClearableSelectProps {
     onChange: (value: string) => void;
     error?: string;
     required?: boolean;
+    disabled?: boolean;
     size?: "small" | "medium";
     minWidth?: string;
     placeholder?: string;
@@ -34,6 +35,7 @@ const ClearableSelect = ({
     onChange,
     error = "",
     required = false,
+    disabled = false,
     size = "medium",
     minWidth = "220px",
     placeholder,
@@ -45,6 +47,7 @@ const ClearableSelect = ({
         <FormControl
             fullWidth
             required={required}
+            disabled={disabled}
             error={!!error}
             size={size}
             sx={{
@@ -58,6 +61,7 @@ const ClearableSelect = ({
                 label={label}
                 value={value}
                 required={required}
+                disabled={disabled}
                 onChange={(e) => onChange(e.target.value)}
                 sx={{
                     pr: clearable && value ? 5 : 0,
@@ -74,9 +78,10 @@ const ClearableSelect = ({
                 ))}
             </Select>
 
-            {clearable && value && (
+            {clearable && value && !disabled && (
                 <IconButton
                     size="small"
+                    disabled={disabled}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => onChange("")}
                     sx={{

@@ -4,6 +4,7 @@ import {
     Button,
     Chip,
     CircularProgress,
+    Divider,
     FormControl,
     IconButton,
     InputAdornment,
@@ -24,6 +25,10 @@ import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 import type { PqrStatus } from "../../interfaces/pqr.interface";
 
@@ -176,6 +181,15 @@ const AgentPqrs = () => {
             backgroundColor: "#f8fafc",
         },
 
+        // list: {
+        //     display: "grid",
+        //     gridTemplateColumns: {
+        //         xs: "1fr",
+        //         lg: "1fr 1fr",
+        //     },
+        //     gap: 2.5,
+        //     alignItems: "start",
+        // },
         list: {
             display: "flex",
             flexDirection: "column",
@@ -185,12 +199,17 @@ const AgentPqrs = () => {
         card: {
             p: {
                 xs: 2,
-                md: 3,
+                md: 2.5,
             },
-            borderRadius: 3,
+            borderRadius: "22px",
             backgroundColor: theme.palette.background.paper,
-            boxShadow: "0 8px 30px rgba(15, 23, 42, 0.08)",
-            border: `1px solid ${theme.palette.primary.light}`,
+            boxShadow: "0 12px 35px rgba(15, 23, 42, 0.08)",
+            border: "1px solid #e5e7eb",
+            transition: "all 0.2s ease",
+            "&:hover": {
+                transform: "translateY(-2px)",
+                boxShadow: "0 18px 45px rgba(15, 23, 42, 0.12)",
+            },
         },
 
         cardHeader: {
@@ -198,16 +217,26 @@ const AgentPqrs = () => {
             justifyContent: "space-between",
             alignItems: "flex-start",
             gap: 2,
-            mb: 1,
-            flexDirection: {
-                xs: "column",
-                sm: "row",
-            },
+            mb: 1.5,
+        },
+
+        cardTitleBox: {
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
         },
 
         cardTitle: {
-            fontWeight: 700,
+            fontWeight: 600,
             color: theme.palette.text.primary,
+            lineHeight: 1.2,
+        },
+
+        dateBox: {
+            display: "flex",
+            alignItems: "center",
+            gap: 0.7,
+            color: theme.palette.text.secondary,
         },
 
         description: {
@@ -218,10 +247,25 @@ const AgentPqrs = () => {
 
         userBox: {
             mt: 2,
-            p: 2,
-            borderRadius: 2,
-            backgroundColor: theme.palette.background.default,
-            border: `1px solid ${theme.palette.primary.light}`,
+            p: 1.7,
+            borderRadius: "16px",
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            gap: 1.5,
+            alignItems: "flex-start",
+        },
+
+        userIconBox: {
+            width: 38,
+            height: 38,
+            minWidth: 38,
+            borderRadius: "12px",
+            backgroundColor: theme.palette.primary.light,
+            color: theme.palette.primary.main,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
         },
 
         responseBox: {
@@ -229,6 +273,15 @@ const AgentPqrs = () => {
             p: 2,
             borderRadius: 2,
             backgroundColor: theme.palette.primary.light,
+        },
+
+        responseTitle: {
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            fontWeight: 800,
+            mb: 0.8,
+            color: theme.palette.primary.dark,
         },
 
         date: {
@@ -286,6 +339,14 @@ const AgentPqrs = () => {
                 borderRadius: "12px",
                 backgroundColor: theme.palette.background.paper,
             },
+        },
+
+        responseButton: {
+            alignSelf: "flex-start",
+            borderRadius: "14px",
+            fontWeight: 800,
+            px: 3,
+            textTransform: "none",
         },
 
         helperError: {
@@ -460,14 +521,17 @@ const AgentPqrs = () => {
                     {filteredPqrs.map((pqr) => (
                         <Paper key={pqr.id} sx={style.card}>
                             <Box sx={style.cardHeader}>
-                                <Box>
+                                <Box sx={style.cardTitleBox}>
                                     <Typography variant="h6" sx={style.cardTitle}>
                                         {getCaseTypeLabel(pqr.caseType)}
                                     </Typography>
 
-                                    <Typography sx={style.date}>
-                                        Creada el {formatDate(pqr.createdAt)}
-                                    </Typography>
+                                    <Box sx={style.dateBox}>
+                                        <CalendarMonthOutlinedIcon fontSize="small" />
+                                        <Typography sx={style.date}>
+                                            Creada el {formatDate(pqr.createdAt)}
+                                        </Typography>
+                                    </Box>
                                 </Box>
 
                                 <Chip
@@ -481,29 +545,38 @@ const AgentPqrs = () => {
                                 />
                             </Box>
 
+                            <Divider />
+
                             <Typography sx={style.description}>
                                 {pqr.description}
                             </Typography>
 
                             {/* Información del usuario solicitante */}
                             <Box sx={style.userBox}>
-                                <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                    Usuario solicitante
-                                </Typography>
+                                <Box sx={style.userIconBox}>
+                                    <PersonOutlineOutlinedIcon fontSize="small" />
+                                </Box>
 
-                                <Typography variant="body2" color="text.secondary">
-                                    {pqr.user?.name || "Usuario no disponible"}
-                                </Typography>
+                                <Box>
+                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>
+                                        Usuario solicitante
+                                    </Typography>
 
-                                <Typography variant="body2" color="text.secondary">
-                                    {pqr.user?.email || "Correo no disponible"}
-                                </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {pqr.user?.name || "Usuario no disponible"}
+                                    </Typography>
+
+                                    <Typography variant="body2" color="text.secondary">
+                                        {pqr.user?.email || "Correo no disponible"}
+                                    </Typography>
+                                </Box>
                             </Box>
 
                             {/* Muestra la respuesta actual si la PQR ya fue respondida */}
                             {activeView === "ASSIGNED" && pqr.response && (
                                 <Box sx={style.responseBox}>
-                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                    <Typography variant="subtitle2" sx={style.responseTitle}>
+                                        <QuestionAnswerOutlinedIcon fontSize="small" />
                                         Respuesta actual
                                     </Typography>
 
@@ -559,16 +632,16 @@ const AgentPqrs = () => {
                                     </Box>
 
                                     <Box sx={style.responseForm}>
-                                        <Typography variant="body2" sx={style.fieldLabel}>
-                                            Responder PQR
-                                        </Typography>
                                         <TextField
+                                            label="Responder PQR"
+                                            placeholder="Escribe la respuesta para el usuario..."
+                                            value={responseTexts[pqr.id] || ""}
+                                            onChange={(event) =>
+                                                handleResponseChange(pqr.id, event.target.value)
+                                            }
                                             fullWidth
                                             multiline
                                             minRows={3}
-                                            placeholder="Escribe la respuesta para el usuario..."
-                                            value={responseTexts[pqr.id] || ""}
-                                            onChange={(event) => handleResponseChange(pqr.id, event.target.value)}
                                             sx={style.responseInput}
                                             slotProps={{
                                                 htmlInput: {
@@ -584,13 +657,11 @@ const AgentPqrs = () => {
                                         />
 
                                         <Button
-                                            variant="contained"
+                                            variant="outlined"
                                             disabled={respondingPqrId === pqr.id}
                                             onClick={() => handleRespondPqr(pqr.id)}
-                                            sx={{
-                                                ...style.button,
-                                                mt: 1.5,
-                                            }}
+                                            startIcon={<SendOutlinedIcon />}
+                                            sx={style.responseButton}
                                         >
                                             {respondingPqrId === pqr.id ? (
                                                 <CircularProgress size={20} color="inherit" />

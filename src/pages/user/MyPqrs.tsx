@@ -2,16 +2,21 @@ import {
     Alert,
     Box,
     Chip,
+    Divider,
     Paper,
     Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+
+import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 
 import { useMyPqrs } from "../../hooks/useMyPqrs";
 import {
     formatDate,
     getCaseTypeLabel,
     getStatusColor,
+    pqrStatusOptions,
 } from "../../utils/pqrUtils";
 
 import PageHeader from "../../components/common/PageHeader";
@@ -40,11 +45,19 @@ const MyPqrs = () => {
         },
 
         card: {
-            p: 3,
-            borderRadius: 3,
+            p: {
+                xs: 2,
+                md: 2.5,
+            },
+            borderRadius: "22px",
             backgroundColor: theme.palette.background.paper,
-            boxShadow: "0 8px 30px rgba(15, 23, 42, 0.08)",
-            border: `1px solid ${theme.palette.primary.light}`,
+            boxShadow: "0 12px 35px rgba(15, 23, 42, 0.08)",
+            border: "1px solid #e5e7eb",
+            transition: "all 0.2s ease",
+            "&:hover": {
+                transform: "translateY(-2px)",
+                boxShadow: "0 18px 45px rgba(15, 23, 42, 0.12)",
+            },
         },
 
         cardHeader: {
@@ -59,9 +72,23 @@ const MyPqrs = () => {
             },
         },
 
+        cardTitleBox: {
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+        },
+
         cardTitle: {
-            fontWeight: 700,
+            fontWeight: 600,
             color: theme.palette.text.primary,
+            lineHeight: 1.2,
+        },
+
+        dateBox: {
+            display: "flex",
+            alignItems: "center",
+            gap: 0.7,
+            color: theme.palette.text.secondary,
         },
 
         description: {
@@ -71,10 +98,20 @@ const MyPqrs = () => {
         },
 
         responseBox: {
-            mt: 2,
+            mt: 2.5,
             p: 2,
-            borderRadius: 2,
+            borderRadius: 3,
             backgroundColor: theme.palette.primary.light,
+            // border: `1px solid ${theme.palette.primary.main}`,
+        },
+
+        responseTitle: {
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            fontWeight: 800,
+            mb: 0.8,
+            color: theme.palette.primary.dark,
         },
 
         date: {
@@ -110,48 +147,60 @@ const MyPqrs = () => {
                 />
             ) : (
                 <Box sx={style.list}>
-                    {pqrs.map((pqr) => (
-                        <Paper key={pqr.id} sx={style.card}>
-                            <Box sx={style.cardHeader}>
-                                <Box>
-                                    <Typography variant="h6" sx={style.cardTitle}>
-                                        {getCaseTypeLabel(pqr.caseType)}
-                                    </Typography>
+                    {pqrs.map((pqr) => {
+                        const currentStatusLabel =
+                            pqrStatusOptions.find(
+                                (option) => option.value === pqr.status
+                            )?.label || pqr.status;
+                        return (
+                            <Paper key={pqr.id} sx={style.card}>
+                                <Box sx={style.cardHeader}>
+                                    <Box sx={style.cardTitleBox}>
+                                        <Typography variant="h6" sx={style.cardTitle}>
+                                            {getCaseTypeLabel(pqr.caseType)}
+                                        </Typography>
 
-                                    <Typography variant="body2" sx={style.date}>
-                                        Creada el {formatDate(pqr.createdAt)}
-                                    </Typography>
+                                        <Box sx={style.dateBox}>
+                                            <CalendarMonthOutlinedIcon fontSize="small" />
+                                            <Typography variant="body2" sx={style.date}>
+                                                Creada el {formatDate(pqr.createdAt)}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+
+                                    <Chip
+                                        label={currentStatusLabel}
+                                        color={getStatusColor(pqr.status)}
+                                        size="small"
+                                        sx={{ fontWeight: 700 }}
+                                    />
                                 </Box>
 
-                                <Chip
-                                    label={pqr.status.replace("_", " ")}
-                                    color={getStatusColor(pqr.status)}
-                                    size="small"
-                                    sx={{ fontWeight: 600 }}
-                                />
-                            </Box>
+                                <Divider />
 
-                            <Typography variant="body2" sx={style.description}>
-                                {pqr.description}
-                            </Typography>
+                                <Typography variant="body2" sx={style.description}>
+                                    {pqr.description}
+                                </Typography>
 
-                            {/* Respuesta registrada por ADMIN o AGENT */}
-                            {pqr.response && (
-                                <Box sx={style.responseBox}>
-                                    <Typography
-                                        variant="subtitle2"
-                                        sx={{ fontWeight: 700, mb: 0.5 }}
-                                    >
-                                        Respuesta recibida
-                                    </Typography>
+                                {/* Respuesta registrada por ADMIN o AGENT */}
+                                {pqr.response && (
+                                    <Box sx={style.responseBox}>
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={style.responseTitle}
+                                        >
+                                            <QuestionAnswerOutlinedIcon fontSize="small" />
+                                            Respuesta recibida
+                                        </Typography>
 
-                                    <Typography variant="body2">
-                                        {pqr.response}
-                                    </Typography>
-                                </Box>
-                            )}
-                        </Paper>
-                    ))}
+                                        <Typography variant="body2" color="text.secondary">
+                                            {pqr.response}
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </Paper>
+                        )
+                    })}
                 </Box>
             )}
         </Box>
