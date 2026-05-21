@@ -562,24 +562,26 @@ const AgentPqrs = () => {
                                         <Typography variant="body2" sx={style.fieldLabel}>
                                             Responder PQR
                                         </Typography>
-
                                         <TextField
                                             fullWidth
                                             multiline
                                             minRows={3}
                                             placeholder="Escribe la respuesta para el usuario..."
                                             value={responseTexts[pqr.id] || ""}
-                                            onChange={(event) =>
-                                                handleResponseChange(pqr.id, event.target.value)
-                                            }
+                                            onChange={(event) => handleResponseChange(pqr.id, event.target.value)}
                                             sx={style.responseInput}
+                                            slotProps={{
+                                                htmlInput: {
+                                                    maxLength: 500,
+                                                },
+                                            }}
+                                            error={!!responseErrors[pqr.id]}
+                                            helperText={
+                                                responseErrors[pqr.id]
+                                                    ? responseErrors[pqr.id]
+                                                    : `${responseTexts[pqr.id]?.length || 0}/500`
+                                            }
                                         />
-
-                                        {responseErrors[pqr.id] && (
-                                            <Typography sx={style.helperError}>
-                                                {responseErrors[pqr.id]}
-                                            </Typography>
-                                        )}
 
                                         <Button
                                             variant="contained"

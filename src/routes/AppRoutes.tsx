@@ -5,10 +5,10 @@ import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
 import PrivateRoute from "./PrivateRoute";
 import DashboardLayout from "../components/layouts/DashboardLayout";
-import CreatePqr from "../pages/pqrs/CreatePqr";
-import MyPqrs from "../pages/pqrs/MyPqrs";
-import AdminPqrs from "../pages/pqrs/AdminPqrs";
-import AdminUser from "../pages/user/AdminUser";
+import CreatePqr from "../pages/user/CreatePqr";
+import MyPqrs from "../pages/user/MyPqrs";
+import AdminPqrs from "../pages/admin/AdminPqrs";
+import AdminUser from "../pages/admin/AdminUser";
 import AgentPqrs from "../pages/agent/AgentPqrs";
 
 const AppRoutes = () => {

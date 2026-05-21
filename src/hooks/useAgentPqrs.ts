@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ValidationError } from "yup";
 import type {
     AgentPqrView,
     MessageType,
@@ -12,6 +13,7 @@ import {
     takePqr,
     updatePqrStatus,
 } from "../services/pqrService";
+import { responsePqrSchema } from "../validations/pqrValidation";
 
 // Obtiene un mensaje de error seguro desde una respuesta del backend.
 const getErrorMessage = (error: unknown, defaultMessage: string) => {
@@ -210,23 +212,21 @@ export const useAgentPqrs = () => {
         }));
     };
 
-    // Envía la respuesta escrita para una PQR asignada.
+    // Valida con Yup y envía la respuesta de una PQR asignada.
     const handleRespondPqr = async (pqrId: number) => {
+        const responseText = responseTexts[pqrId] || "";
+
         try {
-            const responseText = responseTexts[pqrId]?.trim();
+            await responsePqrSchema.validate(responseText);
 
-            if (!responseText) {
-                setResponseErrors((prev) => ({
-                    ...prev,
-                    [pqrId]: "Debes escribir una respuesta antes de enviarla.",
-                }));
-
-                return;
-            }
+            setResponseErrors((prev) => ({
+                ...prev,
+                [pqrId]: "",
+            }));
 
             setRespondingPqrId(pqrId);
 
-            const response = await respondPqr(pqrId, responseText);
+            const response = await respondPqr(pqrId, responseText.trim());
 
             // Actualiza la PQR respondida dentro de la lista de asignadas.
             setAssignedPqrs((prev) =>
@@ -242,12 +242,21 @@ export const useAgentPqrs = () => {
 
             showSnackbar(response.message || "Respuesta enviada correctamente.");
         } catch (error) {
+            if (error instanceof ValidationError) {
+                setResponseErrors((prev) => ({
+                    ...prev,
+                    [pqrId]: error.message,
+                }));
+
+                return;
+            }
+
             console.error(error);
 
-            showSnackbar(
-                getErrorMessage(error, "Error al responder la PQR."),
-                "error"
-            );
+            setResponseErrors((prev) => ({
+                ...prev,
+                [pqrId]: getErrorMessage(error, "Error al responder la PQR."),
+            }));
         } finally {
             setRespondingPqrId(null);
         }

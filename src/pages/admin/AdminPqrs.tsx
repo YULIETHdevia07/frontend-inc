@@ -1,36 +1,48 @@
-import { useEffect, useState } from "react";
-import { ValidationError } from "yup";
 import {
     Alert,
     Box,
-    Chip,
-    CircularProgress,
-    Paper,
     Button,
+    Chip,
+    Paper,
     TextField,
     Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import type { Pqr, PqrStatus } from "../../interfaces/pqr.interface";
-import { getAllPqrs, updatePqrStatus, respondPqr } from "../../services/pqrService";
-import { responsePqrSchema } from "../../validations/pqrValidation";
-import ClearableSelect from "../../components/common/ClearableSelect";
-import { pqrStatusOptions, getStatusColor, formatDate, getCaseTypeLabel } from "../../utils/pqrUtils";
-import PageHeader from "../../components/common/PageHeader";
 
+import { useAdminPqrs } from "../../hooks/useAdminPqrs";
+import {
+    formatDate,
+    getCaseTypeLabel,
+    getStatusColor,
+    pqrStatusOptions,
+} from "../../utils/pqrUtils";
+
+import PageHeader from "../../components/common/PageHeader";
+import LoadingBox from "../../components/common/LoadingBox";
+import EmptyState from "../../components/common/EmptyState";
+import ClearableSelect from "../../components/common/ClearableSelect";
+
+// Página administrativa para consultar, responder y cambiar estados de PQR.
 const AdminPqrs = () => {
     const theme = useTheme();
 
-    const [pqrs, setPqrs] = useState<Pqr[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
-    const [successPqrId, setSuccessPqrId] = useState<number | null>(null);
-    const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
-        {}
-    );
-    const [responseTexts, setResponseTexts] = useState<Record<number, string>>({});
-    const [responseErrors, setResponseErrors] = useState<Record<number, string>>({});
+    const {
+        pqrs,
+        loading,
+        error,
+
+        successMessage,
+        successPqrId,
+
+        statusChanges,
+        responseTexts,
+        responseErrors,
+
+        handleStatusChange,
+        handleUpdateStatus,
+        handleResponseTextChange,
+        handleRespondPqr,
+    } = useAdminPqrs();
 
     const style = {
         container: {
@@ -91,13 +103,6 @@ const AdminPqrs = () => {
             fontSize: "0.85rem",
         },
 
-        empty: {
-            p: 4,
-            borderRadius: 3,
-            textAlign: "center",
-            backgroundColor: theme.palette.background.paper,
-            boxShadow: "0 8px 30px rgba(15, 23, 42, 0.08)",
-        },
         actionsBox: {
             mt: 2,
             display: "flex",
@@ -110,7 +115,9 @@ const AdminPqrs = () => {
             borderRadius: 2,
             fontWeight: 600,
             px: 3,
+            textTransform: "none",
         },
+
         responseForm: {
             mt: 2,
             display: "flex",
@@ -123,156 +130,21 @@ const AdminPqrs = () => {
             borderRadius: 2,
             fontWeight: 600,
             px: 3,
+            textTransform: "none",
         },
     };
 
-    // Carga todas las PQR para el administrador.
-    const loadAllPqrs = async () => {
-        try {
-            setLoading(true);
-            setError("");
-
-            const response = await getAllPqrs();
-
-            setPqrs(response.pqrs);
-        } catch (error) {
-            console.error(error);
-            setError("Error al cargar las PQR. Verifica que el usuario tenga rol ADMIN.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Guarda el estado seleccionado de una PQR.
-    const handleStatusChange = (pqrId: number, status: string) => {
-        setStatusChanges((prev) => {
-            const updated = { ...prev };
-
-            if (!status) {
-                delete updated[pqrId];
-                return updated;
-            }
-
-            updated[pqrId] = status as PqrStatus;
-            return updated;
-        });
-    };
-
-    // Actualiza el estado de una PQR.
-    const handleUpdateStatus = async (pqrId: number) => {
-        const newStatus = statusChanges[pqrId];
-
-        if (!newStatus) {
-            return;
-        }
-
-        try {
-            setError("");
-            setSuccessMessage("");
-            setSuccessPqrId(null);
-
-            await updatePqrStatus(pqrId, newStatus);
-
-            setSuccessMessage("Estado actualizado correctamente.");
-            setSuccessPqrId(pqrId);
-
-            await loadAllPqrs();
-
-            setStatusChanges((prev) => {
-                const updated = { ...prev };
-                delete updated[pqrId];
-                return updated;
-            });
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    // Guarda el texto escrito como respuesta.
-    const handleResponseTextChange = (pqrId: number, value: string) => {
-        setResponseTexts((prev) => ({
-            ...prev,
-            [pqrId]: value,
-        }));
-
-        setResponseErrors((prev) => ({
-            ...prev,
-            [pqrId]: "",
-        }));
-    };
-
-    // Valida y envía la respuesta de la PQR.
-    const handleRespondPqr = async (pqrId: number) => {
-        const responseText = responseTexts[pqrId] || "";
-
-        try {
-            await responsePqrSchema.validate(responseText);
-
-            setError("");
-            setSuccessMessage("");
-            setSuccessPqrId(null);
-
-            setResponseErrors((prev) => ({
-                ...prev,
-                [pqrId]: "",
-            }));
-
-            await respondPqr(pqrId, responseText.trim());
-
-            setSuccessMessage("PQR respondida correctamente.");
-            setSuccessPqrId(pqrId);
-
-            await loadAllPqrs();
-
-            setResponseTexts((prev) => {
-                const updated = { ...prev };
-                delete updated[pqrId];
-                return updated;
-            });
-        } catch (error: unknown) {
-            if (error instanceof ValidationError) {
-                setResponseErrors((prev) => ({
-                    ...prev,
-                    [pqrId]: error.message,
-                }));
-                return;
-            }
-
-            console.error(error);
-            setResponseErrors((prev) => ({
-                ...prev,
-                [pqrId]: "Error al responder la PQR.",
-            }));
-        }
-    };
-
-    // Carga las PQR al abrir la vista.
-    useEffect(() => {
-        loadAllPqrs();
-    }, []);
-
     if (loading) {
-        return (
-            <Box
-                sx={{
-                    minHeight: "300px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
+        return <LoadingBox />;
     }
 
     return (
         <Box sx={style.container}>
             <PageHeader
                 title="Todas las PQR"
-                subtitle="Administra y revisa las peticiones, quejas, reclamos o solicitudes
-                    registradas por los usuarios."
+                subtitle="Administra y revisa las peticiones, quejas, reclamos o solicitudes registradas por los usuarios."
             />
+
             {error && (
                 <Alert severity="error" sx={{ marginBottom: "16px" }}>
                     {error}
@@ -280,15 +152,10 @@ const AdminPqrs = () => {
             )}
 
             {pqrs.length === 0 ? (
-                <Paper sx={style.empty}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                        No hay PQR registradas
-                    </Typography>
-
-                    <Typography variant="body2" color="text.secondary">
-                        Cuando los usuarios creen PQR, aparecerán en este espacio.
-                    </Typography>
-                </Paper>
+                <EmptyState
+                    title="No hay PQR registradas"
+                    description="Cuando los usuarios creen PQR, aparecerán en este espacio."
+                />
             ) : (
                 <Box sx={style.list}>
                     {pqrs.map((pqr) => (
@@ -339,6 +206,23 @@ const AdminPqrs = () => {
                                     Rol: {pqr.user?.role || "No disponible"}
                                 </Typography>
                             </Box>
+
+                            {pqr.response && (
+                                <Box sx={style.responseBox}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{
+                                            fontWeight: 700,
+                                            mb: 0.5,
+                                        }}
+                                    >
+                                        Respuesta registrada
+                                    </Typography>
+
+                                    <Typography variant="body2">{pqr.response}</Typography>
+                                </Box>
+                            )}
+
                             <Box sx={style.actionsBox}>
                                 <ClearableSelect
                                     label="Estado"
@@ -357,15 +241,17 @@ const AdminPqrs = () => {
                                 >
                                     Guardar estado
                                 </Button>
-
                             </Box>
-                            {pqr.status !== "RESPONDIDA" && (
+
+                            {pqr.status !== "CERRADA" && (
                                 <Box sx={style.responseForm}>
                                     <TextField
                                         label="Respuesta para el usuario"
                                         placeholder="Escribe aquí la respuesta de la PQR..."
                                         value={responseTexts[pqr.id] || ""}
-                                        onChange={(e) => handleResponseTextChange(pqr.id, e.target.value)}
+                                        onChange={(event) =>
+                                            handleResponseTextChange(pqr.id, event.target.value)
+                                        }
                                         fullWidth
                                         multiline
                                         minRows={3}
@@ -381,6 +267,7 @@ const AdminPqrs = () => {
                                                 : `${responseTexts[pqr.id]?.length || 0}/500`
                                         }
                                     />
+
                                     <Button
                                         variant="outlined"
                                         sx={style.responseButton}
@@ -388,19 +275,6 @@ const AdminPqrs = () => {
                                     >
                                         Responder PQR
                                     </Button>
-                                </Box>
-                            )}
-
-                            {pqr.response && (
-                                <Box sx={style.responseBox}>
-                                    <Typography
-                                        variant="subtitle2"
-                                        sx={{ fontWeight: 700, mb: 0.5 }}
-                                    >
-                                        Respuesta registrada
-                                    </Typography>
-
-                                    <Typography variant="body2">{pqr.response}</Typography>
                                 </Box>
                             )}
                         </Paper>

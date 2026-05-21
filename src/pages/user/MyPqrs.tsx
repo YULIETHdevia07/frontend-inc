@@ -1,45 +1,36 @@
-import { useEffect, useState } from "react";
 import {
     Alert,
     Box,
     Chip,
-    CircularProgress,
     Paper,
     Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import type { Pqr } from "../../services/pqrService";
-import { getMyPqrs } from "../../services/pqrService";
+
+import { useMyPqrs } from "../../hooks/useMyPqrs";
 import {
-    getStatusColor,
-    getCaseTypeLabel,
     formatDate,
+    getCaseTypeLabel,
+    getStatusColor,
 } from "../../utils/pqrUtils";
 
+import PageHeader from "../../components/common/PageHeader";
+import LoadingBox from "../../components/common/LoadingBox";
+import EmptyState from "../../components/common/EmptyState";
+
+// Página donde el usuario consulta las PQR que ha creado.
 const MyPqrs = () => {
     const theme = useTheme();
 
-    const [pqrs, setPqrs] = useState<Pqr[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const {
+        pqrs,
+        loading,
+        error,
+    } = useMyPqrs();
 
     const style = {
         container: {
             width: "100%",
-        },
-
-        header: {
-            mb: 3,
-        },
-
-        title: {
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-        },
-
-        subtitle: {
-            color: theme.palette.text.secondary,
-            mt: 0.5,
         },
 
         list: {
@@ -62,6 +53,10 @@ const MyPqrs = () => {
             alignItems: "flex-start",
             gap: 2,
             mb: 1,
+            flexDirection: {
+                xs: "column",
+                sm: "row",
+            },
         },
 
         cardTitle: {
@@ -83,85 +78,36 @@ const MyPqrs = () => {
         },
 
         date: {
-            mt: 2,
+            mt: 1,
             color: theme.palette.text.secondary,
             fontSize: "0.85rem",
         },
-
-        empty: {
-            p: 4,
-            borderRadius: 3,
-            textAlign: "center",
-            backgroundColor: theme.palette.background.paper,
-            boxShadow: "0 8px 30px rgba(15, 23, 42, 0.08)",
-        },
     };
-
-    // Carga las PQR del usuario autenticado.
-    const loadMyPqrs = async () => {
-        try {
-            setLoading(true);
-            setError("");
-
-            const response = await getMyPqrs();
-
-            setPqrs(response.pqrs);
-        } catch (error) {
-            console.error(error);
-            setError("Error al cargar las PQR.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Carga las PQR al abrir la vista.
-    useEffect(() => {
-        loadMyPqrs();
-    }, []);
 
     if (loading) {
-        return (
-            <Box
-                sx={{
-                    minHeight: "300px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
+        return <LoadingBox />;
     }
 
     return (
         <Box sx={style.container}>
-            <Box sx={style.header}>
-                <Typography variant="h5" sx={style.title}>
-                    Mis PQR
-                </Typography>
+            <PageHeader
+                title="Mis PQR"
+                subtitle="Consulta el estado de tus peticiones, quejas, reclamos o solicitudes."
+            />
 
-                <Typography variant="body2" sx={style.subtitle}>
-                    Consulta el estado de tus peticiones, quejas, reclamos o solicitudes.
-                </Typography>
-            </Box>
-
+            {/* Mensaje de error al cargar las PQR */}
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}
                 </Alert>
             )}
 
+            {/* Estado vacío cuando el usuario no tiene PQR */}
             {pqrs.length === 0 ? (
-                <Paper sx={style.empty}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                        No tienes PQR registradas
-                    </Typography>
-
-                    <Typography variant="body2" color="text.secondary">
-                        Cuando crees una PQR, aparecerá en este espacio.
-                    </Typography>
-                </Paper>
+                <EmptyState
+                    title="No tienes PQR registradas"
+                    description="Cuando crees una PQR, aparecerá en este espacio."
+                />
             ) : (
                 <Box sx={style.list}>
                     {pqrs.map((pqr) => (
@@ -189,16 +135,19 @@ const MyPqrs = () => {
                                 {pqr.description}
                             </Typography>
 
+                            {/* Respuesta registrada por ADMIN o AGENT */}
                             {pqr.response && (
                                 <Box sx={style.responseBox}>
                                     <Typography
                                         variant="subtitle2"
                                         sx={{ fontWeight: 700, mb: 0.5 }}
                                     >
-                                        Respuesta del administrador
+                                        Respuesta recibida
                                     </Typography>
 
-                                    <Typography variant="body2">{pqr.response}</Typography>
+                                    <Typography variant="body2">
+                                        {pqr.response}
+                                    </Typography>
                                 </Box>
                             )}
                         </Paper>

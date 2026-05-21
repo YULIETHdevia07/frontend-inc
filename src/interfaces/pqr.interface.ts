@@ -47,3 +47,9 @@ export interface TakePqrResponse {
   message: string;
   pqr: Pqr;
 }
+
+// Errores de validación del formulario para crear una PQR.
+export interface CreatePqrFormErrors {
+    caseType: string;
+    description: string;
+}

@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { ValidationError } from "yup";
 import {
     Alert,
     Box,
@@ -9,40 +7,28 @@ import {
     Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { createPqr } from "../../services/pqrService";
-import { createPqrSchema } from "../../validations/pqrValidation";
+
+import { useCreatePqr } from "../../hooks/useCreatePqr";
+import { pqrCaseTypes } from "../../data/pqrCaseTypes";
+
 import ClearableSelect from "../../components/common/ClearableSelect";
 
+// Página donde el usuario crea una nueva PQR.
 const CreatePqr = () => {
     const theme = useTheme();
 
-    const pqrCaseTypes = [
-        {
-            label: "SAP",
-            value: "SAP",
-        },
-        {
-            label: "Daño de equipo",
-            value: "DANO_EQUIPO",
-        },
-        {
-            label: "Instalación",
-            value: "INSTALACION",
-        },
-        {
-            label: "Otro",
-            value: "OTRO",
-        },
-    ];
+    const {
+        caseType,
+        description,
 
-    const [caseType, setCaseType] = useState("");
-    const [description, setDescription] = useState("");
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
-    const [formErrors, setFormErrors] = useState({
-        caseType: "",
-        description: "",
-    });
+        message,
+        error,
+        formErrors,
+
+        handleCaseTypeChange,
+        handleDescriptionChange,
+        handleCreatePqr,
+    } = useCreatePqr();
 
     const style = {
         container: {
@@ -80,91 +66,6 @@ const CreatePqr = () => {
             fontWeight: 600,
             borderRadius: 2,
         },
-        iconSelect: {
-            position: "absolute",
-            right: 32,
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 2,
-            color: theme.palette.text.secondary,
-        }
-    };
-
-    const handleCreatePqr = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        const formData = {
-            caseType,
-            description,
-        };
-
-        try {
-            await createPqrSchema.validate(formData, {
-                abortEarly: false,
-            });
-
-            setFormErrors({
-                caseType: "",
-                description: "",
-            });
-
-            setError("");
-            setMessage("");
-
-            await createPqr({
-                caseType: caseType.trim(),
-                description: description.trim(),
-            });
-
-            setCaseType("");
-            setDescription("");
-
-            setMessage("PQR creada correctamente.");
-        } catch (error: unknown) {
-            if (error instanceof ValidationError) {
-                const errors = {
-                    caseType: "",
-                    description: "",
-                };
-
-                error.inner.forEach((validationError) => {
-                    const path = validationError.path as keyof typeof errors;
-
-                    if (path) {
-                        errors[path] = validationError.message;
-                    }
-                });
-
-                setFormErrors(errors);
-                setMessage("");
-                return;
-            }
-
-            console.error(error);
-            setError("Error al crear la PQR.");
-            setMessage("");
-        }
-    };
-
-    const handleInputChange = (
-        field: "caseType" | "description",
-        value: string
-    ) => {
-        if (field === "caseType") {
-            setCaseType(value);
-        }
-
-        if (field === "description") {
-            setDescription(value);
-        }
-
-        setMessage("");
-        setError("");
-
-        setFormErrors((prev) => ({
-            ...prev,
-            [field]: "",
-        }));
     };
 
     return (
@@ -179,19 +80,21 @@ const CreatePqr = () => {
                     atendida.
                 </Typography>
 
+                {/* Mensaje cuando la PQR se crea correctamente. */}
                 {message && (
                     <Alert severity="success" sx={{ mb: 2 }}>
                         {message}
                     </Alert>
                 )}
 
+                {/* Mensaje para errores generales del backend. */}
                 {error && (
                     <Alert severity="error" sx={{ mb: 2 }}>
                         {error}
                     </Alert>
                 )}
 
-
+                {/* Formulario de creación de PQR. */}
                 <Box component="form" sx={style.form} onSubmit={handleCreatePqr}>
                     <ClearableSelect
                         label="Tipo de caso"
@@ -200,7 +103,7 @@ const CreatePqr = () => {
                         clearable
                         options={pqrCaseTypes}
                         error={formErrors.caseType}
-                        onChange={(value) => handleInputChange("caseType", value)}
+                        onChange={handleCaseTypeChange}
                     />
 
                     <TextField
@@ -208,7 +111,9 @@ const CreatePqr = () => {
                         required
                         placeholder="Describe tu solicitud, queja o reclamo"
                         value={description}
-                        onChange={(e) => handleInputChange("description", e.target.value)}
+                        onChange={(event) =>
+                            handleDescriptionChange(event.target.value)
+                        }
                         fullWidth
                         multiline
                         minRows={4}
