@@ -36,10 +36,16 @@ export interface CreatePqrData {
   description: string;
 }
 
-//  Respuesta al obtener múltiples PQR.
+// Respuesta al obtener múltiples PQR.
 export interface PqrResponse {
   message: string;
   pqrs: Pqr[];
+}
+
+// Respuesta para endpoints que devuelven una sola PQR.
+export interface SinglePqrResponse {
+  message: string;
+  pqr: Pqr;
 }
 
 // Respuesta al tomar o asignar una PQR.
@@ -50,6 +56,6 @@ export interface TakePqrResponse {
 
 // Errores de validación del formulario para crear una PQR.
 export interface CreatePqrFormErrors {
-    caseType: string;
-    description: string;
+  caseType: string;
+  description: string;
 }

@@ -20,7 +20,6 @@ src/
 ├── data/
 ├── hooks/
 ├── interfaces/
-├── layouts/
 ├── pages/
 ├── routes/
 ├── services/
@@ -65,50 +64,52 @@ Esta carpeta contiene los componentes visuales reutilizables del proyecto.
 
 Los componentes no deben crearse pensando únicamente en una vista específica, sino con la intención de que puedan reutilizarse en diferentes módulos cuando sea posible.
 
-Se recomienda dividir esta carpeta en componentes comunes y componentes específicos por módulo.
+Para mantener una estructura ordenada, esta carpeta se divide en componentes comunes, componentes específicos por módulo y componentes de estructura visual.
 
 ```txt
 components/
 │
 ├── common/
+│   ├── ClearableSelect.tsx
+│   ├── CustomSnackbar.tsx
 │   ├── DataTable.tsx
-│   ├── PageHeader.tsx
 │   ├── EmptyState.tsx
+│   ├── Header.tsx
 │   ├── LoadingBox.tsx
-│   └── CustomSnackbar.tsx
+│   ├── PageContainer.tsx
+│   ├── PageHeader.tsx
+│   └── SidebarMenu.tsx
 │
-└── users/
-    ├── ChangeUserRoleDialog.tsx
-    └── UserRoleChip.tsx
+├── users/
+│   ├── ChangeUserRoleDialog.tsx
+│   └── UserRoleChip.tsx
+│
+└── layouts/
+    └── DashboardLayout.tsx
 ```
 
 #### `components/common/`
 
 Aquí van los componentes globales que pueden usarse en diferentes vistas del sistema.
 
-Ejemplos:
+Estos componentes no dependen directamente de un módulo específico, por lo tanto, pueden reutilizarse en distintas partes del proyecto.
 
-```txt
-DataTable.tsx
-PageHeader.tsx
-EmptyState.tsx
-LoadingBox.tsx
-CustomSnackbar.tsx
-```
 
 Estos componentes pueden utilizarse en módulos como:
 
 ```txt
 Usuarios
 PQR
-Roles
-Reportes
-Solicitudes
+EtC ...
 ```
+
+Por ejemplo, `DataTable.tsx` puede utilizarse para mostrar usuarios, PQR, roles o cualquier otro listado del sistema, siempre que se configure correctamente desde la vista donde se use.
 
 #### `components/users/`
 
 Aquí van los componentes específicos del módulo de usuarios.
+
+Estos componentes dependen directamente de la lógica, información o acciones relacionadas con usuarios.
 
 Ejemplos:
 
@@ -117,17 +118,50 @@ ChangeUserRoleDialog.tsx
 UserRoleChip.tsx
 ```
 
-Estos componentes dependen directamente de la lógica o información de usuarios.
+Estos componentes no se ubican en `components/common/` porque su uso está relacionado únicamente con el módulo de usuarios.
 
-Regla importante:
+#### `components/layouts/`
+
+Aquí van los componentes encargados de definir la estructura visual general de una página.
+
+Estos componentes pueden organizar elementos como el encabezado, el menú lateral y el contenedor principal donde se muestra el contenido.
+
+Ejemplo:
+
+```txt
+DashboardLayout.tsx
+```
+
+#### `DashboardLayout.tsx`
+
+Este componente define la estructura principal de las páginas internas del sistema.
+
+Se utiliza para envolver las vistas que necesitan una misma distribución visual, como el menú lateral, el encabezado y el área principal de contenido.
+
+Ejemplos de páginas que pueden usar este layout:
+
+```txt
+Dashboard
+Usuarios
+PQR
+Roles
+Reportes
+Solicitudes
+```
+
+El objetivo de este layout es evitar repetir la misma estructura visual en cada página protegida del sistema.
+
+#### Regla importante
 
 ```txt
 Si el componente sirve para varias vistas, debe ir en components/common.
 Si el componente solo sirve para un módulo específico, debe ir en components/nombreModulo.
+Si el componente define la estructura general de una página, debe ir en components/layouts.
 ```
 
----
+Esta organización ayuda a mantener el proyecto más limpio, ordenado y fácil de mantener.
 
+---
 ### `context/`
 
 Esta carpeta contiene los contextos globales de React.
@@ -395,20 +429,23 @@ Centralizar la identidad visual del proyecto.
 
 ### `utils/`
 
-Esta carpeta contiene funciones auxiliares reutilizables.
+Esta carpeta contiene funciones auxiliares reutilizables del proyecto.
 
-Ejemplos:
+Los archivos ubicados en `utils/` no representan componentes visuales, páginas ni servicios. Su función es guardar lógica pequeña y reutilizable que puede usarse en diferentes partes del sistema.
+
+Ejemplo:
 
 ```txt
 utils/
+├── getErrorMessage.ts
 ├── userRoleUtils.tsx
 ├── pqrUtils.ts
-└── formatDate.ts
 ```
 
 Aquí pueden ir funciones como:
 
 ```txt
+Extraer mensajes de error del backend
 Formatear fechas
 Convertir roles en etiquetas visibles
 Asignar colores a estados
@@ -420,6 +457,12 @@ Responsabilidad principal:
 ```txt
 Guardar funciones reutilizables que no dependen directamente de una pantalla.
 ```
+
+#### `getErrorMessage.ts`
+
+Este archivo contiene una función auxiliar encargada de obtener el mensaje de error enviado por el backend.
+
+Su objetivo es evitar repetir la misma lógica de manejo de errores en diferentes hooks, páginas o componentes.
 
 ---
 

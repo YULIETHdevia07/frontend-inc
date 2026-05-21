@@ -7,6 +7,7 @@ import {
     updatePqrStatus,
 } from "../services/pqrService";
 import { responsePqrSchema } from "../validations/pqrValidation";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Hook encargado de manejar la lógica administrativa de PQR.
 export const useAdminPqrs = () => {
@@ -85,9 +86,9 @@ export const useAdminPqrs = () => {
             setSuccessMessage("");
             setSuccessPqrId(null);
 
-            await updatePqrStatus(pqrId, newStatus);
+            const response = await updatePqrStatus(pqrId, newStatus);
 
-            setSuccessMessage("Estado actualizado correctamente.");
+            setSuccessMessage(response.message);
             setSuccessPqrId(pqrId);
 
             await loadAllPqrs();
@@ -99,7 +100,7 @@ export const useAdminPqrs = () => {
             });
         } catch (error) {
             console.error(error);
-            setError("Error al actualizar el estado de la PQR.");
+            setError(getErrorMessage(error, "Error al actualizar el estado de la PQR."));
         }
     };
 
@@ -132,9 +133,9 @@ export const useAdminPqrs = () => {
                 [pqrId]: "",
             }));
 
-            await respondPqr(pqrId, responseText.trim());
+            const response = await respondPqr(pqrId, responseText.trim());
 
-            setSuccessMessage("PQR respondida correctamente.");
+            setSuccessMessage(response.message);
             setSuccessPqrId(pqrId);
 
             await loadAllPqrs();
@@ -158,7 +159,7 @@ export const useAdminPqrs = () => {
 
             setResponseErrors((prev) => ({
                 ...prev,
-                [pqrId]: "Error al responder la PQR.",
+                [pqrId]: getErrorMessage(error, "Error al responder la PQR."),
             }));
         }
     };
