@@ -44,6 +44,7 @@ import PageHeader from "../../components/common/PageHeader";
 import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
 import CustomSnackbar from "../../components/common/CustomSnackbar";
+import ClearableSelect from "../../components/common/ClearableSelect";
 
 // Página del agente para tomar PQR, responderlas y cambiar su estado.
 const AgentPqrs = () => {
@@ -594,29 +595,23 @@ const AgentPqrs = () => {
                                             Cambiar estado
                                         </Typography>
 
-                                        <FormControl fullWidth size="small">
-                                            <Select
-                                                value={statusByPqrId[pqr.id] || pqr.status}
-                                                onChange={(event) =>
-                                                    handleStatusChange(
-                                                        pqr.id,
-                                                        event.target.value as PqrStatus
-                                                    )
-                                                }
-                                                sx={style.select}
-                                            >
-                                                {pqrStatusOptions.map((option) => (
-                                                    <MenuItem key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
+                                        <ClearableSelect
+                                            label="Estado"
+                                            value={statusByPqrId[pqr.id] || pqr.status}
+                                            disabled={pqr.status == "CERRADA"}
+                                            required
+                                            size="small"
+                                            minWidth="100%"
+                                            options={pqrStatusOptions}
+                                            onChange={(value) =>
+                                                handleStatusChange(pqr.id, value as PqrStatus)
+                                            }
+                                        />
 
                                         <Button
                                             fullWidth
                                             variant="contained"
-                                            disabled={updatingStatusId === pqr.id}
+                                            disabled={updatingStatusId === pqr.id || pqr.status == "CERRADA"}
                                             onClick={() => handleUpdateStatus(pqr.id)}
                                             sx={{
                                                 ...style.button,
@@ -636,6 +631,7 @@ const AgentPqrs = () => {
                                             label="Responder PQR"
                                             placeholder="Escribe la respuesta para el usuario..."
                                             value={responseTexts[pqr.id] || ""}
+                                            disabled={pqr.status == "CERRADA"}
                                             onChange={(event) =>
                                                 handleResponseChange(pqr.id, event.target.value)
                                             }
@@ -658,7 +654,7 @@ const AgentPqrs = () => {
 
                                         <Button
                                             variant="outlined"
-                                            disabled={respondingPqrId === pqr.id}
+                                            disabled={respondingPqrId === pqr.id || pqr.status == "CERRADA"}
                                             onClick={() => handleRespondPqr(pqr.id)}
                                             startIcon={<SendOutlinedIcon />}
                                             sx={style.responseButton}

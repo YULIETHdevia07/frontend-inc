@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ValidationError } from "yup";
-import type { Pqr, PqrStatus } from "../interfaces/pqr.interface";
+import type { MessageType, Pqr, PqrStatus } from "../interfaces/pqr.interface";
 import {
     getAllPqrs,
     respondPqr,
@@ -20,12 +20,6 @@ export const useAdminPqrs = () => {
     // Mensaje de error general.
     const [error, setError] = useState("");
 
-    // Mensaje de éxito mostrado sobre una PQR.
-    const [successMessage, setSuccessMessage] = useState("");
-
-    // Id de la PQR donde se muestra el mensaje de éxito.
-    const [successPqrId, setSuccessPqrId] = useState<number | null>(null);
-
     // Guarda temporalmente los estados seleccionados.
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
         {}
@@ -41,6 +35,27 @@ export const useAdminPqrs = () => {
         {}
     );
 
+    // Mensaje mostrado en el snackbar.
+    const [message, setMessage] = useState("");
+
+    // Tipo visual del mensaje: success, error, info o warning.
+    const [messageType, setMessageType] = useState<MessageType>("success");
+
+    // Controla si el snackbar está abierto.
+    const [openMessage, setOpenMessage] = useState(false);
+
+    // Muestra un mensaje temporal en pantalla.
+    const showSnackbar = (text: string, type: MessageType = "success") => {
+        setMessage(text);
+        setMessageType(type);
+        setOpenMessage(true);
+    };
+
+    // Cierra el mensaje temporal.
+    const closeMessage = () => {
+        setOpenMessage(false);
+    };
+
     // Carga todas las PQR para el administrador.
     const loadAllPqrs = async () => {
         try {
@@ -52,6 +67,7 @@ export const useAdminPqrs = () => {
             setPqrs(response.pqrs);
         } catch (error) {
             console.error(error);
+
             setError("Error al cargar las PQR. Verifica que el usuario tenga rol ADMIN.");
         } finally {
             setLoading(false);
@@ -75,32 +91,47 @@ export const useAdminPqrs = () => {
 
     // Actualiza el estado de una PQR.
     const handleUpdateStatus = async (pqrId: number) => {
-        const newStatus = statusChanges[pqrId];
-
-        if (!newStatus) {
-            return;
-        }
 
         try {
-            setError("");
-            setSuccessMessage("");
-            setSuccessPqrId(null);
+            const newStatus = statusChanges[pqrId];
 
+            if (!newStatus) {
+                showSnackbar("Debes seleccionar un estado.", "warning");
+                return;
+            }
             const response = await updatePqrStatus(pqrId, newStatus);
 
-            setSuccessMessage(response.message);
-            setSuccessPqrId(pqrId);
+            // Actualiza inmediatamente el estado en la vista sin recargar toda la lista.
+            setPqrs((prev) =>
+                prev.map((pqr) =>
+                    pqr.id === pqrId
+                        ? {
+                            ...pqr,
+                            ...response.pqr,
+                            status: newStatus,
+                        }
+                        : pqr
+                )
+            );
 
-            await loadAllPqrs();
-
+            // Limpia el cambio temporal después de actualizar la PQR.
             setStatusChanges((prev) => {
                 const updated = { ...prev };
                 delete updated[pqrId];
                 return updated;
             });
+
+            showSnackbar(
+                response.message || "Estado actualizado correctamente.",
+                "success"
+            );
         } catch (error) {
             console.error(error);
-            setError(getErrorMessage(error, "Error al actualizar el estado de la PQR."));
+
+            showSnackbar(
+                getErrorMessage(error, "Error al actualizar el estado de la PQR."),
+                "error"
+            );
         }
     };
 
@@ -124,10 +155,6 @@ export const useAdminPqrs = () => {
         try {
             await responsePqrSchema.validate(responseText);
 
-            setError("");
-            setSuccessMessage("");
-            setSuccessPqrId(null);
-
             setResponseErrors((prev) => ({
                 ...prev,
                 [pqrId]: "",
@@ -135,16 +162,22 @@ export const useAdminPqrs = () => {
 
             const response = await respondPqr(pqrId, responseText.trim());
 
-            setSuccessMessage(response.message);
-            setSuccessPqrId(pqrId);
+            // Actualiza solo la PQR respondida sin recargar toda la vista.
+            setPqrs((prev) =>
+                prev.map((pqr) => (pqr.id === pqrId ? response.pqr : pqr))
+            );
 
-            await loadAllPqrs();
-
+            // Limpia el campo de respuesta después de enviar.
             setResponseTexts((prev) => {
                 const updated = { ...prev };
                 delete updated[pqrId];
                 return updated;
             });
+
+            showSnackbar(
+                response.message || "Respuesta enviada correctamente.",
+                "success"
+            );
         } catch (error) {
             if (error instanceof ValidationError) {
                 setResponseErrors((prev) => ({
@@ -157,10 +190,10 @@ export const useAdminPqrs = () => {
 
             console.error(error);
 
-            setResponseErrors((prev) => ({
-                ...prev,
-                [pqrId]: getErrorMessage(error, "Error al responder la PQR."),
-            }));
+            showSnackbar(
+                getErrorMessage(error, "Error al responder la PQR."),
+                "error"
+            );
         }
     };
 
@@ -174,12 +207,14 @@ export const useAdminPqrs = () => {
         loading,
         error,
 
-        successMessage,
-        successPqrId,
-
         statusChanges,
         responseTexts,
         responseErrors,
+
+        message,
+        messageType,
+        openMessage,
+        closeMessage,
 
         handleStatusChange,
         handleUpdateStatus,

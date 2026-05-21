@@ -27,6 +27,7 @@ import PageHeader from "../../components/common/PageHeader";
 import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
 import ClearableSelect from "../../components/common/ClearableSelect";
+import CustomSnackbar from "../../components/common/CustomSnackbar";
 
 // Página administrativa para consultar, responder y cambiar estados de PQR.
 const AdminPqrs = () => {
@@ -37,12 +38,14 @@ const AdminPqrs = () => {
         loading,
         error,
 
-        successMessage,
-        successPqrId,
-
         statusChanges,
         responseTexts,
         responseErrors,
+
+        message,
+        messageType,
+        openMessage,
+        closeMessage,
 
         handleStatusChange,
         handleUpdateStatus,
@@ -214,11 +217,6 @@ const AdminPqrs = () => {
             textTransform: "none",
         },
 
-        successAlert: {
-            mb: 2,
-            borderRadius: 2,
-        },
-
         errorAlert: {
             mb: 2,
             borderRadius: 2,
@@ -257,12 +255,6 @@ const AdminPqrs = () => {
 
                         return (
                             <Paper key={pqr.id} sx={style.card}>
-                                {successPqrId === pqr.id && successMessage && (
-                                    <Alert severity="success" sx={style.successAlert}>
-                                        {successMessage}
-                                    </Alert>
-                                )}
-
                                 <Box sx={style.cardHeader}>
                                     <Box sx={style.cardTitleBox}>
                                         <Typography variant="h6" sx={style.cardTitle}>
@@ -392,9 +384,7 @@ const AdminPqrs = () => {
                                             helperText={
                                                 responseErrors[pqr.id]
                                                     ? responseErrors[pqr.id]
-                                                    : `${responseTexts[pqr.id]
-                                                        ?.length || 0
-                                                    }/500`
+                                                    : `${responseTexts[pqr.id]?.length || 0}/500`
                                             }
                                         />
 
@@ -408,13 +398,20 @@ const AdminPqrs = () => {
                                             Responder PQR
                                         </Button>
                                     </Box>
-
                                 </Box>
                             </Paper>
                         );
                     })}
                 </Box>
             )}
+
+            {/* Mensajes de éxito, error o advertencia */}
+            <CustomSnackbar
+                open={openMessage}
+                message={message}
+                severity={messageType}
+                onClose={closeMessage}
+            />
         </Box>
     );
 };
