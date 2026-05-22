@@ -1,5 +1,5 @@
 // Estados permitidos para una PQR.
-export type PqrStatus = "PENDIENTE" | "EN_PROCESO" | "RESPONDIDA" | "CERRADA";
+export type PqrStatus = "PENDIENTE" | "EN_PROCESO" | "CERRADA";
 
 // Vistas disponibles en la página del agente.
 export type AgentPqrView = "AVAILABLE" | "ASSIGNED";

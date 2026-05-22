@@ -1,14 +1,6 @@
 import type { ChipProps } from "@mui/material";
 import type { PqrStatus } from "../interfaces/pqr.interface";
 
-// Opciones disponibles para los estados de una PQR.
-export const pqrStatusOptions = [
-  { label: "PENDIENTE", value: "PENDIENTE" },
-  { label: "EN PROCESO", value: "EN_PROCESO" },
-  { label: "RESPONDIDA", value: "RESPONDIDA" },
-  { label: "CERRADA", value: "CERRADA" },
-];
-
 // Devuelve el color del estado para el Chip.
 export const getStatusColor = (
   status: PqrStatus
@@ -20,11 +12,8 @@ export const getStatusColor = (
     case "EN_PROCESO":
       return "info";
 
-    case "RESPONDIDA":
-      return "success";
-
     case "CERRADA":
-      return "default";
+      return "success";
 
     default:
       return "default";

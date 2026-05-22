@@ -1,21 +1,21 @@
 export const menuItems = [
   {
     module: "PQR",
-    roles: ["ADMIN", "USER", "AGENT"],
+    roles: ["USER"],
     submodules: [
       {
         name: "Solicitudes",
-        roles: ["ADMIN", "USER"],
+        roles: ["USER"],
         options: [
           {
             label: "Mis PQR",
             path: "/dashboard/pqrs/my",
-            roles: ["ADMIN", "USER"],
+            roles: ["USER"],
           },
           {
             label: "Crear PQR",
             path: "/dashboard/pqrs/create",
-            roles: ["ADMIN", "USER"],
+            roles: ["USER"],
           },
         ],
       },

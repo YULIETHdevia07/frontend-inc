@@ -16,12 +16,12 @@ import {
     formatDate,
     getCaseTypeLabel,
     getStatusColor,
-    pqrStatusOptions,
 } from "../../utils/pqrUtils";
 
 import PageHeader from "../../components/common/PageHeader";
 import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
+import { pqrStatusOptions } from "../../data/pqrOptions";
 
 // Página donde el usuario consulta las PQR que ha creado.
 const MyPqrs = () => {

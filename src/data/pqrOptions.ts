@@ -17,3 +17,10 @@ export const pqrCaseTypes = [
         value: "OTRO",
     },
 ];
+
+// Opciones disponibles para los estados de una PQR.
+export const pqrStatusOptions = [
+  { label: "PENDIENTE", value: "PENDIENTE" },
+  { label: "EN PROCESO", value: "EN_PROCESO" },
+  { label: "CERRADA", value: "CERRADA" },
+];

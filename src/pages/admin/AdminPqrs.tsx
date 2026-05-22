@@ -33,7 +33,6 @@ import {
     formatDate,
     getCaseTypeLabel,
     getStatusColor,
-    pqrStatusOptions,
 } from "../../utils/pqrUtils";
 
 import PageHeader from "../../components/common/PageHeader";
@@ -44,6 +43,7 @@ import CustomSnackbar from "../../components/common/CustomSnackbar";
 import { useState } from "react";
 import type { PqrStatus } from "../../interfaces/pqr.interface";
 import { getFilterStyles } from "../../styles/filterStyles";
+import { pqrStatusOptions } from "../../data/pqrOptions";
 
 // Página administrativa para consultar, responder y cambiar estados de PQR.
 const AdminPqrs = () => {

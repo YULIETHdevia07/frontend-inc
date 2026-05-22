@@ -36,7 +36,6 @@ import {
     formatDate,
     getCaseTypeLabel,
     getStatusColor,
-    pqrStatusOptions,
 } from "../../utils/pqrUtils";
 
 import PageHeader from "../../components/common/PageHeader";
@@ -45,6 +44,7 @@ import EmptyState from "../../components/common/EmptyState";
 import CustomSnackbar from "../../components/common/CustomSnackbar";
 import ClearableSelect from "../../components/common/ClearableSelect";
 import { getFilterStyles } from "../../styles/filterStyles";
+import { pqrStatusOptions } from "../../data/pqrOptions";
 
 // Página del agente para tomar PQR, responderlas y cambiar su estado.
 const AgentPqrs = () => {

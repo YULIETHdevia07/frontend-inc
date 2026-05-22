@@ -9,7 +9,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import { useCreatePqr } from "../../hooks/useCreatePqr";
-import { pqrCaseTypes } from "../../data/pqrCaseTypes";
+import { pqrCaseTypes } from "../../data/pqrOptions";
 
 import ClearableSelect from "../../components/common/ClearableSelect";
 
