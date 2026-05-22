@@ -231,7 +231,7 @@ export const useAdminPqrs = () => {
         messageType,
         openMessage,
         closeMessage,
-
+        loadAllPqrs,
         handleStatusChange,
         handleUpdateStatus,
         handleResponseTextChange,

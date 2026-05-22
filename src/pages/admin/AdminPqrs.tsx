@@ -8,6 +8,12 @@ import {
     Paper,
     TextField,
     Typography,
+    IconButton,
+    InputAdornment,
+    Menu,
+    MenuItem,
+    Select,
+    Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -17,6 +23,10 @@ import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlin
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
+import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 
 import { useAdminPqrs } from "../../hooks/useAdminPqrs";
 import {
@@ -31,6 +41,8 @@ import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
 import ClearableSelect from "../../components/common/ClearableSelect";
 import CustomSnackbar from "../../components/common/CustomSnackbar";
+import { useState } from "react";
+import type { PqrStatus } from "../../interfaces/pqr.interface";
 
 // Página administrativa para consultar, responder y cambiar estados de PQR.
 const AdminPqrs = () => {
@@ -53,11 +65,148 @@ const AdminPqrs = () => {
         openMessage,
         closeMessage,
 
+        loadAllPqrs,
         handleStatusChange,
         handleUpdateStatus,
         handleResponseTextChange,
         handleRespondPqr,
     } = useAdminPqrs();
+
+    // Controla el texto escrito en el buscador.
+    const [searchTerm, setSearchTerm] = useState("");
+
+    // Controla si el buscador está visible o solo se muestra el ícono.
+    const [showSearch, setShowSearch] = useState(false);
+
+    // Controla el filtro por estado de la PQR.
+    const [statusFilter, setStatusFilter] = useState<"ALL" | PqrStatus>("ALL");
+
+    // Controla el filtro por tipo de caso de la PQR.
+    const [caseTypeFilter, setCaseTypeFilter] = useState("ALL");
+
+    // Controla el filtro para saber si la PQR tiene o no agente asignado.
+    const [agentFilter, setAgentFilter] = useState<
+        "ALL" | "WITH_AGENT" | "WITHOUT_AGENT"
+    >("ALL");
+
+    // Controla la fecha inicial del filtro por rango.
+    const [startDateFilter, setStartDateFilter] = useState("");
+
+    // Controla la fecha final del filtro por rango.
+    const [endDateFilter, setEndDateFilter] = useState("");
+
+    // Controla la apertura del menú de filtros.
+    const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(null);
+
+    // Indica si el menú de filtros está abierto.
+    const openFilterMenu = Boolean(filterAnchorEl);
+
+    // Muestra el campo de búsqueda.
+    const toggleSearch = () => {
+        setShowSearch(true);
+    };
+
+    // Limpia el texto de búsqueda y oculta el campo.
+    const clearSearch = () => {
+        setSearchTerm("");
+        setShowSearch(false);
+    };
+
+    // Abre el menú de filtros.
+    const openFilters = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setFilterAnchorEl(event.currentTarget);
+    };
+
+    // Cierra el menú de filtros.
+    const closeFilters = () => {
+        setFilterAnchorEl(null);
+    };
+
+    // Limpia todos los filtros aplicados.
+    const clearFilters = () => {
+        setStatusFilter("ALL");
+        setAgentFilter("ALL");
+        setStartDateFilter("");
+        setEndDateFilter("");
+        setEndDateFilter("");
+    };
+
+    // Verifica si existe algún filtro activo.
+    const hasActiveFilters =
+        statusFilter !== "ALL" ||
+        caseTypeFilter !== "ALL" ||
+        agentFilter !== "ALL" ||
+        startDateFilter !== "" ||
+        endDateFilter !== "";
+
+    // Opciones únicas de tipo de caso tomadas desde las PQR cargadas.
+    // Esto evita escribir manualmente los tipos y se adapta a los datos reales.
+    const caseTypeOptions = Array.from(
+        new Set(pqrs.map((pqr) => pqr.caseType))
+    );
+
+    // Lista de PQR filtradas según búsqueda, estado, agente asignado y rango de fecha.
+    const filteredPqrs = pqrs.filter((pqr) => {
+        // Normaliza el texto buscado para comparar sin importar mayúsculas o espacios.
+        const normalizedSearch = searchTerm.toLowerCase().trim();
+
+        // Valida si la PQR coincide con el texto escrito en el buscador.
+        // Busca en descripción, tipo de caso, estado, solicitante y agente asignado.
+        const matchesSearch =
+            !normalizedSearch ||
+            pqr.description.toLowerCase().includes(normalizedSearch) ||
+            pqr.caseType.toLowerCase().includes(normalizedSearch) ||
+            pqr.status.toLowerCase().includes(normalizedSearch) ||
+            pqr.user?.name?.toLowerCase().includes(normalizedSearch) ||
+            pqr.user?.email?.toLowerCase().includes(normalizedSearch) ||
+            pqr.assignedTo?.name?.toLowerCase().includes(normalizedSearch) ||
+            pqr.assignedTo?.email?.toLowerCase().includes(normalizedSearch);
+
+        // Valida si la PQR coincide con el estado seleccionado.
+        const matchesStatus =
+            statusFilter === "ALL" || pqr.status === statusFilter;
+
+        // Valida si la PQR coincide con el tipo de caso seleccionado.
+        const matchesCaseType =
+            caseTypeFilter === "ALL" || pqr.caseType === caseTypeFilter;
+
+        // Valida si la PQR cumple con el filtro de agente asignado.
+        const matchesAgent =
+            agentFilter === "ALL" ||
+            (agentFilter === "WITH_AGENT" && !!pqr.assignedTo) ||
+            (agentFilter === "WITHOUT_AGENT" && !pqr.assignedTo);
+
+        // Convierte la fecha de creación de la PQR para compararla con el rango seleccionado.
+        const createdDate = new Date(pqr.createdAt);
+
+        // Crea la fecha inicial en horario local desde las 00:00:00.
+        // Esto permite que al seleccionar una fecha inicial filtre desde ese día completo.
+        const startDate = startDateFilter
+            ? new Date(`${startDateFilter}T00:00:00`)
+            : null;
+
+        // Crea la fecha final en horario local hasta las 23:59:59.999.
+        // Esto permite incluir todas las PQR creadas durante la fecha final seleccionada.
+        const endDate = endDateFilter
+            ? new Date(`${endDateFilter}T23:59:59.999`)
+            : null;
+
+        // Si existe fecha inicial, muestra solo PQR creadas desde esa fecha en adelante.
+        const matchesStartDate = !startDate || createdDate >= startDate;
+
+        // Si existe fecha final, muestra solo PQR creadas hasta esa fecha incluida.
+        const matchesEndDate = !endDate || createdDate <= endDate;
+
+        // La PQR solo se muestra si cumple todas las condiciones.
+        return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesCaseType &&
+            matchesAgent &&
+            matchesStartDate &&
+            matchesEndDate
+        );
+    });
 
     const style = {
         container: {
@@ -260,6 +409,85 @@ const AdminPqrs = () => {
             mb: 2,
             borderRadius: 2,
         },
+
+        searchInput: {
+            width: {
+                xs: "100%",
+                sm: "280px",
+            },
+            "& .MuiOutlinedInput-root": {
+                borderRadius: "12px",
+                backgroundColor: theme.palette.background.paper,
+            },
+        },
+
+        iconButton: {
+            borderRadius: "12px",
+            backgroundColor: "#f1f5f9",
+            color: "#334155",
+            "&:hover": {
+                backgroundColor: theme.palette.primary.light,
+                color: theme.palette.primary.main,
+            },
+        },
+
+        activeIconButton: {
+            borderRadius: "12px",
+            backgroundColor: theme.palette.primary.light,
+            color: theme.palette.primary.main,
+            "&:hover": {
+                backgroundColor: theme.palette.primary.light,
+            },
+        },
+
+        filterMenuPaper: {
+            width: {
+                xs: 300,
+                sm: 340,
+            },
+            p: 1,
+            borderRadius: "16px",
+            boxShadow: "0 12px 30px rgba(15, 23, 42, 0.14)",
+        },
+
+        filterMenuContent: {
+            p: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.5,
+        },
+
+        filterTitle: {
+            fontWeight: 800,
+            color: theme.palette.text.primary,
+        },
+
+        filterSelect: {
+            borderRadius: "12px",
+            backgroundColor: "#f8fafc",
+        },
+
+        filterDateInput: {
+            "& .MuiOutlinedInput-root": {
+                borderRadius: "12px",
+                backgroundColor: "#f8fafc",
+            },
+        },
+
+        filterDateRow: {
+            display: "grid",
+            gridTemplateColumns: {
+                xs: "1fr",
+                sm: "1fr 1fr",
+            },
+            gap: 1,
+        },
+
+        clearFilterButton: {
+            borderRadius: "10px",
+            textTransform: "none",
+            fontWeight: 700,
+        },
     };
 
     if (loading) {
@@ -271,6 +499,185 @@ const AdminPqrs = () => {
             <PageHeader
                 title="Todas las PQR"
                 subtitle="Administra y revisa las peticiones, quejas, reclamos o solicitudes registradas por los usuarios."
+                actions={
+                    <>
+                        {/* Buscador desplegable para filtrar PQR por texto. */}
+                        {showSearch ? (
+                            <TextField
+                                placeholder="Buscar PQR..."
+                                value={searchTerm}
+                                onChange={(event) => setSearchTerm(event.target.value)}
+                                size="small"
+                                autoFocus
+                                sx={style.searchInput}
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchOutlinedIcon fontSize="small" />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton size="small" onClick={clearSearch}>
+                                                    <CloseOutlinedIcon fontSize="small" />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    },
+                                }}
+                            />
+                        ) : (
+                            <Tooltip title="Buscar PQR">
+                                <IconButton
+                                    onClick={toggleSearch}
+                                    sx={searchTerm ? style.activeIconButton : style.iconButton}
+                                >
+                                    <SearchOutlinedIcon />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+
+                        {/* Botón que abre el menú de filtros. */}
+                        <Tooltip title="Filtrar PQR">
+                            <IconButton
+                                onClick={openFilters}
+                                sx={hasActiveFilters ? style.activeIconButton : style.iconButton}
+                            >
+                                <FilterListOutlinedIcon />
+                            </IconButton>
+                        </Tooltip>
+
+                        {/* Menú desplegable con filtros por estado, agente y fecha. */}
+                        <Menu
+                            anchorEl={filterAnchorEl}
+                            open={openFilterMenu}
+                            onClose={closeFilters}
+                            slotProps={{
+                                paper: {
+                                    sx: style.filterMenuPaper,
+                                },
+                            }}
+                        >
+                            <Box sx={style.filterMenuContent}>
+                                <Typography variant="body2" sx={style.filterTitle}>
+                                    Filtros de PQR
+                                </Typography>
+
+                                {/* Filtro por estado de la PQR. */}
+                                <Select
+                                    fullWidth
+                                    value={statusFilter}
+                                    onChange={(event) =>
+                                        setStatusFilter(event.target.value as "ALL" | PqrStatus)
+                                    }
+                                    size="small"
+                                    sx={style.filterSelect}
+                                >
+                                    <MenuItem value="ALL">Todos los estados</MenuItem>
+
+                                    {pqrStatusOptions.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+
+                                {/* Filtro por tipo de caso de la PQR. */}
+                                <Select
+                                    fullWidth
+                                    value={caseTypeFilter}
+                                    onChange={(event) =>
+                                        setCaseTypeFilter(event.target.value)
+                                    }
+                                    size="small"
+                                    sx={style.filterSelect}
+                                >
+                                    <MenuItem value="ALL">Todos los tipos de caso</MenuItem>
+
+                                    {caseTypeOptions.map((caseType) => (
+                                        <MenuItem key={caseType} value={caseType}>
+                                            {getCaseTypeLabel(caseType)}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+
+                                {/* Filtro por agente asignado. */}
+                                <Select
+                                    fullWidth
+                                    value={agentFilter}
+                                    onChange={(event) =>
+                                        setAgentFilter(
+                                            event.target.value as
+                                            | "ALL"
+                                            | "WITH_AGENT"
+                                            | "WITHOUT_AGENT"
+                                        )
+                                    }
+                                    size="small"
+                                    sx={style.filterSelect}
+                                >
+                                    <MenuItem value="ALL">Todas las PQR</MenuItem>
+                                    <MenuItem value="WITH_AGENT">Con agente asignado</MenuItem>
+                                    <MenuItem value="WITHOUT_AGENT">Sin agente asignado</MenuItem>
+                                </Select>
+
+                                {/* Filtro por rango de fecha de creación. */}
+                                <Box sx={style.filterDateRow}>
+                                    <TextField
+                                        label="Desde"
+                                        type="date"
+                                        value={startDateFilter}
+                                        onChange={(event) =>
+                                            setStartDateFilter(event.target.value)
+                                        }
+                                        size="small"
+                                        sx={style.filterDateInput}
+                                        slotProps={{
+                                            inputLabel: {
+                                                shrink: true,
+                                            },
+                                        }}
+                                    />
+
+                                    <TextField
+                                        label="Hasta"
+                                        type="date"
+                                        value={endDateFilter}
+                                        onChange={(event) =>
+                                            setEndDateFilter(event.target.value)
+                                        }
+                                        size="small"
+                                        sx={style.filterDateInput}
+                                        slotProps={{
+                                            inputLabel: {
+                                                shrink: true,
+                                            },
+                                        }}
+                                    />
+                                </Box>
+
+                                {/* Limpia todos los filtros aplicados. */}
+                                <Button
+                                    fullWidth
+                                    variant="text"
+                                    onClick={clearFilters}
+                                    disabled={!hasActiveFilters}
+                                    sx={style.clearFilterButton}
+                                >
+                                    Limpiar filtros
+                                </Button>
+                            </Box>
+                        </Menu>
+
+                        {/* Recarga la lista de PQR desde el backend. */}
+                        <Tooltip title="Actualizar lista">
+                            <IconButton onClick={loadAllPqrs} sx={style.iconButton}>
+                                <RefreshOutlinedIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </>
+                }
             />
 
             {error && (
@@ -279,14 +686,14 @@ const AdminPqrs = () => {
                 </Alert>
             )}
 
-            {pqrs.length === 0 ? (
+            {filteredPqrs.length === 0 ? (
                 <EmptyState
                     title="No hay PQR registradas"
                     description="Cuando los usuarios creen PQR, aparecerán en este espacio."
                 />
             ) : (
                 <Box sx={style.list}>
-                    {pqrs.map((pqr) => {
+                    {filteredPqrs.map((pqr) => {
                         const currentStatusLabel =
                             pqrStatusOptions.find(
                                 (option) => option.value === pqr.status
