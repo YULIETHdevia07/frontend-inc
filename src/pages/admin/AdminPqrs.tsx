@@ -3,6 +3,7 @@ import {
     Box,
     Button,
     Chip,
+    CircularProgress,
     Divider,
     Paper,
     TextField,
@@ -37,6 +38,9 @@ const AdminPqrs = () => {
         pqrs,
         loading,
         error,
+
+        updatingStatusId,
+        respondingPqrId,
 
         statusChanges,
         responseTexts,
@@ -348,14 +352,18 @@ const AdminPqrs = () => {
                                         <Button
                                             fullWidth
                                             variant="contained"
-                                            disabled={pqr.status == "CERRADA"}
+                                            disabled={updatingStatusId === pqr.id || pqr.status === "CERRADA"}
                                             sx={{
                                                 ...style.button,
                                                 mt: 1.5,
                                             }}
                                             onClick={() => handleUpdateStatus(pqr.id)}
                                         >
-                                            Guardar estado
+                                            {updatingStatusId === pqr.id ? (
+                                                <CircularProgress size={20} color="inherit" />
+                                            ) : (
+                                                "Guardar estado"
+                                            )}
                                         </Button>
                                     </Box>
 
@@ -390,12 +398,16 @@ const AdminPqrs = () => {
 
                                         <Button
                                             variant="outlined"
-                                            disabled={pqr.status == "CERRADA"}
+                                            disabled={respondingPqrId === pqr.id || pqr.status === "CERRADA"}
                                             sx={style.responseButton}
                                             startIcon={<SendOutlinedIcon />}
                                             onClick={() => handleRespondPqr(pqr.id)}
                                         >
-                                            Responder PQR
+                                            {respondingPqrId === pqr.id ? (
+                                                <CircularProgress size={20} color="inherit" />
+                                            ) : (
+                                                "Responder PQR"
+                                            )}
                                         </Button>
                                     </Box>
                                 </Box>

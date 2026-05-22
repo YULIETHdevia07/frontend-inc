@@ -5,7 +5,6 @@ import {
     Chip,
     CircularProgress,
     Divider,
-    FormControl,
     IconButton,
     InputAdornment,
     Menu,
@@ -656,7 +655,7 @@ const AgentPqrs = () => {
                                             variant="outlined"
                                             disabled={respondingPqrId === pqr.id || pqr.status == "CERRADA"}
                                             onClick={() => handleRespondPqr(pqr.id)}
-                                            startIcon={<SendOutlinedIcon />}
+                                             startIcon={<SendOutlinedIcon />}
                                             sx={style.responseButton}
                                         >
                                             {respondingPqrId === pqr.id ? (

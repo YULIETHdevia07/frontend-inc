@@ -20,6 +20,12 @@ export const useAdminPqrs = () => {
     // Mensaje de error general.
     const [error, setError] = useState("");
 
+    // Guarda el id de la PQR cuyo estado se está actualizando.
+    const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
+
+    // Guarda el id de la PQR que se está respondiendo.
+    const [respondingPqrId, setRespondingPqrId] = useState<number | null>(null);
+
     // Guarda temporalmente los estados seleccionados.
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
         {}
@@ -91,17 +97,19 @@ export const useAdminPqrs = () => {
 
     // Actualiza el estado de una PQR.
     const handleUpdateStatus = async (pqrId: number) => {
+        const newStatus = statusChanges[pqrId];
+
+        if (!newStatus) {
+            showSnackbar("Debes seleccionar un estado.", "warning");
+            return;
+        }
 
         try {
-            const newStatus = statusChanges[pqrId];
+            setUpdatingStatusId(pqrId);
 
-            if (!newStatus) {
-                showSnackbar("Debes seleccionar un estado.", "warning");
-                return;
-            }
             const response = await updatePqrStatus(pqrId, newStatus);
 
-            // Actualiza inmediatamente el estado en la vista sin recargar toda la lista.
+            // Actualiza inmediatamente la PQR modificada sin recargar toda la vista.
             setPqrs((prev) =>
                 prev.map((pqr) =>
                     pqr.id === pqrId
@@ -132,9 +140,10 @@ export const useAdminPqrs = () => {
                 getErrorMessage(error, "Error al actualizar el estado de la PQR."),
                 "error"
             );
+        } finally {
+            setUpdatingStatusId(null);
         }
     };
-
     // Guarda el texto escrito como respuesta.
     const handleResponseTextChange = (pqrId: number, value: string) => {
         setResponseTexts((prev) => ({
@@ -159,6 +168,8 @@ export const useAdminPqrs = () => {
                 ...prev,
                 [pqrId]: "",
             }));
+
+            setRespondingPqrId(pqrId);
 
             const response = await respondPqr(pqrId, responseText.trim());
 
@@ -194,6 +205,8 @@ export const useAdminPqrs = () => {
                 getErrorMessage(error, "Error al responder la PQR."),
                 "error"
             );
+        } finally {
+            setRespondingPqrId(null);
         }
     };
 
@@ -206,6 +219,9 @@ export const useAdminPqrs = () => {
         pqrs,
         loading,
         error,
+
+        updatingStatusId,
+        respondingPqrId,
 
         statusChanges,
         responseTexts,
