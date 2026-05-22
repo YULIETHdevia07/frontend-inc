@@ -44,10 +44,12 @@ import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
 import CustomSnackbar from "../../components/common/CustomSnackbar";
 import ClearableSelect from "../../components/common/ClearableSelect";
+import { getFilterStyles } from "../../styles/filterStyles";
 
 // Página del agente para tomar PQR, responderlas y cambiar su estado.
 const AgentPqrs = () => {
     const theme = useTheme();
+    const filterStyles = getFilterStyles(theme);
 
     const {
         availablePqrs,
@@ -127,58 +129,6 @@ const AgentPqrs = () => {
             alignItems: "center",
             gap: 1,
             flexWrap: "wrap",
-        },
-
-        searchInput: {
-            width: {
-                xs: "100%",
-                sm: "280px",
-            },
-            "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                backgroundColor: theme.palette.background.paper,
-            },
-        },
-
-        iconButton: {
-            borderRadius: "12px",
-            backgroundColor: "#f1f5f9",
-            color: "#334155",
-            "&:hover": {
-                backgroundColor: theme.palette.primary.light,
-                color: theme.palette.primary.main,
-            },
-        },
-
-        activeIconButton: {
-            borderRadius: "12px",
-            backgroundColor: theme.palette.primary.light,
-            color: theme.palette.primary.main,
-            "&:hover": {
-                backgroundColor: theme.palette.primary.light,
-            },
-        },
-
-        filterMenuPaper: {
-            width: 240,
-            padding: "8px",
-            borderRadius: "14px",
-            boxShadow: "0 12px 30px rgba(15, 23, 42, 0.14)",
-        },
-
-        filterMenuContent: {
-            padding: "8px",
-        },
-
-        filterTitle: {
-            fontWeight: 800,
-            marginBottom: "8px",
-            color: theme.palette.text.primary,
-        },
-
-        filterSelect: {
-            borderRadius: "12px",
-            backgroundColor: "#f8fafc",
         },
 
         // list: {
@@ -361,13 +311,6 @@ const AgentPqrs = () => {
             px: 3,
             textTransform: "none",
         },
-
-        clearFilterButton: {
-            marginTop: "8px",
-            borderRadius: "10px",
-            textTransform: "none",
-            fontWeight: 700,
-        },
     };
 
     if (loading) {
@@ -389,7 +332,7 @@ const AgentPqrs = () => {
                                 onChange={handleSearchChange}
                                 size="small"
                                 autoFocus
-                                sx={style.searchInput}
+                                sx={filterStyles.searchInput}
                                 slotProps={{
                                     input: {
                                         startAdornment: (
@@ -411,7 +354,7 @@ const AgentPqrs = () => {
                             <Tooltip title="Buscar PQR">
                                 <IconButton
                                     onClick={toggleSearch}
-                                    sx={searchTerm ? style.activeIconButton : style.iconButton}
+                                    sx={searchTerm ? filterStyles.activeIconButton : filterStyles.iconButton}
                                 >
                                     <SearchOutlinedIcon />
                                 </IconButton>
@@ -424,8 +367,8 @@ const AgentPqrs = () => {
                                 onClick={openFilters}
                                 sx={
                                     statusFilter !== "ALL"
-                                        ? style.activeIconButton
-                                        : style.iconButton
+                                        ? filterStyles.activeIconButton
+                                        : filterStyles.iconButton
                                 }
                             >
                                 <FilterListOutlinedIcon />
@@ -438,12 +381,12 @@ const AgentPqrs = () => {
                             onClose={closeFilters}
                             slotProps={{
                                 paper: {
-                                    sx: style.filterMenuPaper,
+                                    sx: filterStyles.filterMenuPaper,
                                 },
                             }}
                         >
-                            <Box sx={style.filterMenuContent}>
-                                <Typography variant="body2" sx={style.filterTitle}>
+                            <Box sx={filterStyles.filterMenuContent}>
+                                <Typography variant="body2" sx={filterStyles.filterTitle}>
                                     Filtrar por estado
                                 </Typography>
 
@@ -452,7 +395,7 @@ const AgentPqrs = () => {
                                     value={statusFilter}
                                     onChange={handleStatusFilterChange}
                                     size="small"
-                                    sx={style.filterSelect}
+                                    sx={filterStyles.filterSelect}
                                 >
                                     <MenuItem value="ALL">Todos los estados</MenuItem>
 
@@ -468,7 +411,7 @@ const AgentPqrs = () => {
                                     variant="text"
                                     onClick={clearStatusFilter}
                                     disabled={statusFilter === "ALL"}
-                                    sx={style.clearFilterButton}
+                                    sx={filterStyles.clearFilterButton}
                                 >
                                     Limpiar filtro
                                 </Button>
@@ -477,7 +420,7 @@ const AgentPqrs = () => {
 
                         {/* Recarga las listas de PQR */}
                         <Tooltip title="Actualizar lista">
-                            <IconButton onClick={loadAgentPqrs} sx={style.iconButton}>
+                            <IconButton onClick={loadAgentPqrs} sx={filterStyles.iconButton}>
                                 <RefreshOutlinedIcon />
                             </IconButton>
                         </Tooltip>
@@ -655,7 +598,7 @@ const AgentPqrs = () => {
                                             variant="outlined"
                                             disabled={respondingPqrId === pqr.id || pqr.status == "CERRADA"}
                                             onClick={() => handleRespondPqr(pqr.id)}
-                                             startIcon={<SendOutlinedIcon />}
+                                            startIcon={<SendOutlinedIcon />}
                                             sx={style.responseButton}
                                         >
                                             {respondingPqrId === pqr.id ? (

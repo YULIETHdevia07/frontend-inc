@@ -12,6 +12,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
@@ -34,9 +35,14 @@ import CustomSnackbar from "../../components/common/CustomSnackbar";
 import DataTable from "../../components/common/DataTable";
 import UserRoleChip from "../../components/users/UserRoleChip";
 import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
+import { getFilterStyles } from "../../styles/filterStyles";
 
 // Página principal para administrar usuarios y roles
 const AdminUsers = () => {
+
+  const theme = useTheme();
+  const filterStyles = getFilterStyles(theme);
+
   const {
     users,
     loading,
@@ -243,16 +249,7 @@ const AdminUsers = () => {
                   onChange={handleSearchChange}
                   size="small"
                   autoFocus
-                  sx={{
-                    width: {
-                      xs: "100%",
-                      sm: "280px",
-                    },
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "12px",
-                      backgroundColor: "#f8fafc",
-                    },
-                  }}
+                  sx={filterStyles.searchInput}
                   slotProps={{
                     input: {
                       startAdornment: (
@@ -274,14 +271,7 @@ const AdminUsers = () => {
                 <Tooltip title="Buscar usuario">
                   <IconButton
                     onClick={toggleSearch}
-                    sx={{
-                      borderRadius: "12px",
-                      backgroundColor: searchTerm ? "primary.light" : "#f1f5f9",
-                      color: searchTerm ? "primary.main" : "#334155",
-                      "&:hover": {
-                        backgroundColor: "#e2e8f0",
-                      },
-                    }}
+                    sx={searchTerm ? filterStyles.activeIconButton : filterStyles.iconButton}
                   >
                     <SearchOutlinedIcon />
                   </IconButton>
@@ -291,15 +281,7 @@ const AdminUsers = () => {
               <Tooltip title="Filtrar por rol">
                 <IconButton
                   onClick={openFilters}
-                  sx={{
-                    borderRadius: "12px",
-                    backgroundColor:
-                      roleFilter !== "ALL" ? "primary.light" : "#f1f5f9",
-                    color: roleFilter !== "ALL" ? "primary.main" : "#334155",
-                    "&:hover": {
-                      backgroundColor: "#e2e8f0",
-                    },
-                  }}
+                  sx={roleFilter !== "ALL" ? filterStyles.activeIconButton : filterStyles.iconButton}
                 >
                   <FilterListOutlinedIcon />
                 </IconButton>
@@ -311,28 +293,12 @@ const AdminUsers = () => {
                 onClose={closeFilters}
                 slotProps={{
                   paper: {
-                    sx: {
-                      width: 240,
-                      padding: "8px",
-                      borderRadius: "14px",
-                      boxShadow: "0 12px 30px rgba(15, 23, 42, 0.14)",
-                    },
+                    sx: filterStyles.smallFilterMenuPaper,
                   },
                 }}
               >
-                <Box
-                  sx={{
-                    padding: "8px",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 800,
-                      marginBottom: "8px",
-                      color: "text.primary",
-                    }}
-                  >
+                <Box sx={filterStyles.smallFilterMenuContent}>
+                  <Typography variant="body2" sx={filterStyles.smallFilterTitle}>
                     Filtrar por rol
                   </Typography>
 
@@ -341,10 +307,7 @@ const AdminUsers = () => {
                     value={roleFilter}
                     onChange={handleRoleFilterChange}
                     size="small"
-                    sx={{
-                      borderRadius: "12px",
-                      backgroundColor: "#f8fafc",
-                    }}
+                    sx={filterStyles.filterSelect}
                   >
                     <MenuItem value="ALL">Todos los roles</MenuItem>
 
@@ -360,12 +323,7 @@ const AdminUsers = () => {
                     variant="text"
                     onClick={clearRoleFilter}
                     disabled={roleFilter === "ALL"}
-                    sx={{
-                      marginTop: "8px",
-                      borderRadius: "10px",
-                      textTransform: "none",
-                      fontWeight: 700,
-                    }}
+                    sx={filterStyles.clearFilterButtonWithMargin}
                   >
                     Limpiar filtro
                   </Button>

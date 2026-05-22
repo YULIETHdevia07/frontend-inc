@@ -43,10 +43,12 @@ import ClearableSelect from "../../components/common/ClearableSelect";
 import CustomSnackbar from "../../components/common/CustomSnackbar";
 import { useState } from "react";
 import type { PqrStatus } from "../../interfaces/pqr.interface";
+import { getFilterStyles } from "../../styles/filterStyles";
 
 // Página administrativa para consultar, responder y cambiar estados de PQR.
 const AdminPqrs = () => {
     const theme = useTheme();
+    const filterStyles = getFilterStyles(theme);
 
     const {
         pqrs,
@@ -127,7 +129,6 @@ const AdminPqrs = () => {
         setStatusFilter("ALL");
         setAgentFilter("ALL");
         setStartDateFilter("");
-        setEndDateFilter("");
         setEndDateFilter("");
     };
 
@@ -409,85 +410,6 @@ const AdminPqrs = () => {
             mb: 2,
             borderRadius: 2,
         },
-
-        searchInput: {
-            width: {
-                xs: "100%",
-                sm: "280px",
-            },
-            "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                backgroundColor: theme.palette.background.paper,
-            },
-        },
-
-        iconButton: {
-            borderRadius: "12px",
-            backgroundColor: "#f1f5f9",
-            color: "#334155",
-            "&:hover": {
-                backgroundColor: theme.palette.primary.light,
-                color: theme.palette.primary.main,
-            },
-        },
-
-        activeIconButton: {
-            borderRadius: "12px",
-            backgroundColor: theme.palette.primary.light,
-            color: theme.palette.primary.main,
-            "&:hover": {
-                backgroundColor: theme.palette.primary.light,
-            },
-        },
-
-        filterMenuPaper: {
-            width: {
-                xs: 300,
-                sm: 340,
-            },
-            p: 1,
-            borderRadius: "16px",
-            boxShadow: "0 12px 30px rgba(15, 23, 42, 0.14)",
-        },
-
-        filterMenuContent: {
-            p: 1,
-            display: "flex",
-            flexDirection: "column",
-            gap: 1.5,
-        },
-
-        filterTitle: {
-            fontWeight: 800,
-            color: theme.palette.text.primary,
-        },
-
-        filterSelect: {
-            borderRadius: "12px",
-            backgroundColor: "#f8fafc",
-        },
-
-        filterDateInput: {
-            "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                backgroundColor: "#f8fafc",
-            },
-        },
-
-        filterDateRow: {
-            display: "grid",
-            gridTemplateColumns: {
-                xs: "1fr",
-                sm: "1fr 1fr",
-            },
-            gap: 1,
-        },
-
-        clearFilterButton: {
-            borderRadius: "10px",
-            textTransform: "none",
-            fontWeight: 700,
-        },
     };
 
     if (loading) {
@@ -509,7 +431,7 @@ const AdminPqrs = () => {
                                 onChange={(event) => setSearchTerm(event.target.value)}
                                 size="small"
                                 autoFocus
-                                sx={style.searchInput}
+                                sx={filterStyles.searchInput}
                                 slotProps={{
                                     input: {
                                         startAdornment: (
@@ -531,7 +453,7 @@ const AdminPqrs = () => {
                             <Tooltip title="Buscar PQR">
                                 <IconButton
                                     onClick={toggleSearch}
-                                    sx={searchTerm ? style.activeIconButton : style.iconButton}
+                                    sx={searchTerm ? filterStyles.activeIconButton : filterStyles.iconButton}
                                 >
                                     <SearchOutlinedIcon />
                                 </IconButton>
@@ -542,7 +464,7 @@ const AdminPqrs = () => {
                         <Tooltip title="Filtrar PQR">
                             <IconButton
                                 onClick={openFilters}
-                                sx={hasActiveFilters ? style.activeIconButton : style.iconButton}
+                                sx={hasActiveFilters ? filterStyles.activeIconButton : filterStyles.iconButton}
                             >
                                 <FilterListOutlinedIcon />
                             </IconButton>
@@ -555,12 +477,12 @@ const AdminPqrs = () => {
                             onClose={closeFilters}
                             slotProps={{
                                 paper: {
-                                    sx: style.filterMenuPaper,
+                                    sx: filterStyles.filterMenuPaper,
                                 },
                             }}
                         >
-                            <Box sx={style.filterMenuContent}>
-                                <Typography variant="body2" sx={style.filterTitle}>
+                            <Box sx={filterStyles.filterMenuContent}>
+                                <Typography variant="body2" sx={filterStyles.filterTitle}>
                                     Filtros de PQR
                                 </Typography>
 
@@ -572,7 +494,7 @@ const AdminPqrs = () => {
                                         setStatusFilter(event.target.value as "ALL" | PqrStatus)
                                     }
                                     size="small"
-                                    sx={style.filterSelect}
+                                    sx={filterStyles.filterSelect}
                                 >
                                     <MenuItem value="ALL">Todos los estados</MenuItem>
 
@@ -591,7 +513,7 @@ const AdminPqrs = () => {
                                         setCaseTypeFilter(event.target.value)
                                     }
                                     size="small"
-                                    sx={style.filterSelect}
+                                    sx={filterStyles.filterSelect}
                                 >
                                     <MenuItem value="ALL">Todos los tipos de caso</MenuItem>
 
@@ -615,7 +537,7 @@ const AdminPqrs = () => {
                                         )
                                     }
                                     size="small"
-                                    sx={style.filterSelect}
+                                    sx={filterStyles.filterSelect}
                                 >
                                     <MenuItem value="ALL">Todas las PQR</MenuItem>
                                     <MenuItem value="WITH_AGENT">Con agente asignado</MenuItem>
@@ -623,7 +545,7 @@ const AdminPqrs = () => {
                                 </Select>
 
                                 {/* Filtro por rango de fecha de creación. */}
-                                <Box sx={style.filterDateRow}>
+                                <Box sx={filterStyles.filterDateRow}>
                                     <TextField
                                         label="Desde"
                                         type="date"
@@ -632,7 +554,7 @@ const AdminPqrs = () => {
                                             setStartDateFilter(event.target.value)
                                         }
                                         size="small"
-                                        sx={style.filterDateInput}
+                                        sx={filterStyles.filterDateInput}
                                         slotProps={{
                                             inputLabel: {
                                                 shrink: true,
@@ -648,7 +570,7 @@ const AdminPqrs = () => {
                                             setEndDateFilter(event.target.value)
                                         }
                                         size="small"
-                                        sx={style.filterDateInput}
+                                        sx={filterStyles.filterDateInput}
                                         slotProps={{
                                             inputLabel: {
                                                 shrink: true,
@@ -663,7 +585,7 @@ const AdminPqrs = () => {
                                     variant="text"
                                     onClick={clearFilters}
                                     disabled={!hasActiveFilters}
-                                    sx={style.clearFilterButton}
+                                    sx={filterStyles.clearFilterButton}
                                 >
                                     Limpiar filtros
                                 </Button>
@@ -672,7 +594,7 @@ const AdminPqrs = () => {
 
                         {/* Recarga la lista de PQR desde el backend. */}
                         <Tooltip title="Actualizar lista">
-                            <IconButton onClick={loadAllPqrs} sx={style.iconButton}>
+                            <IconButton onClick={loadAllPqrs} sx={filterStyles.iconButton}>
                                 <RefreshOutlinedIcon />
                             </IconButton>
                         </Tooltip>
