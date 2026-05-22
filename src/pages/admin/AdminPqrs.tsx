@@ -15,6 +15,8 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
+import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 
 import { useAdminPqrs } from "../../hooks/useAdminPqrs";
 import {
@@ -86,10 +88,16 @@ const AdminPqrs = () => {
 
         cardHeader: {
             display: "flex",
+            flexDirection: "column",
+            gap: 1.3,
+            mb: 1.5,
+        },
+
+        cardHeaderTop: {
+            display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
             gap: 2,
-            mb: 1.5,
             flexDirection: {
                 xs: "column",
                 sm: "row",
@@ -99,11 +107,11 @@ const AdminPqrs = () => {
         cardTitleBox: {
             display: "flex",
             flexDirection: "column",
-            gap: 0.5,
+            gap: 0.6,
         },
 
         cardTitle: {
-            fontWeight: 600,
+            fontWeight: 700,
             color: theme.palette.text.primary,
             lineHeight: 1.2,
         },
@@ -117,36 +125,63 @@ const AdminPqrs = () => {
 
         date: {
             color: theme.palette.text.secondary,
-            fontSize: "0.85rem",
+            fontSize: "0.84rem",
+        },
+
+        infoRow: {
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: {
+                xs: 1,
+                sm: 2,
+            },
+        },
+
+        infoItem: {
+            display: "flex",
+            alignItems: "center",
+            gap: 0.7,
+            minWidth: {
+                xs: "100%",
+                sm: "auto",
+            },
+        },
+
+        infoLabel: {
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            color: theme.palette.text.secondary,
+            textTransform: "uppercase",
+            letterSpacing: 0.4,
+        },
+
+        infoText: {
+            fontSize: "0.84rem",
+            color: theme.palette.text.secondary,
+        },
+
+        agentText: {
+            fontSize: "0.84rem",
+            color: theme.palette.success.main,
+            fontWeight: 600,
+        },
+
+        noAgentText: {
+            fontSize: "0.84rem",
+            color: theme.palette.text.disabled,
+            fontStyle: "italic",
+        },
+
+        statusChip: {
+            fontWeight: 700,
+            borderRadius: "10px",
         },
 
         description: {
             color: theme.palette.text.secondary,
             mt: 1,
             lineHeight: 1.7,
-        },
-
-        userBox: {
-            mt: 2,
-            p: 1.7,
-            borderRadius: "16px",
-            backgroundColor: "#f8fafc",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            gap: 1.5,
-            alignItems: "flex-start",
-        },
-
-        userIconBox: {
-            width: 38,
-            height: 38,
-            minWidth: 38,
-            borderRadius: "12px",
-            backgroundColor: theme.palette.primary.light,
-            color: theme.palette.primary.main,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
         },
 
         responseBox: {
@@ -259,27 +294,98 @@ const AdminPqrs = () => {
 
                         return (
                             <Paper key={pqr.id} sx={style.card}>
-                                <Box sx={style.cardHeader}>
-                                    <Box sx={style.cardTitleBox}>
-                                        <Typography variant="h6" sx={style.cardTitle}>
-                                            {getCaseTypeLabel(pqr.caseType)}
-                                        </Typography>
 
-                                        <Box sx={style.dateBox}>
-                                            <CalendarMonthOutlinedIcon fontSize="small" />
-                                            <Typography variant="body2" sx={style.date}>
-                                                Creada el {formatDate(pqr.createdAt)}
+                                <Box sx={style.cardHeader}>
+                                    <Box sx={style.cardHeaderTop}>
+                                        <Box sx={style.cardTitleBox}>
+                                            <Typography variant="h6" sx={style.cardTitle}>
+                                                {getCaseTypeLabel(pqr.caseType)}
                                             </Typography>
+
+                                            <Box sx={style.dateBox}>
+                                                <CalendarMonthOutlinedIcon fontSize="small" />
+                                                <Typography variant="body2" sx={style.date}>
+                                                    Creada el {formatDate(pqr.createdAt)}
+                                                </Typography>
+                                            </Box>
                                         </Box>
+
+                                        <Chip
+                                            label={currentStatusLabel}
+                                            color={getStatusColor(pqr.status)}
+                                            size="small"
+                                            sx={style.statusChip}
+                                        />
                                     </Box>
 
-                                    <Chip
-                                        label={currentStatusLabel}
-                                        color={getStatusColor(pqr.status)}
-                                        size="small"
-                                        sx={{ fontWeight: 700 }}
-                                    />
+                                    <Box sx={style.infoRow}>
+                                        <Box sx={style.infoItem}>
+                                            <PersonOutlineOutlinedIcon
+                                                fontSize="small"
+                                                sx={{ color: theme.palette.text.secondary }}
+                                            />
+
+                                            <Box>
+                                                <Typography sx={style.infoLabel}>
+                                                    Solicitante
+                                                </Typography>
+
+                                                <Typography sx={style.infoText}>
+                                                    {pqr.user?.name || "No disponible"} · {pqr.user?.email || "No disponible"}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+
+                                        <Box sx={style.infoItem}>
+                                            {pqr.assignedTo ? (
+                                                <>
+                                                    <SupportAgentOutlinedIcon
+                                                        fontSize="small"
+                                                        sx={{ color: theme.palette.success.main }}
+                                                    />
+
+                                                    <Box>
+                                                        <Typography
+                                                            sx={{
+                                                                ...style.infoLabel,
+                                                                color: theme.palette.success.main,
+                                                            }}
+                                                        >
+                                                            Agente
+                                                        </Typography>
+
+                                                        <Typography sx={style.agentText}>
+                                                            {pqr.assignedTo.name} · {pqr.assignedTo.email}
+                                                        </Typography>
+                                                    </Box>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <PersonOffOutlinedIcon
+                                                        fontSize="small"
+                                                        sx={{ color: theme.palette.text.disabled }}
+                                                    />
+
+                                                    <Box>
+                                                        <Typography
+                                                            sx={{
+                                                                ...style.infoLabel,
+                                                                color: theme.palette.text.disabled,
+                                                            }}
+                                                        >
+                                                            Agente
+                                                        </Typography>
+
+                                                        <Typography sx={style.noAgentText}>
+                                                            Sin agente asignado
+                                                        </Typography>
+                                                    </Box>
+                                                </>
+                                            )}
+                                        </Box>
+                                    </Box>
                                 </Box>
+
 
                                 <Divider />
 
@@ -287,32 +393,6 @@ const AdminPqrs = () => {
                                     {pqr.description}
                                 </Typography>
 
-                                <Box sx={style.userBox}>
-                                    <Box sx={style.userIconBox}>
-                                        <PersonOutlineOutlinedIcon fontSize="small" />
-                                    </Box>
-
-                                    <Box>
-                                        <Typography
-                                            variant="subtitle2"
-                                            sx={{ fontWeight: 800 }}
-                                        >
-                                            Usuario solicitante
-                                        </Typography>
-
-                                        <Typography variant="body2" color="text.secondary">
-                                            Nombre: {pqr.user?.name || "No disponible"}
-                                        </Typography>
-
-                                        <Typography variant="body2" color="text.secondary">
-                                            Correo: {pqr.user?.email || "No disponible"}
-                                        </Typography>
-
-                                        <Typography variant="body2" color="text.secondary">
-                                            Rol: {pqr.user?.role || "No disponible"}
-                                        </Typography>
-                                    </Box>
-                                </Box>
 
                                 {pqr.response && (
                                     <Box sx={style.responseBox}>
