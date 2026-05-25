@@ -28,12 +28,23 @@ export interface Pqr {
   assignedToId: number | null;
   user?: PqrUser;
   assignedTo?: PqrUser | null;
+
+  // Datos de calificación de la PQR.
+  rating?: number | null;
+  ratingComment?: string | null;
+  ratedAt?: string | null;
 }
 
 // Datos necesarios para crear una nueva PQR.
 export interface CreatePqrData {
   caseType: string;
   description: string;
+}
+
+// Datos necesarios para calificar una PQR.
+export interface RatePqrData {
+  rating: number;
+  ratingComment?: string;
 }
 
 // Respuesta al obtener múltiples PQR.
@@ -50,6 +61,12 @@ export interface SinglePqrResponse {
 
 // Respuesta al tomar o asignar una PQR.
 export interface TakePqrResponse {
+  message: string;
+  pqr: Pqr;
+}
+
+// Respuesta al calificar una PQR.
+export interface RatePqrResponse {
   message: string;
   pqr: Pqr;
 }

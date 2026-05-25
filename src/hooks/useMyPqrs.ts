@@ -1,44 +1,144 @@
 import { useEffect, useState } from "react";
-import type { Pqr } from "../interfaces/pqr.interface";
-import { getMyPqrs } from "../services/pqrService";
+import type { MessageType, Pqr } from "../interfaces/pqr.interface";
+import { getMyPqrs, ratePqr } from "../services/pqrService";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Hook encargado de manejar las PQR del usuario autenticado.
 export const useMyPqrs = () => {
-    // Lista de PQR creadas por el usuario.
-    const [pqrs, setPqrs] = useState<Pqr[]>([]);
+  // Lista de PQR creadas por el usuario.
+  const [pqrs, setPqrs] = useState<Pqr[]>([]);
 
-    // Controla la carga inicial de la vista.
-    const [loading, setLoading] = useState(true);
+  // Controla la carga inicial de la vista.
+  const [loading, setLoading] = useState(true);
 
-    // Guarda errores generales al cargar las PQR.
-    const [error, setError] = useState("");
+  // Guarda errores generales al cargar las PQR.
+  const [error, setError] = useState("");
 
-    // Carga las PQR del usuario autenticado desde el backend.
-    const loadMyPqrs = async () => {
-        try {
-            setLoading(true);
-            setError("");
+  // PQR que tiene abierto el formulario de calificación.
+  const [ratingPqrId, setRatingPqrId] = useState<number | null>(null);
 
-            const response = await getMyPqrs();
+  // Valor de la calificación seleccionada.
+  const [rating, setRating] = useState<number | null>(null);
 
-            setPqrs(response.pqrs);
-        } catch (error) {
-            console.error(error);
-            setError("Error al cargar las PQR.");
-        } finally {
-            setLoading(false);
-        }
-    };
+  // Comentario opcional de la calificación.
+  const [ratingComment, setRatingComment] = useState("");
 
-    // Carga las PQR cuando se abre la vista.
-    useEffect(() => {
-        loadMyPqrs();
-    }, []);
+  // Controla el loading del botón de calificar.
+  const [ratingLoading, setRatingLoading] = useState(false);
 
-    return {
-        pqrs,
-        loading,
-        error,
-        loadMyPqrs,
-    };
+  // Estados para mensajes visuales.
+  const [openMessage, setOpenMessage] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<MessageType>("success");
+
+  // Carga las PQR del usuario autenticado desde el backend.
+  const loadMyPqrs = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await getMyPqrs();
+
+      setPqrs(response.pqrs);
+    } catch (error) {
+      console.error(error);
+      setError("Error al cargar las PQR.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Abre el formulario de calificación dentro de la tarjeta.
+  const openRatingForm = (pqrId: number) => {
+    setRatingPqrId(pqrId);
+    setRating(null);
+    setRatingComment("");
+  };
+
+  // Cierra el formulario de calificación.
+  const closeRatingForm = () => {
+    if (ratingLoading) return;
+
+    setRatingPqrId(null);
+    setRating(null);
+    setRatingComment("");
+  };
+
+  // Muestra mensajes de éxito, error o advertencia.
+  const showMessage = (text: string, type: MessageType) => {
+    setMessage(text);
+    setMessageType(type);
+    setOpenMessage(true);
+  };
+
+  // Cierra el snackbar.
+  const closeMessage = () => {
+    setOpenMessage(false);
+  };
+
+  // Envía la calificación al backend.
+  const submitRating = async (pqrId: number) => {
+    if (!rating) {
+      showMessage("Selecciona una calificación antes de enviar.", "warning");
+      return;
+    }
+
+    try {
+      setRatingLoading(true);
+
+      const data =
+        ratingComment.trim().length > 0
+          ? {
+              rating,
+              ratingComment: ratingComment.trim(),
+            }
+          : {
+              rating,
+            };
+
+      const response = await ratePqr(pqrId, data);
+
+      setPqrs((currentPqrs) =>
+        currentPqrs.map((pqr) =>
+          pqr.id === pqrId ? response.pqr : pqr
+        )
+      );
+
+      showMessage(response.message, "success");
+      closeRatingForm();
+    } catch (error) {
+      console.error(error);
+      showMessage(getErrorMessage(error), "error");
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
+  // Carga las PQR cuando se abre la vista.
+  useEffect(() => {
+    loadMyPqrs();
+  }, []);
+
+  return {
+    pqrs,
+    loading,
+    error,
+    loadMyPqrs,
+
+    ratingPqrId,
+    rating,
+    ratingComment,
+    ratingLoading,
+
+    openMessage,
+    message,
+    messageType,
+
+    setRating,
+    setRatingComment,
+    openRatingForm,
+    closeRatingForm,
+    submitRating,
+    closeMessage,
+  };
 };

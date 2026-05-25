@@ -3,6 +3,8 @@ import type {
   CreatePqrData,
   PqrResponse,
   PqrStatus,
+  RatePqrData,
+  RatePqrResponse,
   SinglePqrResponse,
   TakePqrResponse,
 } from "../interfaces/pqr.interface";
@@ -71,5 +73,18 @@ export const takePqr = async (
 // Obtiene las PQR asignadas al AGENT autenticado.
 export const getMyAssignedPqrs = async (): Promise<PqrResponse> => {
   const response = await api.get<PqrResponse>("/pqrs/assigned/my");
+  return response.data;
+};
+
+// Califica una PQR cerrada. Endpoint usado por USER.
+export const ratePqr = async (
+  pqrId: number,
+  data: RatePqrData
+): Promise<RatePqrResponse> => {
+  const response = await api.patch<RatePqrResponse>(
+    `/pqrs/${pqrId}/rate`,
+    data
+  );
+
   return response.data;
 };
