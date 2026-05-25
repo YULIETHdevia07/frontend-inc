@@ -44,6 +44,7 @@ import { useState } from "react";
 import type { PqrStatus } from "../../interfaces/pqr.interface";
 import { getFilterStyles } from "../../styles/filterStyles";
 import { pqrStatusOptions } from "../../data/pqrOptions";
+import PqrRatingSummary from "../../components/pqr/PqrRatingSummary";
 
 // Página administrativa para consultar, responder y cambiar estados de PQR.
 const AdminPqrs = () => {
@@ -714,8 +715,6 @@ const AdminPqrs = () => {
                                         </Box>
                                     </Box>
                                 </Box>
-
-
                                 <Divider />
 
                                 <Typography variant="body2" sx={style.description}>
@@ -737,6 +736,14 @@ const AdminPqrs = () => {
                                             {pqr.response}
                                         </Typography>
                                     </Box>
+                                )}
+
+                                {pqr.rating !== null && pqr.rating !== undefined && (
+                                    <PqrRatingSummary
+                                        rating={pqr.rating}
+                                        ratingComment={pqr.ratingComment}
+                                        ratedAt={pqr.ratedAt}
+                                    />
                                 )}
 
                                 <Box sx={style.actionsBox}>

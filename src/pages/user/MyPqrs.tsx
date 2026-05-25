@@ -27,6 +27,7 @@ import LoadingBox from "../../components/common/LoadingBox";
 import EmptyState from "../../components/common/EmptyState";
 import CustomSnackbar from "../../components/common/CustomSnackbar";
 import { pqrStatusOptions } from "../../data/pqrOptions";
+import PqrRatingSummary from "../../components/pqr/PqrRatingSummary";
 
 // Página donde el usuario consulta las PQR que ha creado.
 const MyPqrs = () => {
@@ -55,191 +56,162 @@ const MyPqrs = () => {
     } = useMyPqrs();
 
     const style = {
-  container: {
-    width: "100%",
-  },
-
-  list: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 2,
-  },
-
-  card: {
-    p: {
-      xs: 2,
-      md: 2.5,
-    },
-    borderRadius: "22px",
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: "0 12px 35px rgba(15, 23, 42, 0.08)",
-    border: `1px solid ${theme.palette.primary.light}`,
-    transition: "all 0.2s ease",
-    "&:hover": {
-      transform: "translateY(-2px)",
-      boxShadow: "0 18px 45px rgba(15, 23, 42, 0.12)",
-    },
-  },
-
-  cardHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 2,
-    mb: 1,
-    flexDirection: {
-      xs: "column",
-      sm: "row",
-    },
-  },
-
-  cardTitleBox: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 0.5,
-  },
-
-  cardTitle: {
-    fontWeight: 600,
-    color: theme.palette.text.primary,
-    lineHeight: 1.2,
-  },
-
-  dateBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: 0.7,
-    color: theme.palette.text.secondary,
-  },
-
-  description: {
-    color: theme.palette.text.secondary,
-    mt: 1,
-    lineHeight: 1.7,
-  },
-
-  responseBox: {
-    mt: 2.5,
-    p: 2,
-    borderRadius: 3,
-    backgroundColor: theme.palette.primary.light,
-  },
-
-  responseTitle: {
-    display: "flex",
-    alignItems: "center",
-    gap: 1,
-    fontWeight: 800,
-    mb: 0.8,
-    color: theme.palette.primary.dark,
-  },
-
-  date: {
-    mt: 1,
-    color: theme.palette.text.secondary,
-    fontSize: "0.85rem",
-  },
-
-  ratingButton: {
-    mt: 2,
-    borderRadius: 3,
-    fontWeight: 800,
-    textTransform: "none",
-    boxShadow: "none",
-  },
-
-  ratingSection: {
-    mt: 2.5,
-    p: {
-      xs: 1.8,
-      md: 2,
-    },
-    borderRadius: 4,
-    backgroundColor: theme.palette.background.default,
-    border: `1px solid ${theme.palette.primary.light}`,
-  },
-
-  ratingHeader: {
-    display: "flex",
-    alignItems: "center",
-    gap: 1,
-    mb: 0.5,
-    fontWeight: 800,
-    color: theme.palette.primary.main
-  },
-
-  ratingDescription: {
-    color: theme.palette.text.secondary,
-    mb: 1.5,
-    lineHeight: 1.6,
-  },
-
-  ratingStarsBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: 1,
-    mb: 1.5,
-    flexWrap: "wrap",
-  },
-
-  ratingText: {
-    color: theme.palette.text.secondary,
-    fontSize: "0.9rem",
-  },
-
-  ratingActions: {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 1,
-    mt: 1.5,
-    flexDirection: {
-      xs: "column",
-      sm: "row",
-    },
-  },
-
-  cancelButton: {
-    borderRadius: 3,
-    fontWeight: 700,
-    textTransform: "none",
-  },
-
-  submitRatingButton: {
-    borderRadius: 3,
-    fontWeight: 800,
-    textTransform: "none",
-    boxShadow: "none",
-  },
-
-  ratedBox: {
-            mt: 2.5,
-            p: 2,
-            borderRadius: 4,
-            backgroundColor: "#fff7ed",
-            border: "1px solid #fed7aa",
+        container: {
+            width: "100%",
         },
 
-        ratedTitle: {
+        list: {
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+        },
+
+        card: {
+            p: {
+                xs: 2,
+                md: 2.5,
+            },
+            borderRadius: "22px",
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: "0 12px 35px rgba(15, 23, 42, 0.08)",
+            border: `1px solid ${theme.palette.primary.light}`,
+            transition: "all 0.2s ease",
+            "&:hover": {
+                transform: "translateY(-2px)",
+                boxShadow: "0 18px 45px rgba(15, 23, 42, 0.12)",
+            },
+        },
+
+        cardHeader: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: 2,
+            mb: 1,
+            flexDirection: {
+                xs: "column",
+                sm: "row",
+            },
+        },
+
+        cardTitleBox: {
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+        },
+
+        cardTitle: {
+            fontWeight: 600,
+            color: theme.palette.text.primary,
+            lineHeight: 1.2,
+        },
+
+        dateBox: {
+            display: "flex",
+            alignItems: "center",
+            gap: 0.7,
+            color: theme.palette.text.secondary,
+        },
+
+        description: {
+            color: theme.palette.text.secondary,
+            mt: 1,
+            lineHeight: 1.7,
+        },
+
+        responseBox: {
+            mt: 2.5,
+            p: 2,
+            borderRadius: 3,
+            backgroundColor: theme.palette.primary.light,
+        },
+
+        responseTitle: {
             display: "flex",
             alignItems: "center",
             gap: 1,
             fontWeight: 800,
-            mb: 1,
-            color: "#9a3412",
+            mb: 0.8,
+            color: theme.palette.primary.dark,
         },
 
-        ratedComment: {
+        date: {
             mt: 1,
             color: theme.palette.text.secondary,
+            fontSize: "0.85rem",
+        },
+
+        ratingButton: {
+            mt: 2,
+            borderRadius: 3,
+            fontWeight: 800,
+            textTransform: "none",
+            boxShadow: "none",
+        },
+
+        ratingSection: {
+            mt: 2.5,
+            p: {
+                xs: 1.8,
+                md: 2,
+            },
+            borderRadius: 4,
+            backgroundColor: theme.palette.background.default,
+            border: `1px solid ${theme.palette.primary.light}`,
+        },
+
+        ratingHeader: {
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            mb: 0.5,
+            fontWeight: 800,
+            color: theme.palette.primary.main
+        },
+
+        ratingDescription: {
+            color: theme.palette.text.secondary,
+            mb: 1.5,
             lineHeight: 1.6,
         },
 
-        ratedDate: {
-            display: "block",
-            mt: 0.8,
-            color: theme.palette.text.secondary,
+        ratingStarsBox: {
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            mb: 1.5,
+            flexWrap: "wrap",
         },
-};
+
+        ratingText: {
+            color: theme.palette.text.secondary,
+            fontSize: "0.9rem",
+        },
+
+        ratingActions: {
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 1,
+            mt: 1.5,
+            flexDirection: {
+                xs: "column",
+                sm: "row",
+            },
+        },
+
+        cancelButton: {
+            borderRadius: 3,
+            fontWeight: 700,
+            textTransform: "none",
+        },
+
+        submitRatingButton: {
+            borderRadius: 3,
+            fontWeight: 800,
+            textTransform: "none",
+            boxShadow: "none",
+        },
+    };
 
     if (loading) {
         return <LoadingBox />;
@@ -321,25 +293,11 @@ const MyPqrs = () => {
 
                                 {/* Calificación ya registrada */}
                                 {pqr.rating && (
-                                    <Box sx={style.ratedBox}>
-                                        <Typography variant="subtitle2" sx={style.ratedTitle}>
-                                            Calificación registrada
-                                        </Typography>
-
-                                        <Rating value={pqr.rating} readOnly size="small" />
-
-                                        {pqr.ratingComment && (
-                                            <Typography variant="body2" sx={style.ratedComment}>
-                                                {pqr.ratingComment}
-                                            </Typography>
-                                        )}
-
-                                        {pqr.ratedAt && (
-                                            <Typography variant="caption" sx={style.ratedDate}>
-                                                Calificada el {formatDate(pqr.ratedAt)}
-                                            </Typography>
-                                        )}
-                                    </Box>
+                                    <PqrRatingSummary
+                                        rating={pqr.rating}
+                                        ratingComment={pqr?.ratingComment}
+                                        ratedAt={pqr.ratedAt}
+                                    />
                                 )}
 
                                 {/* Botón para abrir formulario de calificación */}

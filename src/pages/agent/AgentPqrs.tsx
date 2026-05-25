@@ -45,6 +45,7 @@ import CustomSnackbar from "../../components/common/CustomSnackbar";
 import ClearableSelect from "../../components/common/ClearableSelect";
 import { getFilterStyles } from "../../styles/filterStyles";
 import { pqrStatusOptions } from "../../data/pqrOptions";
+import PqrRatingSummary from "../../components/pqr/PqrRatingSummary";
 
 // Página del agente para tomar PQR, responderlas y cambiar su estado.
 const AgentPqrs = () => {
@@ -528,6 +529,17 @@ const AgentPqrs = () => {
                                     </Typography>
                                 </Box>
                             )}
+                            
+                            {/* Muestra la calificación registrada por el usuario */}
+                            {
+                                pqr.rating !== null &&
+                                pqr.rating !== undefined && (
+                                    <PqrRatingSummary
+                                        rating={pqr.rating}
+                                        ratingComment={pqr.ratingComment}
+                                        ratedAt={pqr.ratedAt}
+                                    />
+                                )}
 
                             {/* Acciones disponibles solo para PQR asignadas */}
                             {activeView === "ASSIGNED" && (
