@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { ValidationError } from "yup";
-import type { MessageType, Pqr, PqrStatus } from "../interfaces/pqr.interface";
+import type {
+    MessageType,
+    Pqr,
+    PqrPriority,
+    PqrStatus,
+} from "../interfaces/pqr.interface";
 import {
     getAllPqrs,
     respondPqr,
+    updatePqrPriority,
     updatePqrStatus,
 } from "../services/pqrService";
 import { responsePqrSchema } from "../validations/pqrValidation";
@@ -21,7 +27,14 @@ export const useAdminPqrs = () => {
     const [error, setError] = useState("");
 
     // Guarda el id de la PQR cuyo estado se está actualizando.
-    const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
+    const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(
+        null
+    );
+
+    // Guarda el id de la PQR cuya prioridad se está actualizando.
+    const [updatingPriorityId, setUpdatingPriorityId] = useState<number | null>(
+        null
+    );
 
     // Guarda el id de la PQR que se está respondiendo.
     const [respondingPqrId, setRespondingPqrId] = useState<number | null>(null);
@@ -30,6 +43,11 @@ export const useAdminPqrs = () => {
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
         {}
     );
+
+    // Guarda temporalmente las prioridades seleccionadas.
+    const [priorityChanges, setPriorityChanges] = useState<
+        Record<number, PqrPriority>
+    >({});
 
     // Guarda las respuestas escritas por PQR.
     const [responseTexts, setResponseTexts] = useState<Record<number, string>>(
@@ -74,7 +92,9 @@ export const useAdminPqrs = () => {
         } catch (error) {
             console.error(error);
 
-            setError("Error al cargar las PQR. Verifica que el usuario tenga rol ADMIN.");
+            setError(
+                "Error al cargar las PQR. Verifica que el usuario tenga rol ADMIN."
+            );
         } finally {
             setLoading(false);
         }
@@ -137,13 +157,80 @@ export const useAdminPqrs = () => {
             console.error(error);
 
             showSnackbar(
-                getErrorMessage(error, "Error al actualizar el estado de la PQR."),
+                getErrorMessage(
+                    error,
+                    "Error al actualizar el estado de la PQR."
+                ),
                 "error"
             );
         } finally {
             setUpdatingStatusId(null);
         }
     };
+
+    // Guarda la prioridad seleccionada de una PQR.
+    const handlePriorityChange = (pqrId: number, priority: string) => {
+        setPriorityChanges((prev) => {
+            const updated = { ...prev };
+
+            if (!priority) {
+                delete updated[pqrId];
+                return updated;
+            }
+
+            updated[pqrId] = priority as PqrPriority;
+            return updated;
+        });
+    };
+
+    // Actualiza la prioridad de una PQR.
+    const handleUpdatePriority = async (pqrId: number) => {
+        const newPriority = priorityChanges[pqrId];
+
+        if (!newPriority) {
+            showSnackbar("Debes seleccionar una prioridad.", "warning");
+            return;
+        }
+
+        try {
+            setUpdatingPriorityId(pqrId);
+
+            const response = await updatePqrPriority(pqrId, newPriority);
+
+            setPqrs((prev) =>
+                prev.map((pqr) =>
+                    pqr.id === pqrId
+                        ? {
+                            ...pqr,
+                            ...response.pqr,
+                            priority: newPriority,
+                        }
+                        : pqr
+                )
+            );
+
+            setPriorityChanges((prev) => {
+                const updated = { ...prev };
+                delete updated[pqrId];
+                return updated;
+            });
+
+            showSnackbar(
+                response.message || "Prioridad actualizada correctamente.",
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+
+            showSnackbar(
+                getErrorMessage(error, "Error al actualizar la prioridad."),
+                "error"
+            );
+        } finally {
+            setUpdatingPriorityId(null);
+        }
+    };
+
     // Guarda el texto escrito como respuesta.
     const handleResponseTextChange = (pqrId: number, value: string) => {
         setResponseTexts((prev) => ({
@@ -221,9 +308,11 @@ export const useAdminPqrs = () => {
         error,
 
         updatingStatusId,
+        updatingPriorityId,
         respondingPqrId,
 
         statusChanges,
+        priorityChanges,
         responseTexts,
         responseErrors,
 
@@ -231,9 +320,12 @@ export const useAdminPqrs = () => {
         messageType,
         openMessage,
         closeMessage,
+
         loadAllPqrs,
         handleStatusChange,
         handleUpdateStatus,
+        handlePriorityChange,
+        handleUpdatePriority,
         handleResponseTextChange,
         handleRespondPqr,
     };

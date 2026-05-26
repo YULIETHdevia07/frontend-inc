@@ -26,6 +26,7 @@ import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 
@@ -68,6 +69,9 @@ const AgentPqrs = () => {
 
         statusFilter,
         setStatusFilter,
+
+        priorityFilter,
+        setPriorityFilter,
 
         searchTerm,
         showSearch,
@@ -120,6 +124,14 @@ const AgentPqrs = () => {
     // Limpia el filtro por estado.
     const clearStatusFilter = () => {
         setStatusFilter("ALL");
+    };
+
+    const handlePriorityFilterChange = (event: { target: { value: string } }) => {
+        setPriorityFilter(event.target.value as "ALL" | PqrPriority);
+    };
+
+    const clearPriorityFilter = () => {
+        setPriorityFilter("ALL");
     };
 
     const getPriorityLabel = (priority?: PqrPriority | null) => {
@@ -371,11 +383,11 @@ const AgentPqrs = () => {
                         )}
 
                         {/* Filtro visual */}
-                        <Tooltip title="Filtrar por estado">
+                        <Tooltip title="Filtrar PQR">
                             <IconButton
                                 onClick={openFilters}
                                 sx={
-                                    statusFilter !== "ALL"
+                                    statusFilter !== "ALL" || priorityFilter !== "ALL"
                                         ? filterStyles.activeIconButton
                                         : filterStyles.iconButton
                                 }
@@ -396,7 +408,7 @@ const AgentPqrs = () => {
                         >
                             <Box sx={filterStyles.filterMenuContent}>
                                 <Typography variant="body2" sx={filterStyles.filterTitle}>
-                                    Filtrar por estado
+                                    Filtrar PQR
                                 </Typography>
 
                                 <Select
@@ -415,14 +427,33 @@ const AgentPqrs = () => {
                                     ))}
                                 </Select>
 
+                                <Select
+                                    fullWidth
+                                    value={priorityFilter}
+                                    onChange={handlePriorityFilterChange}
+                                    size="small"
+                                    sx={filterStyles.filterSelect}
+                                >
+                                    <MenuItem value="ALL">Todas las prioridades</MenuItem>
+
+                                    {pqrPriorityOptions.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+
                                 <Button
                                     fullWidth
                                     variant="text"
-                                    onClick={clearStatusFilter}
-                                    disabled={statusFilter === "ALL"}
+                                    onClick={() => {
+                                        clearStatusFilter();
+                                        clearPriorityFilter();
+                                    }}
+                                    disabled={statusFilter === "ALL" && priorityFilter === "ALL"}
                                     sx={filterStyles.clearFilterButton}
                                 >
-                                    Limpiar filtro
+                                    Limpiar filtros
                                 </Button>
                             </Box>
                         </Menu>
@@ -501,8 +532,13 @@ const AgentPqrs = () => {
                                         <CalendarMonthOutlinedIcon fontSize="small" />
 
                                         <Typography sx={style.date}>
-                                            Creada el{" "}
-                                            {formatDate(pqr.createdAt)}
+                                            Creada : {formatDate(pqr.createdAt)}
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={style.dateBox}>
+                                        <PersonOutlineOutlinedIcon fontSize="small" />
+                                        <Typography variant="body2" sx={style.date}>
+                                            Usuario : {pqr.user?.name || "No disponible"}  · {pqr.user?.email || "No disponible"}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -520,27 +556,6 @@ const AgentPqrs = () => {
                             <Typography sx={style.description}>
                                 {pqr.description}
                             </Typography>
-
-                            {/* Información del usuario solicitante */}
-                            {/* <Box sx={style.userBox}>
-                                <Box sx={style.userIconBox}>
-                                    <PersonOutlineOutlinedIcon fontSize="small" />
-                                </Box>
-
-                                <Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>
-                                        Usuario solicitante
-                                    </Typography>
-
-                                    <Typography variant="body2" color="text.secondary">
-                                        {pqr.user?.name || "Usuario no disponible"}
-                                    </Typography>
-
-                                    <Typography variant="body2" color="text.secondary">
-                                        {pqr.user?.email || "Correo no disponible"}
-                                    </Typography>
-                                </Box>
-                            </Box> */}
 
                             {/* Muestra la respuesta actual si la PQR ya fue respondida */}
                             {activeView === "ASSIGNED" && pqr.response && (

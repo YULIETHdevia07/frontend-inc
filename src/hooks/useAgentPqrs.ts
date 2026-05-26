@@ -67,6 +67,11 @@ export const useAgentPqrs = () => {
     // Controla el filtro por estado.
     const [statusFilter, setStatusFilter] = useState<"ALL" | PqrStatus>("ALL");
 
+    // Controla el filtro por prioridad.
+    const [priorityFilter, setPriorityFilter] = useState<"ALL" | PqrPriority>(
+        "ALL"
+    );
+
     // Guarda el texto escrito en el buscador.
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -359,9 +364,12 @@ export const useAgentPqrs = () => {
             const matchesStatus =
                 statusFilter === "ALL" || pqr.status === statusFilter;
 
-            return matchesSearch && matchesStatus;
+            const matchesPriority =
+                priorityFilter === "ALL" || pqr.priority === priorityFilter;
+
+            return matchesSearch && matchesStatus && matchesPriority;
         });
-    }, [currentPqrs, searchTerm, statusFilter]);
+    }, [currentPqrs, searchTerm, statusFilter, priorityFilter]);
 
     // Carga la información al abrir la vista.
     useEffect(() => {
@@ -384,6 +392,9 @@ export const useAgentPqrs = () => {
 
         statusFilter,
         setStatusFilter,
+
+        priorityFilter,
+        setPriorityFilter,
 
         searchTerm,
         showSearch,
