@@ -4,6 +4,7 @@ import type {
     AgentPqrView,
     MessageType,
     Pqr,
+    PqrPriority,
     PqrStatus,
 } from "../interfaces/pqr.interface";
 import {
@@ -11,6 +12,7 @@ import {
     getMyAssignedPqrs,
     respondPqr,
     takePqr,
+    updatePqrPriority,
     updatePqrStatus,
 } from "../services/pqrService";
 import { responsePqrSchema } from "../validations/pqrValidation";
@@ -53,6 +55,9 @@ export const useAgentPqrs = () => {
     // Guarda el id de la PQR cuyo estado se está actualizando.
     const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
 
+    // Guarda el id de la PQR cuya prioridad se está actualizando.
+    const [updatingPriorityId, setUpdatingPriorityId] = useState<number | null>(null);
+
     // Guarda el id de la PQR que se está respondiendo.
     const [respondingPqrId, setRespondingPqrId] = useState<number | null>(null);
 
@@ -72,6 +77,11 @@ export const useAgentPqrs = () => {
     const [statusByPqrId, setStatusByPqrId] = useState<Record<number, PqrStatus>>(
         {}
     );
+
+    // Guarda la nueva prioridad seleccionada por cada PQR.
+    const [priorityByPqrId, setPriorityByPqrId] = useState<
+        Record<number, PqrPriority>
+    >({});
 
     // Guarda el texto de respuesta escrito por cada PQR.
     const [responseTexts, setResponseTexts] = useState<Record<number, string>>(
@@ -198,6 +208,56 @@ export const useAgentPqrs = () => {
         }
     };
 
+    // Guarda temporalmente la prioridad seleccionada antes de enviarla.
+    const handlePriorityChange = (pqrId: number, priority: PqrPriority) => {
+        setPriorityByPqrId((prev) => ({
+            ...prev,
+            [pqrId]: priority,
+        }));
+    };
+
+    // Actualiza la prioridad de una PQR asignada.
+    const handleUpdatePriority = async (pqrId: number) => {
+        try {
+            const selectedPriority = priorityByPqrId[pqrId];
+
+            if (!selectedPriority) {
+                showSnackbar("Debes seleccionar una prioridad.", "warning");
+                return;
+            }
+
+            setUpdatingPriorityId(pqrId);
+
+            const response = await updatePqrPriority(pqrId, selectedPriority);
+
+            // Actualiza la PQR modificada dentro de la lista de asignadas.
+            setAssignedPqrs((prev) =>
+                prev.map((pqr) => (pqr.id === pqrId ? response.pqr : pqr))
+            );
+
+            // Limpia el cambio temporal después de guardar.
+            setPriorityByPqrId((prev) => {
+                const updated = { ...prev };
+                delete updated[pqrId];
+                return updated;
+            });
+
+            showSnackbar(
+                response.message || "Prioridad actualizada correctamente.",
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+
+            showSnackbar(
+                getErrorMessage(error, "Error al actualizar la prioridad."),
+                "error"
+            );
+        } finally {
+            setUpdatingPriorityId(null);
+        }
+    };
+
     // Guarda el texto escrito en el campo de respuesta.
     const handleResponseChange = (pqrId: number, value: string) => {
         setResponseTexts((prev) => ({
@@ -212,7 +272,7 @@ export const useAgentPqrs = () => {
         }));
     };
 
-    // Valida con Yup y envía la respuesta de una PQR asignada.
+    // Envía la respuesta de una PQR asignada.
     const handleRespondPqr = async (pqrId: number) => {
         const responseText = responseTexts[pqrId] || "";
 
@@ -292,6 +352,7 @@ export const useAgentPqrs = () => {
                 pqr.description.toLowerCase().includes(normalizedSearch) ||
                 pqr.caseType.toLowerCase().includes(normalizedSearch) ||
                 pqr.status.toLowerCase().includes(normalizedSearch) ||
+                pqr.priority?.toLowerCase().includes(normalizedSearch) ||
                 pqr.user?.name?.toLowerCase().includes(normalizedSearch) ||
                 pqr.user?.email?.toLowerCase().includes(normalizedSearch);
 
@@ -315,6 +376,7 @@ export const useAgentPqrs = () => {
         loading,
         takingPqrId,
         updatingStatusId,
+        updatingPriorityId,
         respondingPqrId,
 
         activeView,
@@ -330,6 +392,7 @@ export const useAgentPqrs = () => {
         clearSearch,
 
         statusByPqrId,
+        priorityByPqrId,
         responseTexts,
         responseErrors,
 
@@ -342,6 +405,8 @@ export const useAgentPqrs = () => {
         handleTakePqr,
         handleStatusChange,
         handleUpdateStatus,
+        handlePriorityChange,
+        handleUpdatePriority,
         handleResponseChange,
         handleRespondPqr,
     };

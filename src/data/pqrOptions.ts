@@ -24,3 +24,11 @@ export const pqrStatusOptions = [
   { label: "EN PROCESO", value: "EN_PROCESO" },
   { label: "CERRADA", value: "CERRADA" },
 ];
+
+// Opciones disponibles para la prioridad de una PQR.
+export const pqrPriorityOptions = [
+    { value: "BAJA", label: "Baja" },
+    { value: "MEDIA", label: "Media" },
+    { value: "ALTA", label: "Alta" },
+    { value: "URGENTE", label: "Urgente" },
+];

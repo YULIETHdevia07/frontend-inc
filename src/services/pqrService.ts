@@ -1,6 +1,7 @@
 import api from "../api/axios";
 import type {
   CreatePqrData,
+  PqrPriority,
   PqrResponse,
   PqrStatus,
   RatePqrData,
@@ -29,17 +30,26 @@ export const getAllPqrs = async (): Promise<PqrResponse> => {
   return response.data;
 };
 
-// Actualiza el estado de una PQR. Endpoint usado por ADMIN.
+// Actualiza el estado de una PQR. Endpoint usado por ADMIN o AGENT.
 export const updatePqrStatus = async (
   id: number,
   status: PqrStatus
 ): Promise<SinglePqrResponse> => {
-  const response = await api.patch<SinglePqrResponse>(
-    `/pqrs/${id}/status`,
-    {
-      status,
-    }
-  );
+  const response = await api.patch<SinglePqrResponse>(`/pqrs/${id}/status`, {
+    status,
+  });
+
+  return response.data;
+};
+
+// Actualiza la prioridad de una PQR. Endpoint usado por ADMIN o AGENT.
+export const updatePqrPriority = async (
+  id: number,
+  priority: PqrPriority
+): Promise<SinglePqrResponse> => {
+  const response = await api.patch<SinglePqrResponse>(`/pqrs/${id}/priority`, {
+    priority,
+  });
 
   return response.data;
 };
@@ -63,9 +73,7 @@ export const getAvailablePqrs = async (): Promise<PqrResponse> => {
 };
 
 // Permite que un AGENT tome una PQR.
-export const takePqr = async (
-  pqrId: number
-): Promise<TakePqrResponse> => {
+export const takePqr = async (pqrId: number): Promise<TakePqrResponse> => {
   const response = await api.patch<TakePqrResponse>(`/pqrs/${pqrId}/take`);
   return response.data;
 };

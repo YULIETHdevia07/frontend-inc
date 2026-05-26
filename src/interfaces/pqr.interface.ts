@@ -1,6 +1,9 @@
 // Estados permitidos para una PQR.
 export type PqrStatus = "PENDIENTE" | "EN_PROCESO" | "CERRADA";
 
+// Priodad permitidos para una PQR.
+export type PqrPriority = "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
+
 // Vistas disponibles en la página del agente.
 export type AgentPqrView = "AVAILABLE" | "ASSIGNED";
 
@@ -33,6 +36,8 @@ export interface Pqr {
   rating?: number | null;
   ratingComment?: string | null;
   ratedAt?: string | null;
+
+  priority: PqrPriority;
 }
 
 // Datos necesarios para crear una nueva PQR.

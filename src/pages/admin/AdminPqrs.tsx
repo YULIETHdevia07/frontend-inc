@@ -635,8 +635,37 @@ const AdminPqrs = () => {
                                             <Box sx={style.dateBox}>
                                                 <CalendarMonthOutlinedIcon fontSize="small" />
                                                 <Typography variant="body2" sx={style.date}>
-                                                    Creada el {formatDate(pqr.createdAt)}
+                                                    Creada : {formatDate(pqr.createdAt)}
                                                 </Typography>
+                                            </Box>
+                                            <Box sx={style.dateBox}>
+                                                <PersonOutlineOutlinedIcon fontSize="small" />
+                                                <Typography variant="body2" sx={style.date}>
+                                                    Usuario : {pqr.user?.name || "No disponible"}  · {pqr.user?.email || "No disponible"}
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={style.dateBox}>
+                                                {pqr.assignedTo ? (
+                                                    <>
+                                                        <SupportAgentOutlinedIcon
+                                                            fontSize="small"
+                                                            sx={{ color: theme.palette.success.main }}
+                                                        />
+                                                        <Typography variant="body2" sx={style.agentText}>
+                                                            Agente : {pqr.assignedTo.name} · {pqr.assignedTo.email}
+                                                        </Typography>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <PersonOffOutlinedIcon
+                                                            fontSize="small"
+                                                            sx={{ color: theme.palette.text.disabled }}
+                                                        />
+                                                        <Typography variant="body2" sx={style.noAgentText}>
+                                                            Sin agente asignado
+                                                        </Typography>
+                                                    </>
+                                                )}
                                             </Box>
                                         </Box>
 
@@ -646,73 +675,6 @@ const AdminPqrs = () => {
                                             size="small"
                                             sx={style.statusChip}
                                         />
-                                    </Box>
-
-                                    <Box sx={style.infoRow}>
-                                        <Box sx={style.infoItem}>
-                                            <PersonOutlineOutlinedIcon
-                                                fontSize="small"
-                                                sx={{ color: theme.palette.text.secondary }}
-                                            />
-
-                                            <Box>
-                                                <Typography sx={style.infoLabel}>
-                                                    Solicitante
-                                                </Typography>
-
-                                                <Typography sx={style.infoText}>
-                                                    {pqr.user?.name || "No disponible"} · {pqr.user?.email || "No disponible"}
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-
-                                        <Box sx={style.infoItem}>
-                                            {pqr.assignedTo ? (
-                                                <>
-                                                    <SupportAgentOutlinedIcon
-                                                        fontSize="small"
-                                                        sx={{ color: theme.palette.success.main }}
-                                                    />
-
-                                                    <Box>
-                                                        <Typography
-                                                            sx={{
-                                                                ...style.infoLabel,
-                                                                color: theme.palette.success.main,
-                                                            }}
-                                                        >
-                                                            Agente
-                                                        </Typography>
-
-                                                        <Typography sx={style.agentText}>
-                                                            {pqr.assignedTo.name} · {pqr.assignedTo.email}
-                                                        </Typography>
-                                                    </Box>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <PersonOffOutlinedIcon
-                                                        fontSize="small"
-                                                        sx={{ color: theme.palette.text.disabled }}
-                                                    />
-
-                                                    <Box>
-                                                        <Typography
-                                                            sx={{
-                                                                ...style.infoLabel,
-                                                                color: theme.palette.text.disabled,
-                                                            }}
-                                                        >
-                                                            Agente
-                                                        </Typography>
-
-                                                        <Typography sx={style.noAgentText}>
-                                                            Sin agente asignado
-                                                        </Typography>
-                                                    </Box>
-                                                </>
-                                            )}
-                                        </Box>
                                     </Box>
                                 </Box>
                                 <Divider />

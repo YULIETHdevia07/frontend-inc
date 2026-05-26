@@ -25,11 +25,11 @@ import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurned
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 
-import type { PqrStatus } from "../../interfaces/pqr.interface";
+import type { PqrPriority, PqrStatus } from "../../interfaces/pqr.interface";
 
 import { useAgentPqrs } from "../../hooks/useAgentPqrs";
 import {
@@ -44,7 +44,7 @@ import EmptyState from "../../components/common/EmptyState";
 import CustomSnackbar from "../../components/common/CustomSnackbar";
 import ClearableSelect from "../../components/common/ClearableSelect";
 import { getFilterStyles } from "../../styles/filterStyles";
-import { pqrStatusOptions } from "../../data/pqrOptions";
+import { pqrPriorityOptions, pqrStatusOptions } from "../../data/pqrOptions";
 import PqrRatingSummary from "../../components/pqr/PqrRatingSummary";
 
 // Página del agente para tomar PQR, responderlas y cambiar su estado.
@@ -60,6 +60,7 @@ const AgentPqrs = () => {
         loading,
         takingPqrId,
         updatingStatusId,
+        updatingPriorityId,
         respondingPqrId,
 
         activeView,
@@ -75,6 +76,7 @@ const AgentPqrs = () => {
         clearSearch,
 
         statusByPqrId,
+        priorityByPqrId,
         responseTexts,
         responseErrors,
 
@@ -89,6 +91,8 @@ const AgentPqrs = () => {
         handleUpdateStatus,
         handleResponseChange,
         handleRespondPqr,
+        handlePriorityChange,
+        handleUpdatePriority,
     } = useAgentPqrs();
 
     // Controla el menú desplegable del filtro por estado.
@@ -118,6 +122,22 @@ const AgentPqrs = () => {
         setStatusFilter("ALL");
     };
 
+    const getPriorityLabel = (priority?: PqrPriority | null) => {
+        return (
+            pqrPriorityOptions.find((option) => option.value === priority)
+                ?.label ||
+            priority ||
+            ""
+        );
+    };
+
+    const getStatusLabel = (status: PqrStatus) => {
+        return (
+            pqrStatusOptions.find((option) => option.value === status)?.label ||
+            status
+        );
+    };
+
     const style = {
         container: {
             width: "100%",
@@ -132,15 +152,6 @@ const AgentPqrs = () => {
             flexWrap: "wrap",
         },
 
-        // list: {
-        //     display: "grid",
-        //     gridTemplateColumns: {
-        //         xs: "1fr",
-        //         lg: "1fr 1fr",
-        //     },
-        //     gap: 2.5,
-        //     alignItems: "start",
-        // },
         list: {
             display: "flex",
             flexDirection: "column",
@@ -160,6 +171,23 @@ const AgentPqrs = () => {
             "&:hover": {
                 transform: "translateY(-2px)",
                 boxShadow: "0 18px 45px rgba(15, 23, 42, 0.12)",
+            },
+        },
+
+        priorityChipBox: {
+            mb: 1.5,
+            display: "flex",
+            justifyContent: "flex-start",
+        },
+
+        priorityChip: {
+            borderRadius: "999px",
+            fontWeight: 800,
+            backgroundColor: "#fff7ed",
+            color: "#c2410c",
+            border: "1px solid #fed7aa",
+            "& .MuiChip-icon": {
+                color: "#c2410c",
             },
         },
 
@@ -183,6 +211,12 @@ const AgentPqrs = () => {
             lineHeight: 1.2,
         },
 
+        statusChip: {
+            borderRadius: "999px",
+            fontWeight: 800,
+            px: 0.5,
+        },
+
         dateBox: {
             display: "flex",
             alignItems: "center",
@@ -190,33 +224,16 @@ const AgentPqrs = () => {
             color: theme.palette.text.secondary,
         },
 
+        date: {
+            mt: 1,
+            color: theme.palette.text.secondary,
+            fontSize: "0.85rem",
+        },
+
         description: {
             color: theme.palette.text.secondary,
             mt: 1,
             lineHeight: 1.7,
-        },
-
-        userBox: {
-            mt: 2,
-            p: 1.7,
-            borderRadius: "16px",
-            backgroundColor: "#f8fafc",
-            border: "1px solid #e2e8f0",
-            display: "flex",
-            gap: 1.5,
-            alignItems: "flex-start",
-        },
-
-        userIconBox: {
-            width: 38,
-            height: 38,
-            minWidth: 38,
-            borderRadius: "12px",
-            backgroundColor: theme.palette.primary.light,
-            color: theme.palette.primary.main,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
         },
 
         responseBox: {
@@ -235,12 +252,6 @@ const AgentPqrs = () => {
             color: theme.palette.primary.dark,
         },
 
-        date: {
-            mt: 1,
-            color: theme.palette.text.secondary,
-            fontSize: "0.85rem",
-        },
-
         actionsBox: {
             mt: 2,
             display: "flex",
@@ -249,22 +260,33 @@ const AgentPqrs = () => {
             flexWrap: "wrap",
         },
 
-        assignedActions: {
+        simpleActions: {
             mt: 2,
             display: "grid",
             gridTemplateColumns: {
                 xs: "1fr",
-                md: "280px 1fr",
+                md: "220px 220px 1fr",
             },
-            gap: 2,
+            gap: 1.5,
             alignItems: "flex-start",
         },
 
-        statusBox: {
-            p: 2,
-            borderRadius: 2,
-            backgroundColor: theme.palette.background.default,
-            border: `1px solid ${theme.palette.primary.light}`,
+        simpleBox: {
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+        },
+
+        simpleLabel: {
+            fontSize: "0.8rem",
+            fontWeight: 700,
+            color: theme.palette.text.secondary,
+        },
+
+        simpleButton: {
+            borderRadius: "10px",
+            textTransform: "none",
+            fontWeight: 700,
         },
 
         responseForm: {
@@ -272,17 +294,6 @@ const AgentPqrs = () => {
             borderRadius: 2,
             backgroundColor: theme.palette.background.default,
             border: `1px solid ${theme.palette.primary.light}`,
-        },
-
-        fieldLabel: {
-            fontWeight: 700,
-            mb: 1,
-            color: theme.palette.text.primary,
-        },
-
-        select: {
-            borderRadius: "12px",
-            backgroundColor: theme.palette.background.paper,
         },
 
         responseInput: {
@@ -298,12 +309,6 @@ const AgentPqrs = () => {
             fontWeight: 800,
             px: 3,
             textTransform: "none",
-        },
-
-        helperError: {
-            mt: 0.8,
-            color: theme.palette.error.main,
-            fontSize: "0.82rem",
         },
 
         button: {
@@ -343,7 +348,10 @@ const AgentPqrs = () => {
                                         ),
                                         endAdornment: (
                                             <InputAdornment position="end">
-                                                <IconButton size="small" onClick={clearSearch}>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={clearSearch}
+                                                >
                                                     <CloseOutlinedIcon fontSize="small" />
                                                 </IconButton>
                                             </InputAdornment>
@@ -421,7 +429,10 @@ const AgentPqrs = () => {
 
                         {/* Recarga las listas de PQR */}
                         <Tooltip title="Actualizar lista">
-                            <IconButton onClick={loadAgentPqrs} sx={filterStyles.iconButton}>
+                            <IconButton
+                                onClick={loadAgentPqrs}
+                                sx={filterStyles.iconButton}
+                            >
                                 <RefreshOutlinedIcon />
                             </IconButton>
                         </Tooltip>
@@ -464,28 +475,43 @@ const AgentPqrs = () => {
                 <Box sx={style.list}>
                     {filteredPqrs.map((pqr) => (
                         <Paper key={pqr.id} sx={style.card}>
+                            {pqr.priority && (
+                                <Box sx={style.priorityChipBox}>
+                                    <Chip
+                                        icon={<FlagOutlinedIcon />}
+                                        label={`Prioridad: ${getPriorityLabel(
+                                            pqr.priority
+                                        )}`}
+                                        size="small"
+                                        sx={style.priorityChip}
+                                    />
+                                </Box>
+                            )}
+
                             <Box sx={style.cardHeader}>
                                 <Box sx={style.cardTitleBox}>
-                                    <Typography variant="h6" sx={style.cardTitle}>
+                                    <Typography
+                                        variant="h6"
+                                        sx={style.cardTitle}
+                                    >
                                         {getCaseTypeLabel(pqr.caseType)}
                                     </Typography>
 
                                     <Box sx={style.dateBox}>
                                         <CalendarMonthOutlinedIcon fontSize="small" />
+
                                         <Typography sx={style.date}>
-                                            Creada el {formatDate(pqr.createdAt)}
+                                            Creada el{" "}
+                                            {formatDate(pqr.createdAt)}
                                         </Typography>
                                     </Box>
                                 </Box>
 
                                 <Chip
-                                    label={
-                                        pqrStatusOptions.find(
-                                            (option) => option.value === pqr.status
-                                        )?.label || pqr.status
-                                    }
+                                    label={getStatusLabel(pqr.status)}
                                     color={getStatusColor(pqr.status)}
                                     size="small"
+                                    sx={style.statusChip}
                                 />
                             </Box>
 
@@ -496,7 +522,7 @@ const AgentPqrs = () => {
                             </Typography>
 
                             {/* Información del usuario solicitante */}
-                            <Box sx={style.userBox}>
+                            {/* <Box sx={style.userBox}>
                                 <Box sx={style.userIconBox}>
                                     <PersonOutlineOutlinedIcon fontSize="small" />
                                 </Box>
@@ -514,7 +540,7 @@ const AgentPqrs = () => {
                                         {pqr.user?.email || "Correo no disponible"}
                                     </Typography>
                                 </Box>
-                            </Box>
+                            </Box> */}
 
                             {/* Muestra la respuesta actual si la PQR ya fue respondida */}
                             {activeView === "ASSIGNED" && pqr.response && (
@@ -529,10 +555,9 @@ const AgentPqrs = () => {
                                     </Typography>
                                 </Box>
                             )}
-                            
+
                             {/* Muestra la calificación registrada por el usuario */}
-                            {
-                                pqr.rating !== null &&
+                            {pqr.rating !== null &&
                                 pqr.rating !== undefined && (
                                     <PqrRatingSummary
                                         rating={pqr.rating}
@@ -543,39 +568,99 @@ const AgentPqrs = () => {
 
                             {/* Acciones disponibles solo para PQR asignadas */}
                             {activeView === "ASSIGNED" && (
-                                <Box sx={style.assignedActions}>
-                                    <Box sx={style.statusBox}>
-                                        <Typography variant="body2" sx={style.fieldLabel}>
-                                            Cambiar estado
+                                <Box sx={style.simpleActions}>
+                                    <Box sx={style.simpleBox}>
+                                        <Typography sx={style.simpleLabel}>
+                                            Estado
                                         </Typography>
 
                                         <ClearableSelect
-                                            label="Estado"
-                                            value={statusByPqrId[pqr.id] || pqr.status}
-                                            disabled={pqr.status == "CERRADA"}
+                                            label="Cambiar estado"
+                                            value={
+                                                statusByPqrId[pqr.id] ||
+                                                pqr.status
+                                            }
+                                            disabled={
+                                                pqr.status === "CERRADA"
+                                            }
                                             required
                                             size="small"
                                             minWidth="100%"
                                             options={pqrStatusOptions}
                                             onChange={(value) =>
-                                                handleStatusChange(pqr.id, value as PqrStatus)
+                                                handleStatusChange(
+                                                    pqr.id,
+                                                    value as PqrStatus
+                                                )
                                             }
                                         />
 
                                         <Button
-                                            fullWidth
                                             variant="contained"
-                                            disabled={updatingStatusId === pqr.id || pqr.status == "CERRADA"}
-                                            onClick={() => handleUpdateStatus(pqr.id)}
-                                            sx={{
-                                                ...style.button,
-                                                mt: 1.5,
-                                            }}
+                                            disabled={
+                                                updatingStatusId === pqr.id ||
+                                                pqr.status === "CERRADA"
+                                            }
+                                            onClick={() =>
+                                                handleUpdateStatus(pqr.id)
+                                            }
+                                            sx={style.simpleButton}
                                         >
                                             {updatingStatusId === pqr.id ? (
-                                                <CircularProgress size={20} color="inherit" />
+                                                <CircularProgress
+                                                    size={20}
+                                                    color="inherit"
+                                                />
                                             ) : (
-                                                "Guardar estado"
+                                                "Guardar"
+                                            )}
+                                        </Button>
+                                    </Box>
+
+                                    <Box sx={style.simpleBox}>
+                                        <Typography sx={style.simpleLabel}>
+                                            Prioridad
+                                        </Typography>
+
+                                        <ClearableSelect
+                                            label="Cambiar prioridad"
+                                            value={
+                                                priorityByPqrId[pqr.id] ||
+                                                pqr.priority
+                                            }
+                                            disabled={
+                                                pqr.status === "CERRADA"
+                                            }
+                                            required
+                                            size="small"
+                                            minWidth="100%"
+                                            options={pqrPriorityOptions}
+                                            onChange={(value) =>
+                                                handlePriorityChange(
+                                                    pqr.id,
+                                                    value as PqrPriority
+                                                )
+                                            }
+                                        />
+
+                                        <Button
+                                            variant="contained"
+                                            disabled={
+                                                updatingPriorityId === pqr.id ||
+                                                pqr.status === "CERRADA"
+                                            }
+                                            onClick={() =>
+                                                handleUpdatePriority(pqr.id)
+                                            }
+                                            sx={style.simpleButton}
+                                        >
+                                            {updatingPriorityId === pqr.id ? (
+                                                <CircularProgress
+                                                    size={20}
+                                                    color="inherit"
+                                                />
+                                            ) : (
+                                                "Guardar"
                                             )}
                                         </Button>
                                     </Box>
@@ -585,9 +670,14 @@ const AgentPqrs = () => {
                                             label="Responder PQR"
                                             placeholder="Escribe la respuesta para el usuario..."
                                             value={responseTexts[pqr.id] || ""}
-                                            disabled={pqr.status == "CERRADA"}
+                                            disabled={
+                                                pqr.status === "CERRADA"
+                                            }
                                             onChange={(event) =>
-                                                handleResponseChange(pqr.id, event.target.value)
+                                                handleResponseChange(
+                                                    pqr.id,
+                                                    event.target.value
+                                                )
                                             }
                                             fullWidth
                                             multiline
