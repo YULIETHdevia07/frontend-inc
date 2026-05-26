@@ -255,10 +255,27 @@ const AdminPqrs = () => {
             },
         },
 
-        priorityChipBox: {
-            mb: 1.5,
+        chipColumn: {
             display: "flex",
-            justifyContent: "flex-start",
+            flexDirection: "column",
+            alignItems: {
+                xs: "flex-start",
+                sm: "flex-end",
+            },
+            gap: 1,
+            width: {
+                xs: "100%",
+                sm: "auto",
+            },
+        },
+
+        priorityChipBox: {
+            display: "flex",
+            justifyContent: {
+                xs: "flex-start",
+                sm: "flex-end",
+            },
+            width: "100%",
         },
 
         priorityChip: {
@@ -267,6 +284,7 @@ const AdminPqrs = () => {
             backgroundColor: "#fff7ed",
             color: "#c2410c",
             border: "1px solid #fed7aa",
+            maxWidth: "100%",
             "& .MuiChip-icon": {
                 color: "#c2410c",
             },
@@ -327,6 +345,7 @@ const AdminPqrs = () => {
             borderRadius: "999px",
             fontWeight: 800,
             px: 0.5,
+            maxWidth: "100%",
         },
 
         description: {
@@ -356,7 +375,8 @@ const AdminPqrs = () => {
             display: "grid",
             gridTemplateColumns: {
                 xs: "1fr",
-                md: "220px 220px 1fr",
+                sm: "1fr 1fr",
+                lg: "220px 220px 1fr",
             },
             gap: 1.5,
             alignItems: "flex-start",
@@ -388,6 +408,10 @@ const AdminPqrs = () => {
             display: "flex",
             flexDirection: "column",
             gap: 1.5,
+            gridColumn: {
+                xs: "1 / -1",
+                lg: "auto",
+            },
         },
 
         responseInput: {
@@ -679,51 +703,25 @@ const AdminPqrs = () => {
                 <Box sx={style.list}>
                     {filteredPqrs.map((pqr) => (
                         <Paper key={pqr.id} sx={style.card}>
-                            {pqr.priority && (
-                                <Box sx={style.priorityChipBox}>
-                                    <Chip
-                                        icon={<FlagOutlinedIcon />}
-                                        label={`Prioridad: ${getPriorityLabel(
-                                            pqr.priority
-                                        )}`}
-                                        size="small"
-                                        sx={style.priorityChip}
-                                    />
-                                </Box>
-                            )}
 
                             <Box sx={style.cardHeader}>
                                 <Box sx={style.cardTitleBox}>
-                                    <Typography
-                                        variant="h6"
-                                        sx={style.cardTitle}
-                                    >
+                                    <Typography variant="h6" sx={style.cardTitle}>
                                         {getCaseTypeLabel(pqr.caseType)}
                                     </Typography>
 
                                     <Box sx={style.dateBox}>
                                         <CalendarMonthOutlinedIcon fontSize="small" />
-                                        <Typography
-                                            variant="body2"
-                                            sx={style.date}
-                                        >
-                                            Creada:{" "}
-                                            {formatDate(pqr.createdAt)}
+                                        <Typography variant="body2" sx={style.date}>
+                                            Creada: {formatDate(pqr.createdAt)}
                                         </Typography>
                                     </Box>
 
                                     <Box sx={style.dateBox}>
                                         <PersonOutlineOutlinedIcon fontSize="small" />
-                                        <Typography
-                                            variant="body2"
-                                            sx={style.date}
-                                        >
-                                            Usuario:{" "}
-                                            {pqr.user?.name ||
-                                                "No disponible"}{" "}
-                                            ·{" "}
-                                            {pqr.user?.email ||
-                                                "No disponible"}
+                                        <Typography variant="body2" sx={style.date}>
+                                            Usuario: {pqr.user?.name || "No disponible"} ·{" "}
+                                            {pqr.user?.email || "No disponible"}
                                         </Typography>
                                     </Box>
 
@@ -732,17 +730,10 @@ const AdminPqrs = () => {
                                             <>
                                                 <SupportAgentOutlinedIcon
                                                     fontSize="small"
-                                                    sx={{
-                                                        color: theme.palette
-                                                            .success.main,
-                                                    }}
+                                                    sx={{ color: theme.palette.success.main }}
                                                 />
-                                                <Typography
-                                                    variant="body2"
-                                                    sx={style.agentText}
-                                                >
-                                                    Agente:{" "}
-                                                    {pqr.assignedTo.name} ·{" "}
+                                                <Typography variant="body2" sx={style.agentText}>
+                                                    Agente: {pqr.assignedTo.name} ·{" "}
                                                     {pqr.assignedTo.email}
                                                 </Typography>
                                             </>
@@ -750,15 +741,9 @@ const AdminPqrs = () => {
                                             <>
                                                 <PersonOffOutlinedIcon
                                                     fontSize="small"
-                                                    sx={{
-                                                        color: theme.palette.text
-                                                            .disabled,
-                                                    }}
+                                                    sx={{ color: theme.palette.text.disabled }}
                                                 />
-                                                <Typography
-                                                    variant="body2"
-                                                    sx={style.noAgentText}
-                                                >
+                                                <Typography variant="body2" sx={style.noAgentText}>
                                                     Sin agente asignado
                                                 </Typography>
                                             </>
@@ -766,12 +751,25 @@ const AdminPqrs = () => {
                                     </Box>
                                 </Box>
 
-                                <Chip
-                                    label={getStatusLabel(pqr.status)}
-                                    color={getStatusColor(pqr.status)}
-                                    size="small"
-                                    sx={style.statusChip}
-                                />
+                                <Box sx={style.chipColumn}>
+                                    {pqr.priority && (
+                                        <Box sx={style.priorityChipBox}>
+                                            <Chip
+                                                icon={<FlagOutlinedIcon />}
+                                                label={`Prioridad: ${getPriorityLabel(pqr.priority)}`}
+                                                size="small"
+                                                sx={style.priorityChip}
+                                            />
+                                        </Box>
+                                    )}
+
+                                    <Chip
+                                        label={getStatusLabel(pqr.status)}
+                                        color={getStatusColor(pqr.status)}
+                                        size="small"
+                                        sx={style.statusChip}
+                                    />
+                                </Box>
                             </Box>
 
                             <Divider />
