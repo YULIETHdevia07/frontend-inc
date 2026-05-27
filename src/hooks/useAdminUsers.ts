@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import type { AlertColor } from "@mui/material";
 import type { User, UserRole } from "../interfaces/user.interface";
-import { getAllUsers, updateUserRole } from "../services/userService";
+import type { BulkUploadResult } from "../interfaces/bulkUpload.interface";
+import {
+    getAllUsers,
+    updateUserRole,
+    uploadUsersBulk,
+} from "../services/userService";
 
 // Hook que centraliza la lógica de administración de usuarios
 export const useAdminUsers = () => {
@@ -19,6 +24,14 @@ export const useAdminUsers = () => {
     const [messageType, setMessageType] = useState<AlertColor>("success");
     const [openMessage, setOpenMessage] = useState(false);
 
+    const [openBulkUploadDialog, setOpenBulkUploadDialog] = useState(false);
+    const [bulkUploadFile, setBulkUploadFile] = useState<File | null>(null);
+    const [bulkUploadLoading, setBulkUploadLoading] = useState(false);
+    const [bulkUploadCompleted, setBulkUploadCompleted] = useState(false);
+    const [bulkUploadResult, setBulkUploadResult] =
+        useState<BulkUploadResult<User> | null>(null);
+
+
     // Muestra mensajes temporales de éxito o error
     const showMessage = (text: string, type: AlertColor = "success") => {
         setMessage(text);
@@ -32,9 +45,12 @@ export const useAdminUsers = () => {
     };
 
     // Carga todos los usuarios registrados desde el backend
-    const loadUsers = async () => {
+    const loadUsers = async (showLoading = true) => {
         try {
-            setLoading(true);
+            if (showLoading) {
+                setLoading(true);
+            }
+
             setError("");
 
             const data = await getAllUsers();
@@ -46,7 +62,9 @@ export const useAdminUsers = () => {
                 "Error al cargar los usuarios. Verifica que el usuario tenga rol ADMIN."
             );
         } finally {
-            setLoading(false);
+            if (showLoading) {
+                setLoading(false);
+            }
         }
     };
 
@@ -100,9 +118,72 @@ export const useAdminUsers = () => {
         }
     };
 
-    // Muestra mensaje informativo para carga masiva pendiente
-    const bulkUploadPending = () => {
-        showMessage("Función de carga masiva pendiente por desarrollar.", "info");
+    // Abre el modal de carga masiva de usuarios
+    const openBulkUpload = () => {
+        setOpenBulkUploadDialog(true);
+    };
+
+    // Cierra el modal de carga masiva y limpia el archivo seleccionado
+    const closeBulkUpload = () => {
+        setOpenBulkUploadDialog(false);
+        setBulkUploadFile(null);
+        setBulkUploadResult(null);
+        setBulkUploadCompleted(false);
+    };
+
+    // Limpia el resultado anterior de la carga masiva
+    const clearBulkUploadResult = () => {
+        setBulkUploadResult(null);
+    };
+
+    // Guarda el archivo Excel seleccionado
+    const changeBulkUploadFile = (file: File | null) => {
+        setBulkUploadFile(file);
+        setBulkUploadResult(null);
+        setBulkUploadCompleted(false);
+    };
+
+    // Envía el archivo Excel al backend para registrar usuarios
+    const uploadBulkUsers = async () => {
+        if (!bulkUploadFile) {
+            showMessage("Debe seleccionar un archivo Excel.", "warning");
+            return;
+        }
+
+        try {
+            setBulkUploadLoading(true);
+            setBulkUploadResult(null);
+
+            const data = await uploadUsersBulk(bulkUploadFile);
+            const result = data.result;
+
+            setBulkUploadResult(result);
+
+            if (result.totalErrors > 0) {
+                showMessage(
+                    result.message ||
+                    `El archivo contiene ${result.totalErrors} error(es). No se registraron usuarios.`,
+                    "warning"
+                );
+                return;
+            }
+
+            showMessage(
+                `Carga masiva exitosa. Usuarios creados: ${result.totalCreated}.`,
+                "success"
+            );
+
+            // Bloquea el botón para evitar subir el mismo archivo otra vez.
+            setBulkUploadCompleted(true);
+
+
+            await loadUsers(false);
+        } catch (error) {
+            console.error(error);
+            showMessage("Error al realizar la carga masiva de usuarios.", "error");
+        } finally {
+            setBulkUploadLoading(false);
+        }
     };
 
     // Carga los usuarios cuando se abre la vista
@@ -124,12 +205,24 @@ export const useAdminUsers = () => {
         messageType,
         openMessage,
 
+        openBulkUploadDialog,
+        bulkUploadFile,
+        bulkUploadLoading,
+        bulkUploadResult,
+
         loadUsers,
         openChangeRoleDialog,
         closeChangeRoleDialog,
         changeSelectedRole,
         updateRole,
-        bulkUploadPending,
+
+        openBulkUpload,
+        closeBulkUpload,
+        changeBulkUploadFile,
+        uploadBulkUsers,
+        clearBulkUploadResult,
+        bulkUploadCompleted,
+
         closeMessage,
     };
 };

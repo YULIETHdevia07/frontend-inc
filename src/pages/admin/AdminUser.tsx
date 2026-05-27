@@ -36,6 +36,7 @@ import DataTable from "../../components/common/DataTable";
 import UserRoleChip from "../../components/users/UserRoleChip";
 import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
 import { getFilterStyles } from "../../styles/filterStyles";
+import BulkUploadDialog from "../../components/common/BulkUploadDialog";
 
 // Página principal para administrar usuarios y roles
 const AdminUsers = () => {
@@ -57,12 +58,24 @@ const AdminUsers = () => {
     messageType,
     openMessage,
 
+    openBulkUploadDialog,
+    bulkUploadFile,
+    bulkUploadLoading,
+    bulkUploadResult,
+
     loadUsers,
     openChangeRoleDialog,
     closeChangeRoleDialog,
     changeSelectedRole,
     updateRole,
-    bulkUploadPending,
+
+    openBulkUpload,
+    closeBulkUpload,
+    changeBulkUploadFile,
+    uploadBulkUsers,
+    clearBulkUploadResult,
+    bulkUploadCompleted,
+
     closeMessage,
   } = useAdminUsers();
 
@@ -271,7 +284,11 @@ const AdminUsers = () => {
                 <Tooltip title="Buscar usuario">
                   <IconButton
                     onClick={toggleSearch}
-                    sx={searchTerm ? filterStyles.activeIconButton : filterStyles.iconButton}
+                    sx={
+                      searchTerm
+                        ? filterStyles.activeIconButton
+                        : filterStyles.iconButton
+                    }
                   >
                     <SearchOutlinedIcon />
                   </IconButton>
@@ -281,7 +298,11 @@ const AdminUsers = () => {
               <Tooltip title="Filtrar por rol">
                 <IconButton
                   onClick={openFilters}
-                  sx={roleFilter !== "ALL" ? filterStyles.activeIconButton : filterStyles.iconButton}
+                  sx={
+                    roleFilter !== "ALL"
+                      ? filterStyles.activeIconButton
+                      : filterStyles.iconButton
+                  }
                 >
                   <FilterListOutlinedIcon />
                 </IconButton>
@@ -298,7 +319,10 @@ const AdminUsers = () => {
                 }}
               >
                 <Box sx={filterStyles.smallFilterMenuContent}>
-                  <Typography variant="body2" sx={filterStyles.smallFilterTitle}>
+                  <Typography
+                    variant="body2"
+                    sx={filterStyles.smallFilterTitle}
+                  >
                     Filtrar por rol
                   </Typography>
 
@@ -332,7 +356,8 @@ const AdminUsers = () => {
 
               <Tooltip title="Carga masiva de usuarios">
                 <IconButton
-                  onClick={bulkUploadPending}
+                  onClick={() => openBulkUpload()}
+                  disabled={bulkUploadLoading}
                   sx={{
                     borderRadius: "12px",
                     backgroundColor: "#f1f5f9",
@@ -348,7 +373,7 @@ const AdminUsers = () => {
 
               <Tooltip title="Actualizar lista">
                 <IconButton
-                  onClick={loadUsers}
+                  onClick={() => loadUsers()}
                   sx={{
                     borderRadius: "12px",
                     backgroundColor: "#f1f5f9",
@@ -389,6 +414,21 @@ const AdminUsers = () => {
         onClose={closeChangeRoleDialog}
         onRoleChange={changeSelectedRole}
         onSave={updateRole}
+      />
+
+      <BulkUploadDialog
+        open={openBulkUploadDialog}
+        title="Carga masiva de usuarios"
+        description="Sube un archivo Excel con los usuarios que deseas registrar en el sistema."
+        requiredColumns={["name", "email", "role", "password"]}
+        file={bulkUploadFile}
+        loading={bulkUploadLoading}
+        completed={bulkUploadCompleted}
+        result={bulkUploadResult}
+        onClose={closeBulkUpload}
+        onFileChange={changeBulkUploadFile}
+        onUpload={uploadBulkUsers}
+        onClearResult={clearBulkUploadResult}
       />
 
       <CustomSnackbar
