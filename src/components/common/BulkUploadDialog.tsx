@@ -37,6 +37,7 @@ const BulkUploadDialog = <T,>({
     onFileChange,
     onUpload,
     onClearResult,
+    onDownloadTemplate,
 }: BulkUploadDialogProps<T>) => {
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0] ?? null;
@@ -66,6 +67,15 @@ const BulkUploadDialog = <T,>({
                     El archivo debe contener las columnas:{" "}
                     <strong>{requiredColumns.join(" | ")}</strong>
                 </Alert>
+
+                {onDownloadTemplate && (
+                    <Button
+                        variant="text"
+                        onClick={onDownloadTemplate}
+                    >
+                        Descargar plantilla Excel
+                    </Button>
+                )}
 
                 <Box
                     sx={{

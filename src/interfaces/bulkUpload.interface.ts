@@ -43,4 +43,5 @@ export interface BulkUploadDialogProps<T = unknown> {
   onFileChange: (file: File | null) => void;
   onUpload: () => void;
   onClearResult?: () => void;
+  onDownloadTemplate?: () => void;
 }
