@@ -7,6 +7,7 @@ import {
     updateUserRole,
     uploadUsersBulk,
 } from "../services/userService";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Hook que centraliza la lógica de administración de usuarios
 export const useAdminUsers = () => {
@@ -180,7 +181,7 @@ export const useAdminUsers = () => {
             await loadUsers(false);
         } catch (error) {
             console.error(error);
-            showMessage("Error al realizar la carga masiva de usuarios.", "error");
+            showMessage(getErrorMessage(error), "error");
         } finally {
             setBulkUploadLoading(false);
         }

@@ -222,7 +222,6 @@ const AgentPqrs = () => {
         },
 
         cardHeader: {
-            border: "solid 1px red",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",

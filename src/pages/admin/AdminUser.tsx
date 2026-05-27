@@ -420,7 +420,7 @@ const AdminUsers = () => {
         open={openBulkUploadDialog}
         title="Carga masiva de usuarios"
         description="Sube un archivo Excel con los usuarios que deseas registrar en el sistema."
-        requiredColumns={["name", "email", "role", "password"]}
+        requiredColumns={["nombre", "email", "contraseña", "rol"]}
         file={bulkUploadFile}
         loading={bulkUploadLoading}
         completed={bulkUploadCompleted}
