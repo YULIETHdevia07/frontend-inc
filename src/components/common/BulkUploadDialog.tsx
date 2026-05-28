@@ -54,6 +54,9 @@ const BulkUploadDialog = <T,>({
         if (onClearResult) {
             onClearResult();
         }
+
+        // Permite volver a seleccionar el mismo archivo varias veces.
+        event.target.value = "";
     };
 
     const handleOpenFileSelector = () => {
