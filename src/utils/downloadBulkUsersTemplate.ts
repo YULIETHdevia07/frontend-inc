@@ -1,11 +1,8 @@
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { theme } from "../theme/theme";
-
-// Convierte colores MUI tipo "#1565c0" a formato ExcelJS "FF1565C0".
-const toExcelColor = (color: string) => {
-  return `FF${color.replace("#", "").toUpperCase()}`;
-};
+import { toExcelColor } from "./excelUtils";
+import type { WorksheetWithDataValidations } from "../interfaces/excel.interface";
 
 export const downloadBulkUsersTemplate = async () => {
   const workbook = new ExcelJS.Workbook();
@@ -79,7 +76,19 @@ export const downloadBulkUsersTemplate = async () => {
     "Regla: escriba una contraseña para el usuario. Debe tener mínimo 6 caracteres.";
 
   worksheet.getCell("D1").note =
-    "Regla: escriba un rol válido. Opciones permitidas: USER, ADMIN o AGENT.";
+    "Regla: seleccione un rol válido. Opciones permitidas: USER, ADMIN o AGENT.";
+
+  // Lista desplegable para rol sin asignar valores vacíos a las filas.
+  const worksheetWithValidation = worksheet as WorksheetWithDataValidations;
+
+  worksheetWithValidation.dataValidations.add("D2:D500", {
+    type: "list",
+    allowBlank: true,
+    formulae: ['"USER,ADMIN,AGENT"'],
+    showErrorMessage: true,
+    errorTitle: "Rol no válido",
+    error: "Debe seleccionar un rol válido: USER, ADMIN o AGENT.",
+  });
 
   worksheet.views = [
     {
