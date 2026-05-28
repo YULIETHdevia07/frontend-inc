@@ -198,6 +198,67 @@ Ejemplos de uso:
 
 ---
 
+---
+
+## 6. Instalación de ExcelJS y File Saver
+
+Se instalaron dependencias para generar y descargar archivos de Excel desde el frontend, especialmente para la funcionalidad de **carga masiva de usuarios**.
+
+### Comando ejecutado
+
+```bash
+npm install exceljs file-saver
+```
+
+### Dependencias instaladas
+
+| Dependencia | Uso dentro del proyecto |
+|---|---|
+| `exceljs` | Permite crear archivos Excel desde el frontend, configurar hojas, columnas, estilos, comentarios y generar archivos `.xlsx`. |
+| `file-saver` | Permite descargar en el navegador archivos generados desde el frontend, como la plantilla de carga masiva de usuarios. |
+
+### Instalación de tipos para File Saver
+
+Como el proyecto trabaja con TypeScript, también se instaló el paquete de tipos de `file-saver` para evitar errores de tipado.
+
+### Comando ejecutado
+
+```bash
+npm install -D @types/file-saver
+```
+
+### ¿Para qué se utilizó ExcelJS?
+
+ExcelJS se utilizó para construir una plantilla de Excel llamada:
+
+```txt
+plantilla_carga_masiva_usuarios.xlsx
+```
+
+Esta plantilla permite registrar usuarios de forma masiva mediante las siguientes columnas:
+
+```txt
+nombre | correo | contraseña | rol
+```
+
+Además, se aplicaron estilos visuales a los encabezados, colores basados en el tema global de Material UI, comentarios con reglas de uso y configuración de la hoja para mejorar la experiencia del usuario.
+
+Archivo relacionado dentro del proyecto:
+
+```txt
+src/utils/downloadBulkUsersTemplate.ts
+```
+
+### ¿Para qué se utilizó File Saver?
+
+File Saver se utilizó para descargar automáticamente la plantilla generada por ExcelJS en el navegador. Después de construir el archivo Excel, se genera un `Blob` y se descarga mediante `saveAs`.
+
+Ejemplo de uso:
+
+```tsx
+saveAs(blob, "plantilla_carga_masiva_usuarios.xlsx");
+```
+
 # Resumen de dependencias instaladas
 
 | Dependencia | Comando | Propósito |
@@ -208,11 +269,14 @@ Ejemplos de uso:
 | React Router DOM | `npm install axios react-router-dom` | Manejar rutas públicas, privadas y navegación SPA. |
 | Material UI | `npm install @mui/material @emotion/react @emotion/styled` | Crear interfaces visuales modernas y reutilizables. |
 | MUI Icons | `npm install @mui/icons-material` | Agregar íconos al header, sidebar y botones. |
+| ExcelJS | `npm install exceljs file-saver` | Crear plantillas Excel para la carga masiva de usuarios. |
+| File Saver | `npm install exceljs file-saver` | Descargar archivos generados desde el frontend. |
+| Tipos de File Saver | `npm install -D @types/file-saver` | Agregar soporte de TypeScript para `file-saver`. |
 
 ---
 
 # Conclusión
 
-Durante esta etapa del frontend se instalaron y configuraron herramientas fundamentales para construir una aplicación moderna, organizada y escalable. Vite permitió iniciar el proyecto con React y TypeScript; Axios facilitó la comunicación con el backend; React Router DOM permitió manejar la navegación; Material UI aportó componentes visuales profesionales; y MUI Icons mejoró la experiencia gráfica de la interfaz.
+Durante esta etapa del frontend se instalaron y configuraron herramientas fundamentales para construir una aplicación moderna, organizada y escalable. Vite permitió iniciar el proyecto con React y TypeScript; Axios facilitó la comunicación con el backend; React Router DOM permitió manejar la navegación; Material UI aportó componentes visuales profesionales; MUI Icons mejoró la experiencia gráfica de la interfaz; y ExcelJS junto con File Saver permitieron generar y descargar plantillas de Excel para procesos como la carga masiva de usuarios.
 
 Además, se avanzó en la construcción de un layout administrativo más limpio, integrando `Header`, `SidebarMenu` y `DashboardLayout` de manera organizada. El botón de abrir y cerrar menú se trasladó al header, el menú lateral quedó más limpio visualmente y se mejoró la presentación del usuario autenticado mediante avatar, saludo y botón de cierre de sesión.
