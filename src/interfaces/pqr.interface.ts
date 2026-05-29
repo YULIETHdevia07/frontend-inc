@@ -1,8 +1,11 @@
 // Estados permitidos para una PQR.
 export type PqrStatus = "PENDIENTE" | "EN_PROCESO" | "CERRADA";
 
-// Priodad permitidos para una PQR.
+// Prioridades permitidas para una PQR.
 export type PqrPriority = "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
+
+// Roles permitidos en el sistema.
+export type UserRole = "USER" | "ADMIN" | "AGENT";
 
 // Vistas disponibles en la página del agente.
 export type AgentPqrView = "AVAILABLE" | "ASSIGNED";
@@ -15,7 +18,7 @@ export interface PqrUser {
   id: number;
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
 }
 
 // Estructura principal de una PQR.
@@ -24,7 +27,6 @@ export interface Pqr {
   caseType: string;
   description: string;
   status: PqrStatus;
-  response: string | null;
   createdAt: string;
   updatedAt: string;
   userId: number;
@@ -37,7 +39,17 @@ export interface Pqr {
   ratingComment?: string | null;
   ratedAt?: string | null;
 
-  priority: PqrPriority;
+  priority: PqrPriority | null;
+}
+
+// Mensaje perteneciente al chat de una PQR.
+export interface PqrMessage {
+  id: number;
+  content: string;
+  createdAt: string;
+  pqrId: number;
+  senderId: number;
+  sender: PqrUser
 }
 
 // Datos necesarios para crear una nueva PQR.
@@ -76,8 +88,20 @@ export interface RatePqrResponse {
   pqr: Pqr;
 }
 
+// Respuesta al obtener el historial de mensajes de una PQR.
+export interface PqrMessagesResponse {
+  message: string;
+  messages: PqrMessage[];
+}
+
 // Errores de validación del formulario para crear una PQR.
 export interface CreatePqrFormErrors {
   caseType: string;
   description: string;
+}
+
+// Parámetros necesarios para inicializar el hook del chat de una PQR.
+export interface UsePqrChatParams {
+  pqrId: number | null;
+  token: string | null;
 }

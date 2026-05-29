@@ -1,6 +1,7 @@
 import api from "../api/axios";
 import type {
   CreatePqrData,
+  PqrMessagesResponse,
   PqrPriority,
   PqrResponse,
   PqrStatus,
@@ -54,6 +55,17 @@ export const updatePqrPriority = async (
   return response.data;
 };
 
+// Obtiene el historial de mensajes de una PQR.
+export const getPqrMessages = async (
+  pqrId: number
+): Promise<PqrMessagesResponse> => {
+  const response = await api.get<PqrMessagesResponse>(
+    `/pqrs/${pqrId}/messages`
+  );
+
+  return response.data;
+};
+
 // Responde una PQR. Endpoint usado por ADMIN o AGENT según tu backend.
 export const respondPqr = async (
   id: number,
@@ -65,6 +77,7 @@ export const respondPqr = async (
 
   return response.data;
 };
+
 
 // Obtiene las PQR disponibles para ser tomadas por un AGENT.
 export const getAvailablePqrs = async (): Promise<PqrResponse> => {

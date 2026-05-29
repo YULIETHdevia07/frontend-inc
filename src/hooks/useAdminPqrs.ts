@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ValidationError } from "yup";
 import type {
     MessageType,
     Pqr,
@@ -8,11 +7,9 @@ import type {
 } from "../interfaces/pqr.interface";
 import {
     getAllPqrs,
-    respondPqr,
     updatePqrPriority,
     updatePqrStatus,
 } from "../services/pqrService";
-import { responsePqrSchema } from "../validations/pqrValidation";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Hook encargado de manejar la lógica administrativa de PQR.
@@ -36,9 +33,6 @@ export const useAdminPqrs = () => {
         null
     );
 
-    // Guarda el id de la PQR que se está respondiendo.
-    const [respondingPqrId, setRespondingPqrId] = useState<number | null>(null);
-
     // Guarda temporalmente los estados seleccionados.
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
         {}
@@ -48,16 +42,6 @@ export const useAdminPqrs = () => {
     const [priorityChanges, setPriorityChanges] = useState<
         Record<number, PqrPriority>
     >({});
-
-    // Guarda las respuestas escritas por PQR.
-    const [responseTexts, setResponseTexts] = useState<Record<number, string>>(
-        {}
-    );
-
-    // Guarda errores de validación por PQR.
-    const [responseErrors, setResponseErrors] = useState<Record<number, string>>(
-        {}
-    );
 
     // Mensaje mostrado en el snackbar.
     const [message, setMessage] = useState("");
@@ -231,72 +215,6 @@ export const useAdminPqrs = () => {
         }
     };
 
-    // Guarda el texto escrito como respuesta.
-    const handleResponseTextChange = (pqrId: number, value: string) => {
-        setResponseTexts((prev) => ({
-            ...prev,
-            [pqrId]: value,
-        }));
-
-        setResponseErrors((prev) => ({
-            ...prev,
-            [pqrId]: "",
-        }));
-    };
-
-    // Valida con Yup y envía la respuesta de una PQR.
-    const handleRespondPqr = async (pqrId: number) => {
-        const responseText = responseTexts[pqrId] || "";
-
-        try {
-            await responsePqrSchema.validate(responseText);
-
-            setResponseErrors((prev) => ({
-                ...prev,
-                [pqrId]: "",
-            }));
-
-            setRespondingPqrId(pqrId);
-
-            const response = await respondPqr(pqrId, responseText.trim());
-
-            // Actualiza solo la PQR respondida sin recargar toda la vista.
-            setPqrs((prev) =>
-                prev.map((pqr) => (pqr.id === pqrId ? response.pqr : pqr))
-            );
-
-            // Limpia el campo de respuesta después de enviar.
-            setResponseTexts((prev) => {
-                const updated = { ...prev };
-                delete updated[pqrId];
-                return updated;
-            });
-
-            showSnackbar(
-                response.message || "Respuesta enviada correctamente.",
-                "success"
-            );
-        } catch (error) {
-            if (error instanceof ValidationError) {
-                setResponseErrors((prev) => ({
-                    ...prev,
-                    [pqrId]: error.message,
-                }));
-
-                return;
-            }
-
-            console.error(error);
-
-            showSnackbar(
-                getErrorMessage(error, "Error al responder la PQR."),
-                "error"
-            );
-        } finally {
-            setRespondingPqrId(null);
-        }
-    };
-
     // Carga las PQR cuando se abre la vista.
     useEffect(() => {
         loadAllPqrs();
@@ -309,12 +227,9 @@ export const useAdminPqrs = () => {
 
         updatingStatusId,
         updatingPriorityId,
-        respondingPqrId,
 
         statusChanges,
         priorityChanges,
-        responseTexts,
-        responseErrors,
 
         message,
         messageType,
@@ -326,7 +241,5 @@ export const useAdminPqrs = () => {
         handleUpdateStatus,
         handlePriorityChange,
         handleUpdatePriority,
-        handleResponseTextChange,
-        handleRespondPqr,
     };
 };

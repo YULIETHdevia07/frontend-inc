@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import {
     Alert,
     Box,
@@ -20,8 +20,7 @@ import { useTheme } from "@mui/material/styles";
 
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
@@ -33,6 +32,8 @@ import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import type { PqrPriority, PqrStatus } from "../../interfaces/pqr.interface";
 
 import { useAdminPqrs } from "../../hooks/useAdminPqrs";
+import { usePqrChat } from "../../hooks/usePqrChat";
+
 import {
     formatDate,
     getCaseTypeLabel,
@@ -47,8 +48,10 @@ import CustomSnackbar from "../../components/common/CustomSnackbar";
 import { getFilterStyles } from "../../styles/filterStyles";
 import { pqrPriorityOptions, pqrStatusOptions } from "../../data/pqrOptions";
 import PqrRatingSummary from "../../components/pqr/PqrRatingSummary";
+import { PqrChatView } from "../../components/pqr/PqrChatView";
+import { useAuth } from "../../context/AuthContext";
 
-// Página administrativa para consultar, responder y cambiar estados de PQR.
+// Página administrativa para consultar, cambiar estados, prioridades y dar seguimiento a las PQR.
 const AdminPqrs = () => {
     const theme = useTheme();
     const filterStyles = getFilterStyles(theme);
@@ -60,12 +63,9 @@ const AdminPqrs = () => {
 
         updatingStatusId,
         updatingPriorityId,
-        respondingPqrId,
 
         statusChanges,
         priorityChanges,
-        responseTexts,
-        responseErrors,
 
         message,
         messageType,
@@ -77,8 +77,6 @@ const AdminPqrs = () => {
         handleUpdateStatus,
         handlePriorityChange,
         handleUpdatePriority,
-        handleResponseTextChange,
-        handleRespondPqr,
     } = useAdminPqrs();
 
     // Controla el texto escrito en el buscador.
@@ -109,11 +107,28 @@ const AdminPqrs = () => {
     const [endDateFilter, setEndDateFilter] = useState("");
 
     // Controla la apertura del menú de filtros.
-    const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(
+    const [filterAnchorEl, setFilterAnchorEl] =
+        useState<null | HTMLElement>(null);
+
+    const [selectedChatPqrId, setSelectedChatPqrId] = useState<number | null>(
         null
     );
 
-    // Indica si el menú de filtros está abierto.
+    const { token } = useAuth();
+
+    const {
+        messages,
+        messageText,
+        setMessageText,
+        loadingMessages,
+        chatError,
+        setChatError,
+        handleSendMessage,
+    } = usePqrChat({
+        pqrId: selectedChatPqrId,
+        token,
+    });
+
     const openFilterMenu = Boolean(filterAnchorEl);
 
     // Muestra el campo de búsqueda.
@@ -128,7 +143,7 @@ const AdminPqrs = () => {
     };
 
     // Abre el menú de filtros.
-    const openFilters = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const openFilters = (event: MouseEvent<HTMLButtonElement>) => {
         setFilterAnchorEl(event.currentTarget);
     };
 
@@ -146,6 +161,16 @@ const AdminPqrs = () => {
         setStartDateFilter("");
         setEndDateFilter("");
     };
+
+    const openPqrChat = (pqrId: number) => {
+        setSelectedChatPqrId(pqrId);
+    };
+
+    const closePqrChat = () => {
+        setSelectedChatPqrId(null);
+    };
+
+    const selectedChatPqr = pqrs.find((pqr) => pqr.id === selectedChatPqrId);
 
     const getPriorityLabel = (priority?: PqrPriority | null) => {
         return (
@@ -354,29 +379,13 @@ const AdminPqrs = () => {
             lineHeight: 1.7,
         },
 
-        responseBox: {
-            mt: 2,
-            p: 2,
-            borderRadius: 2,
-            backgroundColor: theme.palette.primary.light,
-        },
-
-        responseTitle: {
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            fontWeight: 800,
-            mb: 0.8,
-            color: theme.palette.primary.dark,
-        },
-
         simpleActions: {
             mt: 2,
             display: "grid",
             gridTemplateColumns: {
                 xs: "1fr",
                 sm: "1fr 1fr",
-                lg: "220px 220px 1fr",
+                lg: "220px 220px 220px",
             },
             gap: 1.5,
             alignItems: "flex-start",
@@ -400,43 +409,38 @@ const AdminPqrs = () => {
             fontWeight: 700,
         },
 
-        responseForm: {
-            p: 2,
-            borderRadius: 2,
-            backgroundColor: theme.palette.background.default,
-            border: `1px solid ${theme.palette.primary.light}`,
-            display: "flex",
-            flexDirection: "column",
-            gap: 1.5,
-            gridColumn: {
-                xs: "1 / -1",
-                lg: "auto",
-            },
-        },
-
-        responseInput: {
-            "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                backgroundColor: theme.palette.background.paper,
-            },
-        },
-
-        responseButton: {
-            alignSelf: "flex-start",
-            borderRadius: "14px",
-            fontWeight: 800,
-            px: 3,
-            textTransform: "none",
-        },
-
         errorAlert: {
             mb: 2,
             borderRadius: 2,
         },
     };
-
     if (loading) {
         return <LoadingBox />;
+    }
+
+    if (selectedChatPqr) {
+        return (
+            <>
+                <PqrChatView
+                    pqr={selectedChatPqr}
+                    messages={messages}
+                    messageText={messageText}
+                    loadingMessages={loadingMessages}
+                    chatError={chatError}
+                    onBack={closePqrChat}
+                    onMessageChange={setMessageText}
+                    onSendMessage={handleSendMessage}
+                    onClearError={() => setChatError("")}
+                />
+
+                <CustomSnackbar
+                    open={openMessage}
+                    message={message}
+                    severity={messageType}
+                    onClose={closeMessage}
+                />
+            </>
+        );
     }
 
     return (
@@ -703,25 +707,37 @@ const AdminPqrs = () => {
                 <Box sx={style.list}>
                     {filteredPqrs.map((pqr) => (
                         <Paper key={pqr.id} sx={style.card}>
-
                             <Box sx={style.cardHeader}>
                                 <Box sx={style.cardTitleBox}>
-                                    <Typography variant="h6" sx={style.cardTitle}>
+                                    <Typography
+                                        variant="h6"
+                                        sx={style.cardTitle}
+                                    >
                                         {getCaseTypeLabel(pqr.caseType)}
                                     </Typography>
 
                                     <Box sx={style.dateBox}>
                                         <CalendarMonthOutlinedIcon fontSize="small" />
-                                        <Typography variant="body2" sx={style.date}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={style.date}
+                                        >
                                             Creada: {formatDate(pqr.createdAt)}
                                         </Typography>
                                     </Box>
 
                                     <Box sx={style.dateBox}>
                                         <PersonOutlineOutlinedIcon fontSize="small" />
-                                        <Typography variant="body2" sx={style.date}>
-                                            Usuario: {pqr.user?.name || "No disponible"} ·{" "}
-                                            {pqr.user?.email || "No disponible"}
+                                        <Typography
+                                            variant="body2"
+                                            sx={style.date}
+                                        >
+                                            Usuario:{" "}
+                                            {pqr.user?.name ||
+                                                "No disponible"}{" "}
+                                            ·{" "}
+                                            {pqr.user?.email ||
+                                                "No disponible"}
                                         </Typography>
                                     </Box>
 
@@ -730,10 +746,17 @@ const AdminPqrs = () => {
                                             <>
                                                 <SupportAgentOutlinedIcon
                                                     fontSize="small"
-                                                    sx={{ color: theme.palette.success.main }}
+                                                    sx={{
+                                                        color: theme.palette
+                                                            .success.main,
+                                                    }}
                                                 />
-                                                <Typography variant="body2" sx={style.agentText}>
-                                                    Agente: {pqr.assignedTo.name} ·{" "}
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={style.agentText}
+                                                >
+                                                    Agente:{" "}
+                                                    {pqr.assignedTo.name} ·{" "}
                                                     {pqr.assignedTo.email}
                                                 </Typography>
                                             </>
@@ -741,9 +764,15 @@ const AdminPqrs = () => {
                                             <>
                                                 <PersonOffOutlinedIcon
                                                     fontSize="small"
-                                                    sx={{ color: theme.palette.text.disabled }}
+                                                    sx={{
+                                                        color: theme.palette.text
+                                                            .disabled,
+                                                    }}
                                                 />
-                                                <Typography variant="body2" sx={style.noAgentText}>
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={style.noAgentText}
+                                                >
                                                     Sin agente asignado
                                                 </Typography>
                                             </>
@@ -756,7 +785,9 @@ const AdminPqrs = () => {
                                         <Box sx={style.priorityChipBox}>
                                             <Chip
                                                 icon={<FlagOutlinedIcon />}
-                                                label={`Prioridad: ${getPriorityLabel(pqr.priority)}`}
+                                                label={`Prioridad: ${getPriorityLabel(
+                                                    pqr.priority
+                                                )}`}
                                                 size="small"
                                                 sx={style.priorityChip}
                                             />
@@ -777,25 +808,6 @@ const AdminPqrs = () => {
                             <Typography variant="body2" sx={style.description}>
                                 {pqr.description}
                             </Typography>
-
-                            {pqr.response && (
-                                <Box sx={style.responseBox}>
-                                    <Typography
-                                        variant="subtitle2"
-                                        sx={style.responseTitle}
-                                    >
-                                        <QuestionAnswerOutlinedIcon fontSize="small" />
-                                        Respuesta registrada
-                                    </Typography>
-
-                                    <Typography
-                                        variant="body2"
-                                        color="text.secondary"
-                                    >
-                                        {pqr.response}
-                                    </Typography>
-                                </Box>
-                            )}
 
                             {pqr.rating !== null &&
                                 pqr.rating !== undefined && (
@@ -858,7 +870,8 @@ const AdminPqrs = () => {
                                         label="Cambiar prioridad"
                                         value={
                                             priorityChanges[pqr.id] ||
-                                            pqr.priority
+                                            pqr.priority ||
+                                            ""
                                         }
                                         disabled={pqr.status === "CERRADA"}
                                         required
@@ -892,55 +905,18 @@ const AdminPqrs = () => {
                                     </Button>
                                 </Box>
 
-                                <Box sx={style.responseForm}>
-                                    <TextField
-                                        label="Respuesta para el usuario"
-                                        placeholder="Escribe aquí la respuesta de la PQR..."
-                                        disabled={pqr.status === "CERRADA"}
-                                        value={responseTexts[pqr.id] || ""}
-                                        onChange={(event) =>
-                                            handleResponseTextChange(
-                                                pqr.id,
-                                                event.target.value
-                                            )
-                                        }
-                                        fullWidth
-                                        multiline
-                                        minRows={3}
-                                        sx={style.responseInput}
-                                        slotProps={{
-                                            htmlInput: {
-                                                maxLength: 500,
-                                            },
-                                        }}
-                                        error={!!responseErrors[pqr.id]}
-                                        helperText={
-                                            responseErrors[pqr.id]
-                                                ? responseErrors[pqr.id]
-                                                : `${responseTexts[pqr.id]
-                                                    ?.length || 0
-                                                }/500`
-                                        }
-                                    />
+                                <Box sx={style.simpleBox}>
+                                    <Typography sx={style.simpleLabel}>
+                                        Seguimiento
+                                    </Typography>
 
                                     <Button
                                         variant="outlined"
-                                        disabled={
-                                            respondingPqrId === pqr.id ||
-                                            pqr.status === "CERRADA"
-                                        }
-                                        sx={style.responseButton}
-                                        startIcon={<SendOutlinedIcon />}
-                                        onClick={() => handleRespondPqr(pqr.id)}
+                                        sx={style.simpleButton}
+                                        startIcon={<ForumOutlinedIcon />}
+                                        onClick={() => openPqrChat(pqr.id)}
                                     >
-                                        {respondingPqrId === pqr.id ? (
-                                            <CircularProgress
-                                                size={20}
-                                                color="inherit"
-                                            />
-                                        ) : (
-                                            "Responder PQR"
-                                        )}
+                                        Ver chat
                                     </Button>
                                 </Box>
                             </Box>
