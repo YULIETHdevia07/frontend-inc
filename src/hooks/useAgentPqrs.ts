@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { ValidationError } from "yup";
 import type {
     AgentPqrView,
     MessageType,
@@ -10,33 +9,11 @@ import type {
 import {
     getAvailablePqrs,
     getMyAssignedPqrs,
-    respondPqr,
     takePqr,
     updatePqrPriority,
     updatePqrStatus,
 } from "../services/pqrService";
-import { responsePqrSchema } from "../validations/pqrValidation";
-
-// Obtiene un mensaje de error seguro desde una respuesta del backend.
-const getErrorMessage = (error: unknown, defaultMessage: string) => {
-    if (
-        typeof error === "object" &&
-        error !== null &&
-        "response" in error
-    ) {
-        const axiosError = error as {
-            response?: {
-                data?: {
-                    message?: string;
-                };
-            };
-        };
-
-        return axiosError.response?.data?.message || defaultMessage;
-    }
-
-    return defaultMessage;
-};
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Hook encargado de manejar la lógica de las PQR del agente.
 export const useAgentPqrs = () => {
@@ -53,13 +30,14 @@ export const useAgentPqrs = () => {
     const [takingPqrId, setTakingPqrId] = useState<number | null>(null);
 
     // Guarda el id de la PQR cuyo estado se está actualizando.
-    const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
+    const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(
+        null
+    );
 
     // Guarda el id de la PQR cuya prioridad se está actualizando.
-    const [updatingPriorityId, setUpdatingPriorityId] = useState<number | null>(null);
-
-    // Guarda el id de la PQR que se está respondiendo.
-    const [respondingPqrId, setRespondingPqrId] = useState<number | null>(null);
+    const [updatingPriorityId, setUpdatingPriorityId] = useState<number | null>(
+        null
+    );
 
     // Controla si se muestran PQR disponibles o asignadas.
     const [activeView, setActiveView] = useState<AgentPqrView>("AVAILABLE");
@@ -68,9 +46,9 @@ export const useAgentPqrs = () => {
     const [statusFilter, setStatusFilter] = useState<"ALL" | PqrStatus>("ALL");
 
     // Controla el filtro por prioridad.
-    const [priorityFilter, setPriorityFilter] = useState<"ALL" | PqrPriority>(
-        "ALL"
-    );
+    const [priorityFilter, setPriorityFilter] = useState<
+        "ALL" | PqrPriority
+    >("ALL");
 
     // Guarda el texto escrito en el buscador.
     const [searchTerm, setSearchTerm] = useState("");
@@ -78,24 +56,19 @@ export const useAgentPqrs = () => {
     // Controla si el campo de búsqueda está visible.
     const [showSearch, setShowSearch] = useState(false);
 
-    // Guarda el nuevo estado seleccionado por cada PQR.
-    const [statusByPqrId, setStatusByPqrId] = useState<Record<number, PqrStatus>>(
-        {}
-    );
+    // Guarda temporalmente el estado seleccionado por cada PQR.
+    const [statusByPqrId, setStatusByPqrId] = useState<
+        Record<number, PqrStatus>
+    >({});
 
-    // Guarda la nueva prioridad seleccionada por cada PQR.
+    // Guarda temporalmente la prioridad seleccionada por cada PQR.
     const [priorityByPqrId, setPriorityByPqrId] = useState<
         Record<number, PqrPriority>
     >({});
 
-    // Guarda el texto de respuesta escrito por cada PQR.
-    const [responseTexts, setResponseTexts] = useState<Record<number, string>>(
-        {}
-    );
-
-    // Guarda errores de validación por cada respuesta.
-    const [responseErrors, setResponseErrors] = useState<Record<number, string>>(
-        {}
+    // Guarda qué PQR asignada tiene abierta la vista del chat.
+    const [selectedChatPqrId, setSelectedChatPqrId] = useState<number | null>(
+        null
     );
 
     // Mensaje mostrado en el snackbar.
@@ -156,11 +129,20 @@ export const useAgentPqrs = () => {
             // La PQR tomada entra en asignadas.
             setAssignedPqrs((prev) => [response.pqr, ...prev]);
 
-            showSnackbar(response.message || "PQR tomada correctamente.", "success");
+            // Cambia automáticamente a la vista de asignadas para continuar la gestión.
+            setActiveView("ASSIGNED");
+
+            showSnackbar(
+                response.message || "PQR tomada correctamente.",
+                "success"
+            );
         } catch (error) {
             console.error(error);
 
-            showSnackbar(getErrorMessage(error, "Error al tomar la PQR."), "error");
+            showSnackbar(
+                getErrorMessage(error, "Error al tomar la PQR."),
+                "error"
+            );
         } finally {
             setTakingPqrId(null);
         }
@@ -176,14 +158,14 @@ export const useAgentPqrs = () => {
 
     // Actualiza el estado de una PQR asignada.
     const handleUpdateStatus = async (pqrId: number) => {
+        const selectedStatus = statusByPqrId[pqrId];
+
+        if (!selectedStatus) {
+            showSnackbar("Debes seleccionar un estado.", "warning");
+            return;
+        }
+
         try {
-            const selectedStatus = statusByPqrId[pqrId];
-
-            if (!selectedStatus) {
-                showSnackbar("Debes seleccionar un estado.", "warning");
-                return;
-            }
-
             setUpdatingStatusId(pqrId);
 
             const response = await updatePqrStatus(pqrId, selectedStatus);
@@ -200,7 +182,10 @@ export const useAgentPqrs = () => {
                 return updated;
             });
 
-            showSnackbar(response.message || "Estado actualizado correctamente.");
+            showSnackbar(
+                response.message || "Estado actualizado correctamente.",
+                "success"
+            );
         } catch (error) {
             console.error(error);
 
@@ -223,14 +208,14 @@ export const useAgentPqrs = () => {
 
     // Actualiza la prioridad de una PQR asignada.
     const handleUpdatePriority = async (pqrId: number) => {
+        const selectedPriority = priorityByPqrId[pqrId];
+
+        if (!selectedPriority) {
+            showSnackbar("Debes seleccionar una prioridad.", "warning");
+            return;
+        }
+
         try {
-            const selectedPriority = priorityByPqrId[pqrId];
-
-            if (!selectedPriority) {
-                showSnackbar("Debes seleccionar una prioridad.", "warning");
-                return;
-            }
-
             setUpdatingPriorityId(pqrId);
 
             const response = await updatePqrPriority(pqrId, selectedPriority);
@@ -263,68 +248,14 @@ export const useAgentPqrs = () => {
         }
     };
 
-    // Guarda el texto escrito en el campo de respuesta.
-    const handleResponseChange = (pqrId: number, value: string) => {
-        setResponseTexts((prev) => ({
-            ...prev,
-            [pqrId]: value,
-        }));
-
-        // Limpia el error de esa PQR mientras el usuario escribe.
-        setResponseErrors((prev) => ({
-            ...prev,
-            [pqrId]: "",
-        }));
+    // Abre la vista de chat para responder una PQR asignada.
+    const openPqrChat = (pqrId: number) => {
+        setSelectedChatPqrId(pqrId);
     };
 
-    // Envía la respuesta de una PQR asignada.
-    const handleRespondPqr = async (pqrId: number) => {
-        const responseText = responseTexts[pqrId] || "";
-
-        try {
-            await responsePqrSchema.validate(responseText);
-
-            setResponseErrors((prev) => ({
-                ...prev,
-                [pqrId]: "",
-            }));
-
-            setRespondingPqrId(pqrId);
-
-            const response = await respondPqr(pqrId, responseText.trim());
-
-            // Actualiza la PQR respondida dentro de la lista de asignadas.
-            setAssignedPqrs((prev) =>
-                prev.map((pqr) => (pqr.id === pqrId ? response.pqr : pqr))
-            );
-
-            // Limpia el campo de respuesta después de enviar.
-            setResponseTexts((prev) => {
-                const updated = { ...prev };
-                delete updated[pqrId];
-                return updated;
-            });
-
-            showSnackbar(response.message || "Respuesta enviada correctamente.");
-        } catch (error) {
-            if (error instanceof ValidationError) {
-                setResponseErrors((prev) => ({
-                    ...prev,
-                    [pqrId]: error.message,
-                }));
-
-                return;
-            }
-
-            console.error(error);
-
-            setResponseErrors((prev) => ({
-                ...prev,
-                [pqrId]: getErrorMessage(error, "Error al responder la PQR."),
-            }));
-        } finally {
-            setRespondingPqrId(null);
-        }
+    // Cierra la vista de chat y regresa al listado del agente.
+    const closePqrChat = () => {
+        setSelectedChatPqrId(null);
     };
 
     // Actualiza el texto del buscador.
@@ -347,7 +278,12 @@ export const useAgentPqrs = () => {
     const currentPqrs =
         activeView === "AVAILABLE" ? availablePqrs : assignedPqrs;
 
-    // Filtra las PQR por búsqueda y estado.
+    // PQR seleccionada para mostrar en la vista del chat.
+    const selectedChatPqr = assignedPqrs.find(
+        (pqr) => pqr.id === selectedChatPqrId
+    );
+
+    // Filtra las PQR por búsqueda, estado y prioridad.
     const filteredPqrs = useMemo(() => {
         const normalizedSearch = searchTerm.toLowerCase().trim();
 
@@ -385,7 +321,6 @@ export const useAgentPqrs = () => {
         takingPqrId,
         updatingStatusId,
         updatingPriorityId,
-        respondingPqrId,
 
         activeView,
         setActiveView,
@@ -404,8 +339,11 @@ export const useAgentPqrs = () => {
 
         statusByPqrId,
         priorityByPqrId,
-        responseTexts,
-        responseErrors,
+
+        selectedChatPqrId,
+        selectedChatPqr,
+        openPqrChat,
+        closePqrChat,
 
         message,
         messageType,
@@ -418,7 +356,5 @@ export const useAgentPqrs = () => {
         handleUpdateStatus,
         handlePriorityChange,
         handleUpdatePriority,
-        handleResponseChange,
-        handleRespondPqr,
     };
 };

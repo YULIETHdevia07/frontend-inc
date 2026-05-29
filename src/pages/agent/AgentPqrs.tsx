@@ -25,14 +25,15 @@ import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurned
 import FolderOpenOutlinedIcon from "@mui/icons-material/FolderOpenOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import QuestionAnswerOutlinedIcon from "@mui/icons-material/QuestionAnswerOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
+import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 
 import type { PqrPriority, PqrStatus } from "../../interfaces/pqr.interface";
 
 import { useAgentPqrs } from "../../hooks/useAgentPqrs";
+import { useAuth } from "../../context/AuthContext";
+import { usePqrChat } from "../../hooks/usePqrChat";
 import {
     formatDate,
     getCaseTypeLabel,
@@ -47,8 +48,9 @@ import ClearableSelect from "../../components/common/ClearableSelect";
 import { getFilterStyles } from "../../styles/filterStyles";
 import { pqrPriorityOptions, pqrStatusOptions } from "../../data/pqrOptions";
 import PqrRatingSummary from "../../components/pqr/PqrRatingSummary";
+import { PqrChatView } from "../../components/pqr/PqrChatView";
 
-// Página del agente para tomar PQR, responderlas y cambiar su estado.
+// Página del agente para tomar PQR, responderlas por chat y cambiar su estado y prioroidad.
 const AgentPqrs = () => {
     const theme = useTheme();
     const filterStyles = getFilterStyles(theme);
@@ -62,7 +64,6 @@ const AgentPqrs = () => {
         takingPqrId,
         updatingStatusId,
         updatingPriorityId,
-        respondingPqrId,
 
         activeView,
         setActiveView,
@@ -81,8 +82,11 @@ const AgentPqrs = () => {
 
         statusByPqrId,
         priorityByPqrId,
-        responseTexts,
-        responseErrors,
+
+        selectedChatPqrId,
+        selectedChatPqr,
+        openPqrChat,
+        closePqrChat,
 
         message,
         messageType,
@@ -93,11 +97,25 @@ const AgentPqrs = () => {
         handleTakePqr,
         handleStatusChange,
         handleUpdateStatus,
-        handleResponseChange,
-        handleRespondPqr,
         handlePriorityChange,
         handleUpdatePriority,
     } = useAgentPqrs();
+
+    // Token obtenido desde el contexto para conectar el chat por Socket.IO.
+    const { token } = useAuth();
+
+    const {
+        messages,
+        messageText,
+        setMessageText,
+        loadingMessages,
+        chatError,
+        setChatError,
+        handleSendMessage,
+    } = usePqrChat({
+        pqrId: selectedChatPqrId,
+        token,
+    });
 
     // Controla el menú desplegable del filtro por estado.
     const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(
@@ -271,22 +289,6 @@ const AgentPqrs = () => {
             lineHeight: 1.7,
         },
 
-        responseBox: {
-            mt: 2,
-            p: 2,
-            borderRadius: 2,
-            backgroundColor: theme.palette.primary.light,
-        },
-
-        responseTitle: {
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            fontWeight: 800,
-            mb: 0.8,
-            color: theme.palette.primary.dark,
-        },
-
         actionsBox: {
             mt: 2,
             display: "flex",
@@ -301,7 +303,7 @@ const AgentPqrs = () => {
             gridTemplateColumns: {
                 xs: "1fr",
                 sm: "1fr 1fr",
-                lg: "220px 220px 1fr",
+                lg: "220px 220px 220px",
             },
             gap: 1.5,
             alignItems: "flex-start",
@@ -325,31 +327,6 @@ const AgentPqrs = () => {
             fontWeight: 700,
         },
 
-        responseForm: {
-            p: 2,
-            borderRadius: 2,
-            backgroundColor: theme.palette.background.default,
-            border: `1px solid ${theme.palette.primary.light}`,
-            gridColumn: {
-                xs: "1 / -1",
-                lg: "auto",
-            },
-        },
-        responseInput: {
-            "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                backgroundColor: theme.palette.background.paper,
-            },
-        },
-
-        responseButton: {
-            alignSelf: "flex-start",
-            borderRadius: "14px",
-            fontWeight: 800,
-            px: 3,
-            textTransform: "none",
-        },
-
         button: {
             borderRadius: 2,
             fontWeight: 600,
@@ -360,6 +337,32 @@ const AgentPqrs = () => {
 
     if (loading) {
         return <LoadingBox />;
+    }
+
+    if (selectedChatPqr) {
+        return (
+            <>
+                <PqrChatView
+                    pqr={selectedChatPqr}
+                    messages={messages}
+                    messageText={messageText}
+                    loadingMessages={loadingMessages}
+                    chatError={chatError}
+                    onBack={closePqrChat}
+                    onMessageChange={setMessageText}
+                    onSendMessage={handleSendMessage}
+                    onClearError={() => setChatError("")}
+                />
+
+                {/* Mensajes de éxito, error o advertencia */}
+                <CustomSnackbar
+                    open={openMessage}
+                    message={message}
+                    severity={messageType}
+                    onClose={closeMessage}
+                />
+            </>
+        );
     }
 
     return (
@@ -402,7 +405,11 @@ const AgentPqrs = () => {
                             <Tooltip title="Buscar PQR">
                                 <IconButton
                                     onClick={toggleSearch}
-                                    sx={searchTerm ? filterStyles.activeIconButton : filterStyles.iconButton}
+                                    sx={
+                                        searchTerm
+                                            ? filterStyles.activeIconButton
+                                            : filterStyles.iconButton
+                                    }
                                 >
                                     <SearchOutlinedIcon />
                                 </IconButton>
@@ -414,7 +421,8 @@ const AgentPqrs = () => {
                             <IconButton
                                 onClick={openFilters}
                                 sx={
-                                    statusFilter !== "ALL" || priorityFilter !== "ALL"
+                                    statusFilter !== "ALL" ||
+                                        priorityFilter !== "ALL"
                                         ? filterStyles.activeIconButton
                                         : filterStyles.iconButton
                                 }
@@ -434,7 +442,10 @@ const AgentPqrs = () => {
                             }}
                         >
                             <Box sx={filterStyles.filterMenuContent}>
-                                <Typography variant="body2" sx={filterStyles.filterTitle}>
+                                <Typography
+                                    variant="body2"
+                                    sx={filterStyles.filterTitle}
+                                >
                                     Filtrar PQR
                                 </Typography>
 
@@ -445,10 +456,15 @@ const AgentPqrs = () => {
                                     size="small"
                                     sx={filterStyles.filterSelect}
                                 >
-                                    <MenuItem value="ALL">Todos los estados</MenuItem>
+                                    <MenuItem value="ALL">
+                                        Todos los estados
+                                    </MenuItem>
 
                                     {pqrStatusOptions.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
+                                        <MenuItem
+                                            key={option.value}
+                                            value={option.value}
+                                        >
                                             {option.label}
                                         </MenuItem>
                                     ))}
@@ -461,10 +477,15 @@ const AgentPqrs = () => {
                                     size="small"
                                     sx={filterStyles.filterSelect}
                                 >
-                                    <MenuItem value="ALL">Todas las prioridades</MenuItem>
+                                    <MenuItem value="ALL">
+                                        Todas las prioridades
+                                    </MenuItem>
 
                                     {pqrPriorityOptions.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
+                                        <MenuItem
+                                            key={option.value}
+                                            value={option.value}
+                                        >
                                             {option.label}
                                         </MenuItem>
                                     ))}
@@ -477,7 +498,10 @@ const AgentPqrs = () => {
                                         clearStatusFilter();
                                         clearPriorityFilter();
                                     }}
-                                    disabled={statusFilter === "ALL" && priorityFilter === "ALL"}
+                                    disabled={
+                                        statusFilter === "ALL" &&
+                                        priorityFilter === "ALL"
+                                    }
                                     sx={filterStyles.clearFilterButton}
                                 >
                                     Limpiar filtros
@@ -501,7 +525,9 @@ const AgentPqrs = () => {
             {/* Botones para cambiar entre PQR disponibles y asignadas */}
             <Box sx={style.viewButtonsContainer}>
                 <Button
-                    variant={activeView === "AVAILABLE" ? "contained" : "outlined"}
+                    variant={
+                        activeView === "AVAILABLE" ? "contained" : "outlined"
+                    }
                     startIcon={<FolderOpenOutlinedIcon />}
                     onClick={() => setActiveView("AVAILABLE")}
                     sx={style.button}
@@ -510,7 +536,9 @@ const AgentPqrs = () => {
                 </Button>
 
                 <Button
-                    variant={activeView === "ASSIGNED" ? "contained" : "outlined"}
+                    variant={
+                        activeView === "ASSIGNED" ? "contained" : "outlined"
+                    }
                     startIcon={<AssignmentOutlinedIcon />}
                     onClick={() => setActiveView("ASSIGNED")}
                     sx={style.button}
@@ -533,25 +561,37 @@ const AgentPqrs = () => {
                 <Box sx={style.list}>
                     {filteredPqrs.map((pqr) => (
                         <Paper key={pqr.id} sx={style.card}>
-
                             <Box sx={style.cardHeader}>
                                 <Box sx={style.cardTitleBox}>
-                                    <Typography variant="h6" sx={style.cardTitle}>
+                                    <Typography
+                                        variant="h6"
+                                        sx={style.cardTitle}
+                                    >
                                         {getCaseTypeLabel(pqr.caseType)}
                                     </Typography>
 
                                     <Box sx={style.dateBox}>
                                         <CalendarMonthOutlinedIcon fontSize="small" />
-                                        <Typography variant="body2" sx={style.date}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={style.date}
+                                        >
                                             Creada: {formatDate(pqr.createdAt)}
                                         </Typography>
                                     </Box>
 
                                     <Box sx={style.dateBox}>
                                         <PersonOutlineOutlinedIcon fontSize="small" />
-                                        <Typography variant="body2" sx={style.date}>
-                                            Usuario: {pqr.user?.name || "No disponible"} ·{" "}
-                                            {pqr.user?.email || "No disponible"}
+                                        <Typography
+                                            variant="body2"
+                                            sx={style.date}
+                                        >
+                                            Usuario:{" "}
+                                            {pqr.user?.name ||
+                                                "No disponible"}{" "}
+                                            ·{" "}
+                                            {pqr.user?.email ||
+                                                "No disponible"}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -561,7 +601,9 @@ const AgentPqrs = () => {
                                         <Box sx={style.priorityChipBox}>
                                             <Chip
                                                 icon={<FlagOutlinedIcon />}
-                                                label={`Prioridad: ${getPriorityLabel(pqr.priority)}`}
+                                                label={`Prioridad: ${getPriorityLabel(
+                                                    pqr.priority
+                                                )}`}
                                                 size="small"
                                                 sx={style.priorityChip}
                                             />
@@ -582,20 +624,6 @@ const AgentPqrs = () => {
                             <Typography sx={style.description}>
                                 {pqr.description}
                             </Typography>
-
-                            {/* Muestra la respuesta actual si la PQR ya fue respondida */}
-                            {activeView === "ASSIGNED" && pqr.response && (
-                                <Box sx={style.responseBox}>
-                                    <Typography variant="subtitle2" sx={style.responseTitle}>
-                                        <QuestionAnswerOutlinedIcon fontSize="small" />
-                                        Respuesta actual
-                                    </Typography>
-
-                                    <Typography variant="body2" color="text.secondary">
-                                        {pqr.response}
-                                    </Typography>
-                                </Box>
-                            )}
 
                             {/* Muestra la calificación registrada por el usuario */}
                             {pqr.rating !== null &&
@@ -667,7 +695,8 @@ const AgentPqrs = () => {
                                             label="Cambiar prioridad"
                                             value={
                                                 priorityByPqrId[pqr.id] ||
-                                                pqr.priority
+                                                pqr.priority ||
+                                                ""
                                             }
                                             disabled={
                                                 pqr.status === "CERRADA"
@@ -706,49 +735,19 @@ const AgentPqrs = () => {
                                         </Button>
                                     </Box>
 
-                                    <Box sx={style.responseForm}>
-                                        <TextField
-                                            label="Responder PQR"
-                                            placeholder="Escribe la respuesta para el usuario..."
-                                            value={responseTexts[pqr.id] || ""}
-                                            disabled={
-                                                pqr.status === "CERRADA"
-                                            }
-                                            onChange={(event) =>
-                                                handleResponseChange(
-                                                    pqr.id,
-                                                    event.target.value
-                                                )
-                                            }
-                                            fullWidth
-                                            multiline
-                                            minRows={3}
-                                            sx={style.responseInput}
-                                            slotProps={{
-                                                htmlInput: {
-                                                    maxLength: 500,
-                                                },
-                                            }}
-                                            error={!!responseErrors[pqr.id]}
-                                            helperText={
-                                                responseErrors[pqr.id]
-                                                    ? responseErrors[pqr.id]
-                                                    : `${responseTexts[pqr.id]?.length || 0}/500`
-                                            }
-                                        />
+                                    <Box sx={style.simpleBox}>
+                                        <Typography sx={style.simpleLabel}>
+                                            Seguimiento
+                                        </Typography>
 
                                         <Button
                                             variant="outlined"
-                                            disabled={respondingPqrId === pqr.id || pqr.status == "CERRADA"}
-                                            onClick={() => handleRespondPqr(pqr.id)}
-                                            startIcon={<SendOutlinedIcon />}
-                                            sx={style.responseButton}
+                                            disabled={pqr.status === "CERRADA"}
+                                            onClick={() => openPqrChat(pqr.id)}
+                                            startIcon={<ForumOutlinedIcon />}
+                                            sx={style.simpleButton}
                                         >
-                                            {respondingPqrId === pqr.id ? (
-                                                <CircularProgress size={20} color="inherit" />
-                                            ) : (
-                                                "Enviar respuesta"
-                                            )}
+                                            Responder por chat
                                         </Button>
                                     </Box>
                                 </Box>
@@ -761,7 +760,10 @@ const AgentPqrs = () => {
                                         variant="contained"
                                         startIcon={
                                             takingPqrId === pqr.id ? (
-                                                <CircularProgress size={18} color="inherit" />
+                                                <CircularProgress
+                                                    size={18}
+                                                    color="inherit"
+                                                />
                                             ) : (
                                                 <AssignmentTurnedInOutlinedIcon />
                                             )

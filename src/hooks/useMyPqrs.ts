@@ -26,6 +26,11 @@ export const useMyPqrs = () => {
   // Controla el loading del botón de calificar.
   const [ratingLoading, setRatingLoading] = useState(false);
 
+  // Guarda qué PQR tiene abierta la vista del chat.
+  const [selectedChatPqrId, setSelectedChatPqrId] = useState<number | null>(
+    null
+  );
+
   // Estados para mensajes visuales.
   const [openMessage, setOpenMessage] = useState(false);
   const [message, setMessage] = useState("");
@@ -64,6 +69,19 @@ export const useMyPqrs = () => {
     setRatingComment("");
   };
 
+  // Abre la vista de chat de una PQR.
+  const openPqrChat = (pqrId: number) => {
+    setSelectedChatPqrId(pqrId);
+  };
+
+  // Cierra la vista de chat y regresa al listado de PQR del usuario.
+  const closePqrChat = () => {
+    setSelectedChatPqrId(null);
+  };
+
+  // PQR seleccionada para mostrar en la vista del chat.
+  const selectedChatPqr = pqrs.find((pqr) => pqr.id === selectedChatPqrId);
+
   // Muestra mensajes de éxito, error o advertencia.
   const showMessage = (text: string, type: MessageType) => {
     setMessage(text);
@@ -89,12 +107,12 @@ export const useMyPqrs = () => {
       const data =
         ratingComment.trim().length > 0
           ? {
-              rating,
-              ratingComment: ratingComment.trim(),
-            }
+            rating,
+            ratingComment: ratingComment.trim(),
+          }
           : {
-              rating,
-            };
+            rating,
+          };
 
       const response = await ratePqr(pqrId, data);
 
@@ -129,6 +147,11 @@ export const useMyPqrs = () => {
     rating,
     ratingComment,
     ratingLoading,
+
+    selectedChatPqrId,
+    selectedChatPqr,
+    openPqrChat,
+    closePqrChat,
 
     openMessage,
     message,
