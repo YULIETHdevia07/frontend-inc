@@ -20,12 +20,12 @@ import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 import type { Pqr, PqrMessage, UserRole } from "../../interfaces/pqr.interface";
 import {
-    formatDate,
     getCaseTypeLabel,
     getStatusColor,
 } from "../../utils/pqrUtils";
 import { pqrStatusOptions } from "../../data/pqrOptions";
 import { getInitials } from "../../utils/avatarUtils";
+import { formatDate } from "../../utils/dateUtils";
 
 interface PqrChatViewProps {
     pqr: Pqr;

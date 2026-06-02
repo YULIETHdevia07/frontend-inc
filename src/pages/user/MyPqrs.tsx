@@ -18,8 +18,8 @@ import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import { useMyPqrs } from "../../hooks/useMyPqrs";
 import { useAuth } from "../../context/AuthContext";
 import { usePqrChat } from "../../hooks/usePqrChat";
+import { formatDate } from "../../utils/dateUtils";
 import {
-    formatDate,
     getCaseTypeLabel,
     getStatusColor,
 } from "../../utils/pqrUtils";

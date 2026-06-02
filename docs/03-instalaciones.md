@@ -259,24 +259,225 @@ Ejemplo de uso:
 saveAs(blob, "plantilla_carga_masiva_usuarios.xlsx");
 ```
 
-# Resumen de dependencias instaladas
+---
 
-| Dependencia | Comando | Propósito |
-|---|---|---|
-| Vite | `npm create vite@latest .` | Crear el proyecto frontend con React y TypeScript. |
-| Dependencias base | `npm install` | Instalar paquetes iniciales del proyecto. |
-| Axios | `npm install axios react-router-dom` | Realizar peticiones HTTP al backend. |
-| React Router DOM | `npm install axios react-router-dom` | Manejar rutas públicas, privadas y navegación SPA. |
-| Material UI | `npm install @mui/material @emotion/react @emotion/styled` | Crear interfaces visuales modernas y reutilizables. |
-| MUI Icons | `npm install @mui/icons-material` | Agregar íconos al header, sidebar y botones. |
-| ExcelJS | `npm install exceljs file-saver` | Crear plantillas Excel para la carga masiva de usuarios. |
-| File Saver | `npm install exceljs file-saver` | Descargar archivos generados desde el frontend. |
-| Tipos de File Saver | `npm install -D @types/file-saver` | Agregar soporte de TypeScript para `file-saver`. |
+## 7. Instalación de XLSX
+
+Se instaló **XLSX** para trabajar con archivos de Excel desde el frontend.
+
+### Comando ejecutado
+
+```bash
+npm install xlsx
+```
+
+### Dependencia instalada
+
+| Dependencia | Uso dentro del proyecto                                                |
+| ----------- | ---------------------------------------------------------------------- |
+| `xlsx`      | Permite leer, procesar o interpretar archivos Excel desde el frontend. |
+
+### ¿Para qué se utilizó XLSX?
+
+XLSX puede utilizarse para leer archivos `.xlsx` cargados por el usuario, procesar su contenido y convertir las filas del archivo en datos que puedan ser enviados al backend.
+
+Esta dependencia puede ser útil en funcionalidades como:
+
+```txt
+Carga masiva de usuarios.
+Lectura de plantillas Excel.
+Validación previa de archivos importados.
+Procesamiento de datos antes de enviarlos al backend.
+```
 
 ---
 
-# Conclusión
+## 8. Instalación de Socket.IO Client
+
+Se instaló **Socket.IO Client** para permitir la comunicación en tiempo real entre el frontend y el backend, especialmente en la funcionalidad del chat de seguimiento de las PQR.
+
+### Comando ejecutado
+
+```bash
+npm install socket.io-client
+```
+
+### Dependencia instalada
+
+| Dependencia        | Uso dentro del proyecto                                                                                                                                                          |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `socket.io-client` | Permite establecer una conexión en tiempo real entre el frontend y el backend mediante WebSockets, facilitando el envío y recepción de mensajes del chat sin recargar la página. |
+
+### ¿Para qué se utilizó Socket.IO Client?
+
+Socket.IO Client se utilizó para implementar el chat en tiempo real dentro del módulo de PQR. Gracias a esta dependencia, el usuario, el administrador o el agente pueden enviar y recibir mensajes de manera inmediata dentro de una PQR específica.
+
+La configuración principal del socket se realizó en el archivo:
+
+```txt
+src/services/pqrSocketService.ts
+```
+
+En este archivo se centralizó la conexión con el servidor de Socket.IO usando la variable de entorno:
+
+```env
+VITE_SOCKET_URL=http://localhost:4000
+```
+
+Esta variable permite separar la URL del servidor de sockets del código fuente, facilitando la configuración del proyecto en diferentes entornos, como desarrollo o producción.
+
+### Funciones principales implementadas
+
+| Función                          | Propósito                                                                                           |
+| -------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `connectPqrSocket(token)`        | Crea o retorna una conexión activa con Socket.IO, enviando el token JWT para autenticar al usuario. |
+| `getPqrSocket()`                 | Retorna la instancia actual del socket.                                                             |
+| `joinPqrRoom(pqrId)`             | Une al usuario autenticado a la sala correspondiente de una PQR.                                    |
+| `sendPqrMessage(pqrId, content)` | Envía un mensaje dentro del chat de una PQR.                                                        |
+| `listenJoinedPqrRoom(callback)`  | Escucha la confirmación del backend cuando el usuario entra a una sala.                             |
+| `listenNewPqrMessage(callback)`  | Escucha los nuevos mensajes recibidos en tiempo real.                                               |
+| `listenPqrSocketError(callback)` | Escucha errores enviados por el backend relacionados con el socket.                                 |
+| `removePqrSocketListeners()`     | Limpia los listeners para evitar eventos duplicados.                                                |
+| `disconnectPqrSocket()`          | Desconecta el socket cuando sea necesario.                                                          |
+
+### Ejemplo de conexión con Socket.IO
+
+```tsx
+socket = io(SOCKET_URL, {
+  auth: {
+    token,
+  },
+});
+```
+
+Esta conexión permite que el backend identifique al usuario autenticado mediante el token JWT y controle qué acciones puede realizar dentro del chat, según su rol y permisos.
+
+### Eventos utilizados en el chat
+
+| Evento             | Uso dentro del proyecto                                                                |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| `join_pqr`         | Permite que el usuario ingrese a la sala de una PQR específica.                        |
+| `send_pqr_message` | Envía un mensaje al backend para ser guardado y distribuido a los usuarios conectados. |
+| `joined_pqr`       | Confirma que el usuario ingresó correctamente a la sala de la PQR.                     |
+| `new_pqr_message`  | Recibe en tiempo real un nuevo mensaje enviado dentro de la PQR.                       |
+| `socket_error`     | Recibe errores relacionados con permisos, conexión o envío de mensajes.                |
+| `connect`          | Detecta cuando el socket se conecta correctamente.                                     |
+| `disconnect`       | Detecta cuando el socket pierde la conexión.                                           |
+| `connect_error`    | Detecta errores al intentar conectar el chat en tiempo real.                           |
+
+### Uso dentro del chat PQR
+
+La lógica del chat se integró mediante un hook personalizado encargado de manejar el historial de mensajes, la conexión al socket, la unión a la sala de la PQR y el envío de mensajes.
+
+Archivo relacionado:
+
+```txt
+src/hooks/usePqrChat.ts
+```
+
+Este hook permite:
+
+```txt
+Cargar el historial de mensajes.
+Conectar el socket con el token del usuario autenticado.
+Unir al usuario a la sala de la PQR seleccionada.
+Escuchar nuevos mensajes en tiempo real.
+Enviar mensajes desde el frontend.
+Controlar errores del chat.
+Evitar listeners duplicados.
+Actualizar el estado visual de conexión.
+```
+
+Además, la vista visual del chat se implementó en:
+
+```txt
+src/components/pqrs/PqrChatView.tsx
+```
+
+Este componente permite mostrar la conversación de forma organizada, diferenciando visualmente los mensajes enviados y recibidos. También muestra información de la PQR, estado, fecha, usuario, agente asignado, mensajes del chat, campo de escritura y botón de envío.
+
+---
+
+## 9. Instalación de Yup
+
+Se instaló **Yup** para facilitar la validación de formularios dentro del frontend.
+
+### Comando ejecutado
+
+```bash
+npm install yup
+```
+
+### Dependencia instalada
+
+| Dependencia | Uso dentro del proyecto                                                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `yup`       | Permite definir esquemas de validación para formularios, controlando campos obligatorios, formatos de correo, longitudes mínimas, entre otras reglas. |
+
+### ¿Para qué se utilizó Yup?
+
+Yup se utiliza para validar datos ingresados por el usuario antes de enviarlos al backend. Esto ayuda a mejorar la experiencia del usuario y evita enviar información incompleta o incorrecta desde el frontend.
+
+Puede aplicarse en formularios como:
+
+```txt
+Login
+Registro de usuarios
+Creación de PQR
+Actualización de usuarios
+Carga o validación de datos
+```
+
+---
+
+
+
+## 10. Instalación de tipos de Node
+
+Como el proyecto trabaja con TypeScript, también se instaló el paquete de tipos de Node.js.
+
+### Comando ejecutado
+
+```bash
+npm install -D @types/node
+```
+
+### Dependencia instalada
+
+| Dependencia   | Uso dentro del proyecto                                       |
+| ------------- | ------------------------------------------------------------- |
+| `@types/node` | Agrega soporte de tipos de Node.js en el proyecto TypeScript. |
+
+### ¿Para qué se utilizó?
+
+Este paquete permite que TypeScript reconozca tipos y configuraciones relacionadas con el entorno de Node.js. Puede ser útil en archivos de configuración, variables de entorno o procesos internos del proyecto frontend.
+
+---
+
+# Resumen actualizado de dependencias instaladas
+
+| Dependencia         | Comando                                                    | Propósito                                                    |
+| ------------------- | ---------------------------------------------------------- | ------------------------------------------------------------ |
+| Vite                | `npm create vite@latest .`                                 | Crear el proyecto frontend con React y TypeScript.           |
+| Dependencias base   | `npm install`                                              | Instalar paquetes iniciales del proyecto.                    |
+| Axios               | `npm install axios react-router-dom`                       | Realizar peticiones HTTP al backend.                         |
+| React Router DOM    | `npm install axios react-router-dom`                       | Manejar rutas públicas, privadas y navegación SPA.           |
+| Material UI         | `npm install @mui/material @emotion/react @emotion/styled` | Crear interfaces visuales modernas y reutilizables.          |
+| MUI Icons           | `npm install @mui/icons-material`                          | Agregar íconos al header, sidebar y botones.                 |
+| ExcelJS             | `npm install exceljs file-saver`                           | Crear plantillas Excel para la carga masiva de usuarios.     |
+| File Saver          | `npm install exceljs file-saver`                           | Descargar archivos generados desde el frontend.              |
+| Tipos de File Saver | `npm install -D @types/file-saver`                         | Agregar soporte de TypeScript para `file-saver`.             |
+| Socket.IO Client    | `npm install socket.io-client`                             | Implementar comunicación en tiempo real para el chat de PQR. |
+| Yup                 | `npm install yup`                                          | Validar formularios del frontend mediante esquemas.          |
+| XLSX                | `npm install xlsx`                                         | Leer y procesar archivos Excel desde el frontend.            |
+| Tipos de Node       | `npm install -D @types/node`                               | Agregar soporte de tipos de Node.js en TypeScript.           |
+
+---
+
+# Conclusión actualizada
 
 Durante esta etapa del frontend se instalaron y configuraron herramientas fundamentales para construir una aplicación moderna, organizada y escalable. Vite permitió iniciar el proyecto con React y TypeScript; Axios facilitó la comunicación con el backend; React Router DOM permitió manejar la navegación; Material UI aportó componentes visuales profesionales; MUI Icons mejoró la experiencia gráfica de la interfaz; y ExcelJS junto con File Saver permitieron generar y descargar plantillas de Excel para procesos como la carga masiva de usuarios.
 
-Además, se avanzó en la construcción de un layout administrativo más limpio, integrando `Header`, `SidebarMenu` y `DashboardLayout` de manera organizada. El botón de abrir y cerrar menú se trasladó al header, el menú lateral quedó más limpio visualmente y se mejoró la presentación del usuario autenticado mediante avatar, saludo y botón de cierre de sesión.
+Además, se incorporó Socket.IO Client para habilitar la comunicación en tiempo real dentro del chat de seguimiento de las PQR. Esta integración permitió conectar el frontend con el servidor de sockets, unir al usuario a una sala específica de PQR, enviar mensajes, recibir respuestas en tiempo real y controlar errores de conexión. Con esto, el sistema ofrece una experiencia más dinámica e inmediata entre usuarios, agentes y administradores.
+
+También se agregaron dependencias complementarias como Yup, para fortalecer la validación de formularios, XLSX, para el manejo de archivos Excel, y tipos de Node.js para mejorar el soporte de TypeScript en el proyecto.

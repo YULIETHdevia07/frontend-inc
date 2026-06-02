@@ -66,19 +66,6 @@ export const getPqrMessages = async (
   return response.data;
 };
 
-// Responde una PQR. Endpoint usado por ADMIN o AGENT según tu backend.
-export const respondPqr = async (
-  id: number,
-  responseText: string
-): Promise<SinglePqrResponse> => {
-  const response = await api.patch<SinglePqrResponse>(`/pqrs/${id}/respond`, {
-    response: responseText,
-  });
-
-  return response.data;
-};
-
-
 // Obtiene las PQR disponibles para ser tomadas por un AGENT.
 export const getAvailablePqrs = async (): Promise<PqrResponse> => {
   const response = await api.get<PqrResponse>("/pqrs/available");

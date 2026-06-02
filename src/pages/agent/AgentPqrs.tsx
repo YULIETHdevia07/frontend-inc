@@ -34,8 +34,8 @@ import type { PqrPriority, PqrStatus } from "../../interfaces/pqr.interface";
 import { useAgentPqrs } from "../../hooks/useAgentPqrs";
 import { useAuth } from "../../context/AuthContext";
 import { usePqrChat } from "../../hooks/usePqrChat";
+import { formatDate } from "../../utils/dateUtils";
 import {
-    formatDate,
     getCaseTypeLabel,
     getStatusColor,
 } from "../../utils/pqrUtils";
