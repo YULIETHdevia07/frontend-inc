@@ -467,23 +467,24 @@ export const PqrChatView = ({
                         </Box>
                     ) : (
                         messages.map((msg, index) => {
+                            // Define si el chat se está viendo desde usuario o soporte.
+                            const isUserView = currentUserRole === "USER";
 
-                            //  quién está viendo el chat
                             const isSupportView =
                                 currentUserRole === "ADMIN" ||
                                 currentUserRole === "AGENT";
 
-                            // quién envió el mensaje
+                            // Define si el mensaje fue enviado por soporte.
                             const isSupportMessage =
                                 msg.sender.role === "ADMIN" ||
                                 msg.sender.role === "AGENT";
 
-                            // si ese mensaje va a la derecha o izquierda
+                            // Define si el mensaje pertenece al lado de quien está viendo el chat.
                             const isMine = isSupportView
                                 ? isSupportMessage
                                 : msg.sender.role === "USER";
 
-                            // separa los mensajes por fecha
+                            // Separa los mensajes por fecha.
                             const showDateDivider =
                                 index === 0 ||
                                 new Date(msg.createdAt).toDateString() !==
@@ -514,18 +515,20 @@ export const PqrChatView = ({
                                                 : style.msgRowReceived
                                         }
                                     >
-                                        <Avatar
-                                            sx={{
-                                                ...style.msgAvatar,
-                                                ...(isMine
-                                                    ? style.mineAvatar
-                                                    : style.receivedAvatar),
-                                            }}
-                                        >
-                                            {getInitials(
-                                                msg.sender.name || "N/A"
-                                            )}
-                                        </Avatar>
+                                        {!isUserView && (
+                                            <Avatar
+                                                sx={{
+                                                    ...style.msgAvatar,
+                                                    ...(isMine
+                                                        ? style.mineAvatar
+                                                        : style.receivedAvatar),
+                                                }}
+                                            >
+                                                {getInitials(
+                                                    msg.sender.name || "N/A"
+                                                )}
+                                            </Avatar>
+                                        )}
 
                                         <Box
                                             sx={
@@ -534,15 +537,17 @@ export const PqrChatView = ({
                                                     : style.msgBubbleWrapperReceived
                                             }
                                         >
-                                            <Typography
-                                                sx={
-                                                    isMine
-                                                        ? style.msgSenderNameMine
-                                                        : style.msgSenderName
-                                                }
-                                            >
-                                                {msg.sender.name || "N/A"}
-                                            </Typography>
+                                            {!isUserView && (
+                                                <Typography
+                                                    sx={
+                                                        isMine
+                                                            ? style.msgSenderNameMine
+                                                            : style.msgSenderName
+                                                    }
+                                                >
+                                                    {msg.sender.name || "N/A"}
+                                                </Typography>
+                                            )}
 
                                             <Box
                                                 sx={
