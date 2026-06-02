@@ -114,7 +114,7 @@ const AdminPqrs = () => {
         null
     );
 
-    const { token } = useAuth();
+    const { token, user } = useAuth();
 
     const {
         messages,
@@ -418,7 +418,7 @@ const AdminPqrs = () => {
         return <LoadingBox />;
     }
 
-    if (selectedChatPqr) {
+    if (selectedChatPqr && user) {
         return (
             <>
                 <PqrChatView
@@ -427,6 +427,7 @@ const AdminPqrs = () => {
                     messageText={messageText}
                     loadingMessages={loadingMessages}
                     chatError={chatError}
+                    currentUserRole={user.role}
                     onBack={closePqrChat}
                     onMessageChange={setMessageText}
                     onSendMessage={handleSendMessage}

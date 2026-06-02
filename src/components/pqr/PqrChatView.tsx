@@ -9,7 +9,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
@@ -18,7 +18,7 @@ import HeadsetMicOutlinedIcon from "@mui/icons-material/HeadsetMicOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
-import type { Pqr, PqrMessage } from "../../interfaces/pqr.interface";
+import type { Pqr, PqrMessage, UserRole } from "../../interfaces/pqr.interface";
 import {
     formatDate,
     getCaseTypeLabel,
@@ -33,6 +33,7 @@ interface PqrChatViewProps {
     messageText: string;
     loadingMessages: boolean;
     chatError: string;
+    currentUserRole: UserRole;
     onBack: () => void;
     onMessageChange: (value: string) => void;
     onSendMessage: () => void;
@@ -46,6 +47,7 @@ export const PqrChatView = ({
     messageText,
     loadingMessages,
     chatError,
+    currentUserRole,
     onBack,
     onMessageChange,
     onSendMessage,
@@ -104,9 +106,9 @@ export const PqrChatView = ({
             backgroundColor: theme.palette.background.default,
             color: theme.palette.text.secondary,
             "&:hover": {
-                backgroundColor: `${theme.palette.primary.main}12`,
+                backgroundColor: alpha(theme.palette.primary.main, 0.08),
                 color: theme.palette.primary.main,
-                borderColor: `${theme.palette.primary.main}40`,
+                borderColor: alpha(theme.palette.primary.main, 0.25),
             },
         },
 
@@ -140,9 +142,9 @@ export const PqrChatView = ({
             borderRadius: "999px",
             fontWeight: 700,
             fontSize: "0.7rem",
-            color: "#1d4ed8",
-            backgroundColor: "#eff6ff",
-            border: "1px solid #bfdbfe",
+            color: theme.palette.primary.dark,
+            backgroundColor: theme.palette.primary.light,
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
             "& .MuiChip-label": {
                 px: 1,
             },
@@ -222,14 +224,14 @@ export const PqrChatView = ({
             whiteSpace: "nowrap",
         },
 
-        msgRowAgent: {
+        msgRowReceived: {
             display: "flex",
             flexDirection: "row",
             alignItems: "flex-end",
             gap: 1,
         },
 
-        msgRowUser: {
+        msgRowMine: {
             display: "flex",
             flexDirection: "row-reverse",
             alignItems: "flex-end",
@@ -244,28 +246,29 @@ export const PqrChatView = ({
             flexShrink: 0,
         },
 
-        agentAvatar: {
-            backgroundColor: "#eff6ff",
-            color: "#1d4ed8",
-            border: "1px solid #bfdbfe",
+        receivedAvatar: {
+            backgroundColor: theme.palette.primary.light,
+            color: theme.palette.primary.dark,
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
         },
 
-        userAvatar: {
-            backgroundColor: `${theme.palette.success.light}30`,
-            color: theme.palette.success.dark,
-            border: `1px solid ${theme.palette.success.light}`,
+        mineAvatar: {
+            backgroundColor: alpha(theme.palette.success.main, 0.12),
+            color: theme.palette.success.main,
+            border: `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
         },
 
-        msgBubbleWrapper: {
+        msgBubbleWrapperReceived: {
             display: "flex",
             flexDirection: "column",
+            alignItems: "flex-start",
             maxWidth: {
                 xs: "80%",
                 md: "70%",
             },
         },
 
-        msgBubbleWrapperUser: {
+        msgBubbleWrapperMine: {
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
@@ -275,7 +278,24 @@ export const PqrChatView = ({
             },
         },
 
-        bubbleAgent: {
+        msgSenderName: {
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            color: theme.palette.text.secondary,
+            mb: 0.35,
+            px: 0.5,
+        },
+
+        msgSenderNameMine: {
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            color: theme.palette.text.secondary,
+            mb: 0.35,
+            px: 0.5,
+            textAlign: "right",
+        },
+
+        bubbleReceived: {
             px: 1.75,
             py: 1.25,
             borderRadius: "16px 16px 16px 4px",
@@ -287,14 +307,14 @@ export const PqrChatView = ({
             whiteSpace: "pre-wrap",
         },
 
-        bubbleUser: {
+        bubbleMine: {
             px: 1.75,
             py: 1.25,
             borderRadius: "16px 16px 4px 16px",
             backgroundColor: theme.palette.primary.main,
             fontSize: "0.875rem",
             lineHeight: 1.55,
-            color: "#fff",
+            color: theme.palette.primary.contrastText,
             whiteSpace: "pre-wrap",
         },
 
@@ -334,7 +354,7 @@ export const PqrChatView = ({
             height: 42,
             borderRadius: "12px",
             backgroundColor: theme.palette.primary.main,
-            color: "#fff",
+            color: theme.palette.primary.contrastText,
             "&:hover": {
                 backgroundColor: theme.palette.primary.dark,
             },
@@ -447,10 +467,23 @@ export const PqrChatView = ({
                         </Box>
                     ) : (
                         messages.map((msg, index) => {
-                            const isAgent =
-                                msg.sender.role === "AGENT" ||
-                                msg.sender.role === "ADMIN";
 
+                            //  quién está viendo el chat
+                            const isSupportView =
+                                currentUserRole === "ADMIN" ||
+                                currentUserRole === "AGENT";
+
+                            // quién envió el mensaje
+                            const isSupportMessage =
+                                msg.sender.role === "ADMIN" ||
+                                msg.sender.role === "AGENT";
+
+                            // si ese mensaje va a la derecha o izquierda
+                            const isMine = isSupportView
+                                ? isSupportMessage
+                                : msg.sender.role === "USER";
+
+                            // separa los mensajes por fecha
                             const showDateDivider =
                                 index === 0 ||
                                 new Date(msg.createdAt).toDateString() !==
@@ -476,34 +509,46 @@ export const PqrChatView = ({
 
                                     <Box
                                         sx={
-                                            isAgent
-                                                ? style.msgRowAgent
-                                                : style.msgRowUser
+                                            isMine
+                                                ? style.msgRowMine
+                                                : style.msgRowReceived
                                         }
                                     >
                                         <Avatar
                                             sx={{
                                                 ...style.msgAvatar,
-                                                ...(isAgent
-                                                    ? style.agentAvatar
-                                                    : style.userAvatar),
+                                                ...(isMine
+                                                    ? style.mineAvatar
+                                                    : style.receivedAvatar),
                                             }}
                                         >
-                                            {getInitials(msg.sender.name)}
+                                            {getInitials(
+                                                msg.sender.name || "N/A"
+                                            )}
                                         </Avatar>
 
                                         <Box
                                             sx={
-                                                isAgent
-                                                    ? style.msgBubbleWrapper
-                                                    : style.msgBubbleWrapperUser
+                                                isMine
+                                                    ? style.msgBubbleWrapperMine
+                                                    : style.msgBubbleWrapperReceived
                                             }
                                         >
+                                            <Typography
+                                                sx={
+                                                    isMine
+                                                        ? style.msgSenderNameMine
+                                                        : style.msgSenderName
+                                                }
+                                            >
+                                                {msg.sender.name || "N/A"}
+                                            </Typography>
+
                                             <Box
                                                 sx={
-                                                    isAgent
-                                                        ? style.bubbleAgent
-                                                        : style.bubbleUser
+                                                    isMine
+                                                        ? style.bubbleMine
+                                                        : style.bubbleReceived
                                                 }
                                             >
                                                 {msg.content}

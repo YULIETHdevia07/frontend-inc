@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/axios";
+import { disconnectPqrSocket } from "../services/pqrSocketService";
 
 interface User {
     id: number;
@@ -47,6 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const logout = () => {
+        disconnectPqrSocket();
         localStorage.removeItem("token");
         setToken(null);
         setUser(null);

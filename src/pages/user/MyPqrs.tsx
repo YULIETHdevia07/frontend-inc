@@ -64,7 +64,7 @@ const MyPqrs = () => {
     } = useMyPqrs();
 
     // Token obtenido desde el contexto para conectar el chat por Socket.IO.
-    const { token } = useAuth();
+    const { token, user } = useAuth();
 
     const {
         messages,
@@ -239,7 +239,7 @@ const MyPqrs = () => {
         return <LoadingBox />;
     }
 
-    if (selectedChatPqr) {
+    if (selectedChatPqr && user) {
         return (
             <>
                 <PqrChatView
@@ -248,6 +248,7 @@ const MyPqrs = () => {
                     messageText={messageText}
                     loadingMessages={loadingMessages}
                     chatError={chatError}
+                    currentUserRole={user.role}
                     onBack={closePqrChat}
                     onMessageChange={setMessageText}
                     onSendMessage={handleSendMessage}
