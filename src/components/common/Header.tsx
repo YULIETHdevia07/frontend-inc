@@ -16,6 +16,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationBell from "./NotificationBell";
+import { getUserRoleLabel } from "../../utils/userRoleUtils";
 
 interface HeaderProps {
     openSidebar: boolean;
@@ -153,7 +154,7 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
                 <Box sx={style.rightContent}>
                     <Box sx={style.userBox}>
                         <Typography sx={style.userName}>
-                            {user ? `Hola, ${user.name}` : "Usuario"}
+                            {user ? `${getUserRoleLabel(user.role)}, ${user.name}` : "Usuario"}
                         </Typography>
 
                         <Typography sx={style.userRole}>
