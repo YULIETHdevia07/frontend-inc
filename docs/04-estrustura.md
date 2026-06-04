@@ -24,6 +24,7 @@ src/
 ├── routes/
 ├── services/
 ├── styles/
+├── templates/
 ├── theme/
 ├── utils/
 ├── validations/
@@ -75,6 +76,7 @@ components/
 │   ├── EmptyState.tsx
 │   ├── Header.tsx
 │   ├── LoadingBox.tsx
+│   ├── NotificationBell.tsx
 │   ├── PageContainer.tsx
 │   ├── PageHeader.tsx
 │   └── SidebarMenu.tsx
@@ -98,18 +100,19 @@ components/
 En esta carpeta se ubican los componentes comunes o reutilizables del sistema.
 Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, pueden usarse en diferentes vistas como usuarios, PQR, reportes, roles u otros módulos futuros.
 
-| Componente             | Descripción                                                                                                                                                                                           | Reutilización dentro del proyecto                                                                             |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `BulkUploadDialog.tsx` | Componente reutilizable para mostrar un modal de carga masiva de archivos. Permite seleccionar o cargar archivos, mostrar información del proceso y ejecutar acciones relacionadas con importaciones. | Puede utilizarse en usuarios, PQR, reportes u otros módulos que requieran carga masiva de datos.              |
-| `ClearableSelect.tsx`  | Componente reutilizable de selección que permite escoger una opción y también limpiar el valor seleccionado.                                                                                          | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR.   |
-| `CustomSnackbar.tsx`   | Componente reutilizable para mostrar mensajes temporales al usuario, como acciones exitosas, errores, advertencias o información.                                                                     | Puede utilizarse en cualquier vista que necesite notificar resultados de acciones realizadas.                 |
-| `DataTable.tsx`        | Componente reutilizable para mostrar información en formato de tabla. Puede recibir columnas, filas y acciones configuradas desde la vista donde se use.                                              | Puede utilizarse para listar usuarios, PQR, roles, reportes u otros registros del sistema.                    |
-| `EmptyState.tsx`       | Componente reutilizable para mostrar un mensaje cuando no existen datos disponibles en una vista.                                                                                                     | Puede utilizarse cuando no hay usuarios, PQR, resultados de búsqueda o registros para mostrar.                |
-| `Header.tsx`           | Componente reutilizable que representa el encabezado superior del sistema. Puede mostrar información del usuario autenticado, acciones rápidas o el botón para abrir y cerrar el menú lateral.        | Se utiliza principalmente dentro del layout principal de las vistas protegidas.                               |
-| `LoadingBox.tsx`       | Componente reutilizable para mostrar un estado de carga mientras se obtiene información del backend.                                                                                                  | Puede utilizarse en tablas, formularios, vistas de detalle o cualquier módulo que cargue datos.               |
-| `PageContainer.tsx`    | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                           | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                  |
-| `PageHeader.tsx`       | Componente reutilizable para mostrar el encabezado de una página, incluyendo título, descripción y acciones principales.                                                                              | Puede utilizarse en vistas como administración de usuarios, listado de PQR, creación de registros o reportes. |
-| `SidebarMenu.tsx`      | Componente reutilizable que representa el menú lateral del sistema. Permite mostrar opciones de navegación según los módulos disponibles y el rol del usuario.                                        | Se utiliza dentro del layout principal para navegar entre las secciones del sistema.                          |
+| Componente             | Descripción                                                                                                                                                                                           | Reutilización dentro del proyecto                                                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `BulkUploadDialog.tsx` | Componente reutilizable para mostrar un modal de carga masiva de archivos. Permite seleccionar o cargar archivos, mostrar información del proceso y ejecutar acciones relacionadas con importaciones. | Puede utilizarse en usuarios, PQR, reportes u otros módulos que requieran carga masiva de datos.                                           |
+| `ClearableSelect.tsx`  | Componente reutilizable de selección que permite escoger una opción y también limpiar el valor seleccionado.                                                                                          | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR.                                |
+| `CustomSnackbar.tsx`   | Componente reutilizable para mostrar mensajes temporales al usuario, como acciones exitosas, errores, advertencias o información.                                                                     | Puede utilizarse en cualquier vista que necesite notificar resultados de acciones realizadas.                                              |
+| `DataTable.tsx`        | Componente reutilizable para mostrar información en formato de tabla. Puede recibir columnas, filas y acciones configuradas desde la vista donde se use.                                              | Puede utilizarse para listar usuarios, PQR, roles, reportes u otros registros del sistema.                                                 |
+| `EmptyState.tsx`       | Componente reutilizable para mostrar un mensaje cuando no existen datos disponibles en una vista.                                                                                                     | Puede utilizarse cuando no hay usuarios, PQR, resultados de búsqueda o registros para mostrar.                                             |
+| `Header.tsx`           | Componente reutilizable que representa el encabezado superior del sistema. Puede mostrar información del usuario autenticado, acciones rápidas o el botón para abrir y cerrar el menú lateral.        | Se utiliza principalmente dentro del layout principal de las vistas protegidas.                                                            |
+| `LoadingBox.tsx`       | Componente reutilizable para mostrar un estado de carga mientras se obtiene información del backend.                                                                                                  | Puede utilizarse en tablas, formularios, vistas de detalle o cualquier módulo que cargue datos.                                            |
+| `NotificationBell.tsx` | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                     | Se utiliza dentro de `Header.tsx` para mostrar novedades importantes del sistema, como creación, asignación, cierre o calificación de PQR. |
+| `PageContainer.tsx`    | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                           | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                                               |
+| `PageHeader.tsx`       | Componente reutilizable para mostrar el encabezado de una página, incluyendo título, descripción y acciones principales.                                                                              | Puede utilizarse en vistas como administración de usuarios, listado de PQR, creación de registros o reportes.                              |
+| `SidebarMenu.tsx`      | Componente reutilizable que representa el menú lateral del sistema. Permite mostrar opciones de navegación según los módulos disponibles y el rol del usuario.                                        | Se utiliza dentro del layout principal para navegar entre las secciones del sistema.                                                       |
 
 El objetivo de `components/common/` es centralizar todos los elementos visuales que pueden servir en varias partes del sistema. Por ejemplo, `DataTable.tsx` no debe ser una tabla exclusiva para usuarios, sino una tabla general que pueda adaptarse a usuarios, PQR, roles o cualquier otro listado.
 
@@ -166,11 +169,12 @@ Si el componente define la estructura visual general de una página, debe ir en 
 Esta organización permite que el proyecto sea más limpio, escalable y fácil de mantener, ya que cada componente tiene una responsabilidad clara y una ubicación lógica dentro de la estructura del frontend.
 
 ---
+
 ### `context/`
 
 Esta carpeta contiene los contextos globales de React.
 
-Se utiliza para manejar información que debe estar disponible en varias partes de la aplicación, como la autenticación del usuario.
+Se utiliza para manejar información que debe estar disponible en varias partes de la aplicación, como la autenticación del usuario, el token, la sesión activa y el cierre de sesión.
 
 Ejemplo:
 
@@ -179,11 +183,33 @@ context/
 └── AuthContext.tsx
 ```
 
-Responsabilidad principal:
+| Archivo           | Descripción                                                                                                                                                                        | Uso dentro del proyecto                                                                                                                                        |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AuthContext.tsx` | Contexto encargado de manejar el usuario autenticado, el token, el inicio de sesión, el cierre de sesión y la conexión global con Socket.IO cuando el usuario ya está autenticado. | Se utiliza para permitir que componentes, hooks y páginas accedan al usuario actual, validen si existe sesión activa y desconecten el socket al cerrar sesión. |
+
+---
+
+#### Responsabilidad principal
 
 ```txt
-Manejar estados globales como usuario autenticado, token, login y logout.
+Manejar el estado global de autenticación.
+Guardar y eliminar el token del localStorage.
+Consultar el perfil del usuario autenticado.
+Conectar Socket.IO cuando existe token y usuario.
+Desconectar Socket.IO cuando el usuario cierra sesión.
 ```
+
+---
+
+#### Funcionamiento general de `AuthContext.tsx`
+
+El contexto de autenticación administra la sesión del usuario dentro del frontend.
+
+Cuando el usuario inicia sesión, el token se guarda en el `localStorage` y también en el estado global del contexto. Luego, el sistema consulta el perfil del usuario autenticado mediante el endpoint correspondiente.
+
+Si el perfil se obtiene correctamente, se guarda la información del usuario en el estado global. Cuando ya existe un token válido y un usuario cargado, el sistema conecta Socket.IO para habilitar funcionalidades en tiempo real, como el chat de PQR y las notificaciones internas.
+
+Cuando el usuario cierra sesión, se desconecta Socket.IO, se elimina el token del `localStorage` y se limpia la información del usuario autenticado.
 
 ---
 
@@ -220,31 +246,34 @@ Centralizar datos fijos para evitar escribirlos repetidamente en los componentes
 
 Esta carpeta contiene hooks personalizados.
 
-Los hooks permiten separar la lógica de una página o componente, dejando el componente más limpio y fácil de entender.
+Los hooks permiten separar la lógica de una página o componente, dejando el componente visual más limpio y fácil de entender.
 
 Ejemplos:
 
 ```txt
 hooks/
 ├── useAdminUsers.ts
-└── useAuth.ts
+├── useAuth.ts
+├── useNotifications.ts
+└── usePqrChat.ts
 ```
 
-En el caso de `useAdminUsers.ts`, se puede manejar:
+| Hook                  | Descripción                                                                                                                                                                                      | Uso dentro del proyecto                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios, carga de usuarios, cambio de roles, carga masiva y mensajes de respuesta.                                                        | Se utiliza en el módulo administrativo de usuarios.                                                            |
+| `useAuth.ts`          | Permite acceder al contexto de autenticación desde cualquier componente.                                                                                                                         | Se utiliza para obtener el usuario autenticado, el token, el estado de carga, login, logout e isAuthenticated. |
+| `useNotifications.ts` | Maneja la lógica de notificaciones del usuario autenticado. Carga notificaciones, obtiene el contador de no leídas, marca una o todas como leídas y escucha nuevas notificaciones por Socket.IO. | Se utiliza en `NotificationBell.tsx`.                                                                          |
+| `usePqrChat.ts`       | Maneja la lógica del chat de una PQR. Carga el historial de mensajes, une al usuario a la sala de la PQR, envía mensajes y escucha nuevos mensajes en tiempo real.                               | Se utiliza en el componente visual del chat de PQR.                                                            |
 
-```txt
-Cargar usuarios
-Actualizar roles
-Abrir y cerrar modal
-Manejar mensajes
-Controlar errores
-```
+---
 
-Responsabilidad principal:
+#### Responsabilidad principal
 
 ```txt
 Separar la lógica del componente visual.
 ```
+
+Los hooks permiten que los componentes se enfoquen en mostrar la interfaz, mientras que la carga de datos, conexión con servicios, manejo de estados y eventos queda centralizada en archivos reutilizables.
 
 ---
 
@@ -252,31 +281,28 @@ Separar la lógica del componente visual.
 
 Esta carpeta contiene las interfaces y tipos de TypeScript que definen la estructura de los datos utilizados en el proyecto.
 
-Aquí se declaran los tipos que representan entidades como usuarios, roles, PQR, respuestas del backend o datos que se envían desde formularios.
+Aquí se declaran los tipos que representan entidades como usuarios, roles, PQR, mensajes, notificaciones, respuestas del backend o datos que se envían desde formularios.
 
 Ejemplos:
 
 ```txt
 interfaces/
-├── user.interface.ts
+├── auth.interface.ts
+├── notification.interface.ts
 ├── pqr.interface.ts
-└── auth.interface.ts
+└── user.interface.ts
 ```
 
-Ejemplo de uso:
+| Archivo                     | Descripción                                                                                                                  | Uso dentro del proyecto                                                                                       |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `auth.interface.ts`         | Define tipos relacionados con autenticación, usuario autenticado o respuestas del login.                                     | Se utiliza en contexto, servicios o componentes relacionados con sesión.                                      |
+| `notification.interface.ts` | Define los tipos e interfaces relacionados con las notificaciones del sistema.                                               | Se utiliza en `notificationService.ts`, `useNotifications.ts`, `NotificationBell.tsx` y eventos de Socket.IO. |
+| `pqr.interface.ts`          | Define los tipos relacionados con PQR, mensajes del chat, estados, tipos de caso y datos usados en el módulo de solicitudes. | Se utiliza en servicios, hooks, componentes y páginas del módulo PQR.                                         |
+| `user.interface.ts`         | Define los tipos relacionados con usuarios y roles.                                                                          | Se utiliza en administración de usuarios y componentes relacionados con roles.                                |
 
-```ts
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: UserRole;
-}
+---
 
-export type UserRole = "USER" | "ADMIN" | "AGENT";
-```
-
-Responsabilidad principal:
+#### Responsabilidad principal
 
 ```txt
 Centralizar los tipos e interfaces para evitar repetir estructuras en diferentes archivos.
@@ -346,22 +372,26 @@ Centralizar la navegación del sistema.
 
 Esta carpeta contiene las funciones encargadas de comunicarse con el backend.
 
+Aquí se centralizan tanto las peticiones HTTP realizadas con Axios como la comunicación en tiempo real mediante Socket.IO.
+
 Estructura:
 
 ```txt
 services/
 ├── authService.ts
+├── notificationService.ts
 ├── pqrService.ts
-├── pqrSocketService.ts
+├── socketService.ts
 └── userService.ts
 ```
 
-| Archivo               | Descripción                                                                              | Uso dentro del proyecto                                                                                                                                        |
-| --------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `authService.ts`      | Contiene las funciones relacionadas con la autenticación del usuario.                    | Se utiliza para iniciar sesión, registrar usuarios y manejar procesos relacionados con el acceso al sistema.                                                   |
-| `pqrService.ts`       | Contiene las funciones HTTP relacionadas con las PQR.                                    | Se utiliza para crear PQR, consultar solicitudes, cambiar estados, asignar agentes, responder PQR, calificar el servicio y cargar el historial de mensajes.    |
-| `pqrSocketService.ts` | Contiene la configuración y funciones del socket para el chat en tiempo real de las PQR. | Se utiliza para conectar el frontend con Socket.IO, unir al usuario a una sala de PQR, enviar mensajes, escuchar nuevos mensajes y controlar errores del chat. |
-| `userService.ts`      | Contiene las funciones relacionadas con la administración de usuarios.                   | Se utiliza para consultar usuarios, actualizar roles y realizar acciones administrativas sobre los usuarios del sistema.                                       |
+| Archivo                  | Descripción                                                                              | Uso dentro del proyecto                                                                                                                                         |
+| ------------------------ | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `authService.ts`         | Contiene las funciones relacionadas con la autenticación del usuario.                    | Se utiliza para iniciar sesión, registrar usuarios y manejar procesos relacionados con el acceso al sistema.                                                    |
+| `notificationService.ts` | Contiene las funciones HTTP relacionadas con las notificaciones del usuario autenticado. | Se utiliza para consultar notificaciones, obtener el contador de no leídas y marcar notificaciones como leídas.                                                 |
+| `pqrService.ts`          | Contiene las funciones HTTP relacionadas con las PQR.                                    | Se utiliza para crear PQR, consultar solicitudes, cambiar estados, asignar agentes, cambiar prioridad, calificar el servicio y cargar el historial de mensajes. |
+| `socketService.ts`       | Contiene la configuración y funciones generales de Socket.IO para el frontend.           | Se utiliza para conectar el socket, desconectarlo, manejar el chat de PQR y escuchar notificaciones en tiempo real.                                             |
+| `userService.ts`         | Contiene las funciones relacionadas con la administración de usuarios.                   | Se utiliza para consultar usuarios, actualizar roles y realizar carga masiva de usuarios.                                                                       |
 
 ---
 
@@ -376,15 +406,25 @@ Estas funciones permiten enviar los datos del usuario al backend para iniciar se
 
 ---
 
-#### Ejemplo de funciones en `userService.ts`
+#### Funciones en `notificationService.ts`
 
 ```txt
-getAllUsers()
-updateUserRole()
-uploadUsersBulk()
+getNotifications()
+getUnreadNotificationsCount()
+markNotificationAsRead()
+markAllNotificationsAsRead()
 ```
 
-Estas funciones permiten consultar los usuarios registrados y actualizar el rol de un usuario desde el módulo administrativo.
+Estas funciones permiten comunicarse con los endpoints de notificaciones del backend.
+
+Se utilizan para:
+
+```txt
+Consultar las notificaciones del usuario autenticado.
+Consultar la cantidad de notificaciones no leídas.
+Marcar una notificación como leída.
+Marcar todas las notificaciones como leídas.
+```
 
 ---
 
@@ -407,33 +447,53 @@ Estas funciones permiten manejar las operaciones principales del módulo de PQR 
 
 ---
 
-#### Funciones en `pqrSocketService.ts`
+#### Funciones en `socketService.ts`
 
 ```txt
-connectPqrSocket()
-getPqrSocket()
+connectSocket()
+getSocket()
+disconnectSocket()
 joinPqrRoom()
 sendPqrMessage()
 listenJoinedPqrRoom()
 listenNewPqrMessage()
-listenPqrSocketError()
+listenNewNotification()
+listenSocketError()
 removePqrSocketListeners()
-disconnectPqrSocket()
+removeNotificationSocketListeners()
 ```
 
-Estas funciones permiten manejar la comunicación en tiempo real del chat de PQR mediante Socket.IO.
+Estas funciones permiten manejar la comunicación en tiempo real mediante Socket.IO.
+
+El archivo `socketService.ts` es general porque el socket ahora se utiliza para dos funcionalidades:
+
+```txt
+1. Chat en tiempo real de PQR.
+2. Notificaciones internas en tiempo real.
+```
 
 ---
 
-#### Responsabilidad principal
+#### Funciones en `userService.ts`
+
+```txt
+getAllUsers()
+updateUserRole()
+uploadUsersBulk()
+```
+
+Estas funciones permiten consultar los usuarios registrados y actualizar el rol de un usuario desde el módulo administrativo.
+
+---
+#### Responsabilidad principal de `services/`
 
 ```txt
 Separar las peticiones HTTP y la comunicación en tiempo real de los componentes visuales.
 ```
 
-Los componentes no deberían llamar directamente a Axios ni configurar directamente Socket.IO. Lo ideal es que usen funciones centralizadas en los servicios.
+Los componentes no deberían llamar directamente a Axios ni configurar directamente Socket.IO.
 
-Esto permite que las páginas, hooks y componentes se enfoquen en mostrar información y manejar la interacción del usuario, mientras que los servicios se encargan de la comunicación con el backend.
+Lo ideal es que usen funciones centralizadas en los servicios. Esto permite que páginas, hooks y componentes se enfoquen en mostrar información y manejar la interacción del usuario, mientras que los servicios se encargan de la comunicación con el backend.
 
 ---
 
@@ -448,8 +508,8 @@ styles/
 └── filterStyles.css
 ```
 
-| Archivo            | Descripción                                                                                                                       | Uso dentro del proyecto                                                                                    |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Archivo            | Descripción                                                                                                                       | Uso dentro del proyecto                                                             |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | `filterStyles.css` | Archivo de estilos utilizado para personalizar elementos visuales relacionados con filtros, contenedores o controles de búsqueda. | Puede aplicarse en vistas que tengan filtros, formularios de búsqueda, carga masiva |
 
 ---
@@ -688,9 +748,9 @@ getErrorMessage()
 formatDate()
 ```
 
-| Función                      | Descripción                                                                                            | Uso dentro del proyecto                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| `formatDate(date)`           | Convierte una fecha en formato legible en español de Colombia.                                         | Se utiliza para mostrar fechas de creación, actualización o mensajes dentro del módulo de PQR. |   
+| Función            | Descripción                                                    | Uso dentro del proyecto                                                                        |
+| ------------------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `formatDate(date)` | Convierte una fecha en formato legible en español de Colombia. | Se utiliza para mostrar fechas de creación, actualización o mensajes dentro del módulo de PQR. |
 
 ---
 
@@ -703,10 +763,10 @@ getStatusColor()
 getCaseTypeLabel()
 ```
 
-| Función                      | Descripción                                                                                            | Uso dentro del proyecto                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| `getStatusColor(status)`     | Devuelve el color que debe mostrarse en un componente `Chip` de Material UI según el estado de la PQR. | Se utiliza para representar visualmente estados como `PENDIENTE`, `EN_PROCESO` o `CERRADA`.    |
-| `getCaseTypeLabel(caseType)` | Convierte el tipo de caso de una PQR en un texto más claro para el usuario.                            | Se utiliza para mostrar tipos como `SAP`, `Daño de equipo`, `Instalación` u `Otro`.            |
+| Función                      | Descripción                                                                                            | Uso dentro del proyecto                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `getStatusColor(status)`     | Devuelve el color que debe mostrarse en un componente `Chip` de Material UI según el estado de la PQR. | Se utiliza para representar visualmente estados como `PENDIENTE`, `EN_PROCESO` o `CERRADA`. |
+| `getCaseTypeLabel(caseType)` | Convierte el tipo de caso de una PQR en un texto más claro para el usuario.                            | Se utiliza para mostrar tipos como `SAP`, `Daño de equipo`, `Instalación` u `Otro`.         |
 
 ---
 

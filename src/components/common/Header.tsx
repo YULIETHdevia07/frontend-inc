@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
+import NotificationBell from "./NotificationBell";
 
 interface HeaderProps {
     openSidebar: boolean;
@@ -160,6 +161,7 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
                         </Typography>
                     </Box>
 
+                    <NotificationBell />
 
                     <Avatar sx={style.avatar}>
                         {user ? userInitial : <PersonIcon />}

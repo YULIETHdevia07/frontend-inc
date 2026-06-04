@@ -5,15 +5,15 @@ import type {
 } from "../interfaces/pqr.interface";
 import { getPqrMessages } from "../services/pqrService";
 import {
-    connectPqrSocket,
-    getPqrSocket,
+    connectSocket,
+    getSocket,
     joinPqrRoom,
     listenJoinedPqrRoom,
     listenNewPqrMessage,
-    listenPqrSocketError,
+    listenSocketError,
     removePqrSocketListeners,
     sendPqrMessage,
-} from "../services/pqrSocketService";
+} from "../services/socketService";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Hook encargado de manejar el historial, conexión y envío de mensajes del chat PQR.
@@ -100,7 +100,7 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
 
         loadMessages();
 
-        const socket = connectPqrSocket(token);
+        const socket = connectSocket(token);
 
         setIsSocketConnected(socket.connected);
 
@@ -148,14 +148,14 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
             });
         });
 
-        listenPqrSocketError((error) => {
+        listenSocketError((error) => {
             setChatError(error.message);
         });
 
         return () => {
             isMountedRef.current = false;
 
-            const currentSocket = getPqrSocket();
+            const currentSocket = getSocket();
 
             currentSocket?.off("connect", handleConnect);
             currentSocket?.off("disconnect", handleDisconnect);
