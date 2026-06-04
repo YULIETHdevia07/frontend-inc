@@ -79,14 +79,17 @@ components/
 │   ├── NotificationBell.tsx
 │   ├── PageContainer.tsx
 │   ├── PageHeader.tsx
-│   └── SidebarMenu.tsx
+│   ├── SidebarMenu.tsx
+│   ├── StatsSummary.tsx
+│   └── ViewToggleButtons.tsx
 │
 ├── layouts/
 │   └── DashboardLayout.tsx
 │
 ├── pqr/
 │   ├── PqrChatView.tsx
-│   └── PqrRatingSummary.tsx
+│   ├── PqrRatingSummary.tsx
+│   └── PqrTicketCard.tsx
 │
 └── users/
     ├── ChangeUserRoleDialog.tsx
@@ -100,19 +103,21 @@ components/
 En esta carpeta se ubican los componentes comunes o reutilizables del sistema.
 Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, pueden usarse en diferentes vistas como usuarios, PQR, reportes, roles u otros módulos futuros.
 
-| Componente             | Descripción                                                                                                                                                                                           | Reutilización dentro del proyecto                                                                                                          |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `BulkUploadDialog.tsx` | Componente reutilizable para mostrar un modal de carga masiva de archivos. Permite seleccionar o cargar archivos, mostrar información del proceso y ejecutar acciones relacionadas con importaciones. | Puede utilizarse en usuarios, PQR, reportes u otros módulos que requieran carga masiva de datos.                                           |
-| `ClearableSelect.tsx`  | Componente reutilizable de selección que permite escoger una opción y también limpiar el valor seleccionado.                                                                                          | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR.                                |
-| `CustomSnackbar.tsx`   | Componente reutilizable para mostrar mensajes temporales al usuario, como acciones exitosas, errores, advertencias o información.                                                                     | Puede utilizarse en cualquier vista que necesite notificar resultados de acciones realizadas.                                              |
-| `DataTable.tsx`        | Componente reutilizable para mostrar información en formato de tabla. Puede recibir columnas, filas y acciones configuradas desde la vista donde se use.                                              | Puede utilizarse para listar usuarios, PQR, roles, reportes u otros registros del sistema.                                                 |
-| `EmptyState.tsx`       | Componente reutilizable para mostrar un mensaje cuando no existen datos disponibles en una vista.                                                                                                     | Puede utilizarse cuando no hay usuarios, PQR, resultados de búsqueda o registros para mostrar.                                             |
-| `Header.tsx`           | Componente reutilizable que representa el encabezado superior del sistema. Puede mostrar información del usuario autenticado, acciones rápidas o el botón para abrir y cerrar el menú lateral.        | Se utiliza principalmente dentro del layout principal de las vistas protegidas.                                                            |
-| `LoadingBox.tsx`       | Componente reutilizable para mostrar un estado de carga mientras se obtiene información del backend.                                                                                                  | Puede utilizarse en tablas, formularios, vistas de detalle o cualquier módulo que cargue datos.                                            |
-| `NotificationBell.tsx` | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                     | Se utiliza dentro de `Header.tsx` para mostrar novedades importantes del sistema, como creación, asignación, cierre o calificación de PQR. |
-| `PageContainer.tsx`    | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                           | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                                               |
-| `PageHeader.tsx`       | Componente reutilizable para mostrar el encabezado de una página, incluyendo título, descripción y acciones principales.                                                                              | Puede utilizarse en vistas como administración de usuarios, listado de PQR, creación de registros o reportes.                              |
-| `SidebarMenu.tsx`      | Componente reutilizable que representa el menú lateral del sistema. Permite mostrar opciones de navegación según los módulos disponibles y el rol del usuario.                                        | Se utiliza dentro del layout principal para navegar entre las secciones del sistema.                                                       |
+| Componente              | Descripción                                                                                                                                                                                               | Reutilización dentro del proyecto                                                                                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BulkUploadDialog.tsx`  | Componente reutilizable para mostrar un modal de carga masiva de archivos. Permite seleccionar o cargar archivos, mostrar información del proceso y ejecutar acciones relacionadas con importaciones.     | Puede utilizarse en usuarios, PQR, reportes u otros módulos que requieran carga masiva de datos.                                                                              |
+| `ClearableSelect.tsx`   | Componente reutilizable de selección que permite escoger una opción y también limpiar el valor seleccionado.                                                                                              | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR.                                                                   |
+| `CustomSnackbar.tsx`    | Componente reutilizable para mostrar mensajes temporales al usuario, como acciones exitosas, errores, advertencias o información.                                                                         | Puede utilizarse en cualquier vista que necesite notificar resultados de acciones realizadas.                                                                                 |
+| `DataTable.tsx`         | Componente reutilizable para mostrar información en formato de tabla. Puede recibir columnas, filas y acciones configuradas desde la vista donde se use.                                                  | Puede utilizarse para listar usuarios, PQR, roles, reportes u otros registros del sistema.                                                                                    |
+| `EmptyState.tsx`        | Componente reutilizable para mostrar un mensaje cuando no existen datos disponibles en una vista.                                                                                                         | Puede utilizarse cuando no hay usuarios, PQR, resultados de búsqueda o registros para mostrar.                                                                                |
+| `Header.tsx`            | Componente reutilizable que representa el encabezado superior del sistema. Puede mostrar información del usuario autenticado, acciones rápidas o el botón para abrir y cerrar el menú lateral.            | Se utiliza principalmente dentro del layout principal de las vistas protegidas.                                                                                               |
+| `LoadingBox.tsx`        | Componente reutilizable para mostrar un estado de carga mientras se obtiene información del backend.                                                                                                      | Puede utilizarse en tablas, formularios, vistas de detalle o cualquier módulo que cargue datos.                                                                               |
+| `NotificationBell.tsx`  | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                         | Se utiliza dentro de `Header.tsx` para mostrar novedades importantes del sistema, como creación, asignación, cierre o calificación de PQR.                                    |
+| `PageContainer.tsx`     | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                               | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                                                                                  |
+| `PageHeader.tsx`        | Componente reutilizable para mostrar el encabezado de una página, incluyendo título, descripción y acciones principales.                                                                                  | Puede utilizarse en vistas como administración de usuarios, listado de PQR, creación de registros o reportes.                                                                 |
+| `SidebarMenu.tsx`       | Componente reutilizable que representa el menú lateral del sistema. Permite mostrar opciones de navegación según los módulos disponibles y el rol del usuario.                                            | Se utiliza dentro del layout principal para navegar entre las secciones del sistema.                                                                                          |
+| `StatsSummary.tsx`      | Componente reutilizable para mostrar tarjetas de resumen con un ícono, una etiqueta y un valor numérico o textual. Permite presentar indicadores importantes de una vista de forma clara y compacta.      | Puede utilizarse en módulos como PQR, usuarios, dashboard o reportes para mostrar conteos como total de registros, pendientes, cerrados, asignados o por calificar.           |
+| `ViewToggleButtons.tsx` | Componente reutilizable para mostrar botones de cambio de vista. Recibe opciones con etiqueta, valor, ícono y contador opcional, permitiendo alternar entre diferentes estados o secciones de una página. | Puede utilizarse en vistas que necesiten cambiar entre categorías, por ejemplo PQR disponibles y PQR asignadas, registros activos e inactivos, o diferentes tipos de listado. |
 
 El objetivo de `components/common/` es centralizar todos los elementos visuales que pueden servir en varias partes del sistema. Por ejemplo, `DataTable.tsx` no debe ser una tabla exclusiva para usuarios, sino una tabla general que pueda adaptarse a usuarios, PQR, roles o cualquier otro listado.
 
@@ -135,10 +140,11 @@ El layout permite mantener una misma estructura visual en las páginas principal
 En esta carpeta se ubican los componentes específicos del módulo de PQR.
 Estos componentes están relacionados directamente con la lógica visual de las solicitudes, el chat y la calificación del servicio.
 
-| Componente             | Descripción                                                                                                                                                                                                                | Uso dentro del proyecto                                                                             |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `PqrChatView.tsx`      | Componente encargado de mostrar la vista visual del chat de una PQR. Presenta la información de la solicitud, los mensajes enviados y recibidos, el campo de escritura, el botón de envío y los estados visuales del chat. | Se utiliza en el módulo de PQR para permitir la comunicación entre usuario, agente o administrador. |
-| `PqrRatingSummary.tsx` | Componente encargado de mostrar el resumen de la calificación realizada por el usuario sobre una PQR. Puede incluir la puntuación, comentario y fecha de calificación.                                                     | Se utiliza en vistas donde se necesita mostrar la valoración dada a una PQR respondida o cerrada.   |
+| Componente             | Descripción                                                                                                                                                                                                                                                                  | Uso dentro del proyecto                                                                                                                             |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PqrChatView.tsx`      | Componente encargado de mostrar la vista visual del chat de una PQR. Presenta la información de la solicitud, los mensajes enviados y recibidos, el campo de escritura, el botón de envío y los estados visuales del chat.                                                   | Se utiliza en el módulo de PQR para permitir la comunicación entre usuario, agente o administrador.                                                 |
+| `PqrRatingSummary.tsx` | Componente encargado de mostrar el resumen de la calificación realizada por el usuario sobre una PQR. Puede incluir la puntuación, comentario y fecha de calificación.                                                                                                       | Se utiliza en vistas donde se necesita mostrar la valoración dada a una PQR respondida o cerrada.                                                   |
+| `PqrTicketCard.tsx`    | Componente encargado de mostrar una PQR en formato de tarjeta compacta. Presenta el identificador de la PQR, tipo de caso, estado, prioridad, fecha, usuario, agente asignado cuando aplica, descripción, calificación y acciones relacionadas con estado, prioridad y chat. | Se utiliza en vistas como `AgentPqrs` y `AdminPqrs` para reutilizar el diseño visual de las tarjetas de PQR y evitar repetir código en cada página. |
 
 Estos componentes se ubican en `components/pqr/` porque dependen directamente del módulo de PQR y no son elementos generales del sistema.
 
@@ -586,6 +592,7 @@ utils/
 ├── avatarUtils.ts
 ├── dateUtils.ts
 ├── excelUtils.ts
+├── formatText.ts
 ├── getErrorMessage.ts
 ├── pqrUtils.ts
 └── userRoleUtils.tsx
@@ -634,6 +641,22 @@ toExcelColor()
 | Función               | Descripción                                                                                             | Uso dentro del proyecto                                                                                              |
 | --------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `toExcelColor(color)` | Convierte un color hexadecimal, como `#1565c0`, al formato ARGB utilizado por ExcelJS, como `FF1565C0`. | Se utiliza al generar archivos de Excel para aplicar colores personalizados a celdas, encabezados, bordes o estilos. |
+
+---
+
+#### `formatText.ts`
+
+Este archivo contiene funciones auxiliares para transformar textos antes de mostrarlos en la interfaz.
+
+```txt
+capitalizeText()
+```
+
+| Función                | Descripción                                                                                                                                                | Uso dentro del proyecto                                                                                                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `capitalizeText(text)` | Convierte un texto a formato capitalizado, dejando solo la primera letra en mayúscula y el resto en minúscula. Por ejemplo, transforma `ADMIN` en `Admin`. | Se utiliza para mostrar textos técnicos del sistema de una forma más amigable para el usuario, como roles, estados u otros valores que vienen en mayúscula desde el backend. |
+
+Este archivo se ubica en `utils/` porque contiene una función pequeña y reutilizable de formato de texto.
 
 ---
 
@@ -696,95 +719,6 @@ Si una función se comunica con el backend, debe ir en services/.
 Si una función maneja estado o lógica de una vista, debe ir en hooks/.
 Si una función contiene validaciones de formularios, debe ir en validations/.
 ```
-
----
-
-#### `avatarUtils.ts`
-
-Este archivo contiene funciones auxiliares relacionadas con la visualización de nombres o avatares dentro del sistema.
-
-```txt
-getInitials()
-```
-
-| Función             | Descripción                                                                              | Uso dentro del proyecto                                                                                         |
-| ------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `getInitials(name)` | Obtiene las iniciales de un nombre completo. Si no recibe un nombre válido, retorna `?`. | Se utiliza para mostrar iniciales en componentes visuales como avatares de usuarios, administradores o agentes. |
-
-
----
-
-#### `excelUtils.ts`
-
-Este archivo contiene funciones auxiliares relacionadas con el manejo de datos o formatos utilizados en archivos de Excel.
-
-```txt
-toExcelColor()
-```
-
-| Función               | Descripción                                                                                             | Uso dentro del proyecto                                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `toExcelColor(color)` | Convierte un color hexadecimal, como `#1565c0`, al formato ARGB utilizado por ExcelJS, como `FF1565C0`. | Se utiliza al generar archivos de Excel para aplicar colores personalizados a celdas, encabezados, bordes o estilos. |
-
----
-
-#### `getErrorMessage.ts`
-
-Este archivo contiene una función auxiliar encargada de extraer mensajes de error enviados por el backend.
-
-```txt
-getErrorMessage()
-```
-
-| Función                                  | Descripción                                                                                                                                        | Uso dentro del proyecto                                                                                                 |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `getErrorMessage(error, defaultMessage)` | Recibe un error desconocido y verifica si es un error de Axios. Si el backend envía un mensaje, lo retorna; si no, retorna un mensaje por defecto. | Se utiliza en hooks, páginas o componentes para mostrar errores claros al usuario cuando una petición al backend falla. |
-
----
-
-#### `dateUtils.ts`
-
-```txt
-formatDate()
-```
-
-| Función            | Descripción                                                    | Uso dentro del proyecto                                                                        |
-| ------------------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `formatDate(date)` | Convierte una fecha en formato legible en español de Colombia. | Se utiliza para mostrar fechas de creación, actualización o mensajes dentro del módulo de PQR. |
-
----
-
-#### `pqrUtils.ts`
-
-Este archivo contiene funciones auxiliares relacionadas con la visualización de información del módulo de PQR.
-
-```txt
-getStatusColor()
-getCaseTypeLabel()
-```
-
-| Función                      | Descripción                                                                                            | Uso dentro del proyecto                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| `getStatusColor(status)`     | Devuelve el color que debe mostrarse en un componente `Chip` de Material UI según el estado de la PQR. | Se utiliza para representar visualmente estados como `PENDIENTE`, `EN_PROCESO` o `CERRADA`. |
-| `getCaseTypeLabel(caseType)` | Convierte el tipo de caso de una PQR en un texto más claro para el usuario.                            | Se utiliza para mostrar tipos como `SAP`, `Daño de equipo`, `Instalación` u `Otro`.         |
-
----
-
-#### `userRoleUtils.ts`
-
-Este archivo contiene funciones auxiliares relacionadas con la visualización de los roles de usuario dentro del sistema.
-
-```txt
-getUserRoleColor()
-getUserRoleIcon()
-getUserRoleLabel()
-```
-
-| Función                  | Descripción                                                                                          | Uso dentro del proyecto                                                             |
-| ------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `getUserRoleColor(role)` | Devuelve el color visual que debe tener un rol de usuario en componentes como `Chip` de Material UI. | Se utiliza para diferenciar visualmente roles como administrador, agente o usuario. |
-| `getUserRoleIcon(role)`  | Retorna el ícono correspondiente según el rol del usuario.                                           | Se utiliza en componentes visuales donde se muestra el rol acompañado de un ícono.  |
-| `getUserRoleLabel(role)` | Convierte el rol técnico del sistema en un texto más claro para mostrar al usuario.                  | Se utiliza para mostrar etiquetas como `Administrador`, `Agente` o `Usuario`.       |
 
 ---
 
