@@ -140,11 +140,11 @@ El layout permite mantener una misma estructura visual en las páginas principal
 En esta carpeta se ubican los componentes específicos del módulo de PQR.
 Estos componentes están relacionados directamente con la lógica visual de las solicitudes, el chat y la calificación del servicio.
 
-| Componente             | Descripción                                                                                                                                                                                                                                                                  | Uso dentro del proyecto                                                                                                                             |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PqrChatView.tsx`      | Componente encargado de mostrar la vista visual del chat de una PQR. Presenta la información de la solicitud, los mensajes enviados y recibidos, el campo de escritura, el botón de envío y los estados visuales del chat.                                                   | Se utiliza en el módulo de PQR para permitir la comunicación entre usuario, agente o administrador.                                                 |
-| `PqrRatingSummary.tsx` | Componente encargado de mostrar el resumen de la calificación realizada por el usuario sobre una PQR. Puede incluir la puntuación, comentario y fecha de calificación.                                                                                                       | Se utiliza en vistas donde se necesita mostrar la valoración dada a una PQR respondida o cerrada.                                                   |
-| `PqrTicketCard.tsx`    | Componente encargado de mostrar una PQR en formato de tarjeta compacta. Presenta el identificador de la PQR, tipo de caso, estado, prioridad, fecha, usuario, agente asignado cuando aplica, descripción, calificación y acciones relacionadas con estado, prioridad y chat. | Se utiliza en vistas como `AgentPqrs` y `AdminPqrs` para reutilizar el diseño visual de las tarjetas de PQR y evitar repetir código en cada página. |
+| Componente             | Descripción                                                                                                                                                                                                                                                                                                     | Uso dentro del proyecto                                                                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PqrChatView.tsx`      | Componente encargado de mostrar la vista visual del chat de una PQR. Presenta la información de la solicitud, los mensajes enviados y recibidos, el campo de escritura, el botón para enviar mensajes, el botón para adjuntar archivos y la visualización de imágenes o documentos enviados en la conversación. | Se utiliza en el módulo de PQR para permitir la comunicación entre usuario, agente o administrador mediante mensajes de texto y archivos adjuntos.  |
+| `PqrRatingSummary.tsx` | Componente encargado de mostrar el resumen de la calificación realizada por el usuario sobre una PQR. Puede incluir la puntuación, comentario y fecha de calificación.                                                                                                                                          | Se utiliza en vistas donde se necesita mostrar la valoración dada a una PQR respondida o cerrada.                                                   |
+| `PqrTicketCard.tsx`    | Componente encargado de mostrar una PQR en formato de tarjeta compacta. Presenta el identificador de la PQR, tipo de caso, estado, prioridad, fecha, usuario, agente asignado cuando aplica, descripción, calificación y acciones relacionadas con estado, prioridad y chat.                                    | Se utiliza en vistas como `AgentPqrs` y `AdminPqrs` para reutilizar el diseño visual de las tarjetas de PQR y evitar repetir código en cada página. |
 
 Estos componentes se ubican en `components/pqr/` porque dependen directamente del módulo de PQR y no son elementos generales del sistema.
 
@@ -264,12 +264,12 @@ hooks/
 └── usePqrChat.ts
 ```
 
-| Hook                  | Descripción                                                                                                                                                                                      | Uso dentro del proyecto                                                                                        |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios, carga de usuarios, cambio de roles, carga masiva y mensajes de respuesta.                                                        | Se utiliza en el módulo administrativo de usuarios.                                                            |
-| `useAuth.ts`          | Permite acceder al contexto de autenticación desde cualquier componente.                                                                                                                         | Se utiliza para obtener el usuario autenticado, el token, el estado de carga, login, logout e isAuthenticated. |
-| `useNotifications.ts` | Maneja la lógica de notificaciones del usuario autenticado. Carga notificaciones, obtiene el contador de no leídas, marca una o todas como leídas y escucha nuevas notificaciones por Socket.IO. | Se utiliza en `NotificationBell.tsx`.                                                                          |
-| `usePqrChat.ts`       | Maneja la lógica del chat de una PQR. Carga el historial de mensajes, une al usuario a la sala de la PQR, envía mensajes y escucha nuevos mensajes en tiempo real.                               | Se utiliza en el componente visual del chat de PQR.                                                            |
+| Hook                  | Descripción                                                                                                                                                                                                                      | Uso dentro del proyecto                                                                                        |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios, carga de usuarios, cambio de roles, carga masiva y mensajes de respuesta.                                                                                        | Se utiliza en el módulo administrativo de usuarios.                                                            |
+| `useAuth.ts`          | Permite acceder al contexto de autenticación desde cualquier componente.                                                                                                                                                         | Se utiliza para obtener el usuario autenticado, el token, el estado de carga, login, logout e isAuthenticated. |
+| `useNotifications.ts` | Maneja la lógica de notificaciones del usuario autenticado. Carga notificaciones, obtiene el contador de no leídas, marca una o todas como leídas y escucha nuevas notificaciones por Socket.IO.                                 | Se utiliza en `NotificationBell.tsx`.                                                                          |
+| `usePqrChat.ts`       | Maneja la lógica del chat de una PQR. Carga el historial de mensajes, une al usuario a la sala de la PQR, envía mensajes de texto, envía archivos adjuntos mediante HTTP y escucha nuevos mensajes en tiempo real por Socket.IO. | Se utiliza en `PqrChatView.tsx` y en las páginas que abren el chat de una PQR.                                 |
 
 ---
 
@@ -299,12 +299,12 @@ interfaces/
 └── user.interface.ts
 ```
 
-| Archivo                     | Descripción                                                                                                                  | Uso dentro del proyecto                                                                                       |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `auth.interface.ts`         | Define tipos relacionados con autenticación, usuario autenticado o respuestas del login.                                     | Se utiliza en contexto, servicios o componentes relacionados con sesión.                                      |
-| `notification.interface.ts` | Define los tipos e interfaces relacionados con las notificaciones del sistema.                                               | Se utiliza en `notificationService.ts`, `useNotifications.ts`, `NotificationBell.tsx` y eventos de Socket.IO. |
-| `pqr.interface.ts`          | Define los tipos relacionados con PQR, mensajes del chat, estados, tipos de caso y datos usados en el módulo de solicitudes. | Se utiliza en servicios, hooks, componentes y páginas del módulo PQR.                                         |
-| `user.interface.ts`         | Define los tipos relacionados con usuarios y roles.                                                                          | Se utiliza en administración de usuarios y componentes relacionados con roles.                                |
+| Archivo                     | Descripción                                                                                                                                                  | Uso dentro del proyecto                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.interface.ts`         | Define tipos relacionados con autenticación, usuario autenticado o respuestas del login.                                                                     | Se utiliza en contexto, servicios o componentes relacionados con sesión.                                                                  |
+| `notification.interface.ts` | Define los tipos e interfaces relacionados con las notificaciones del sistema.                                                                               | Se utiliza en `notificationService.ts`, `useNotifications.ts`, `NotificationBell.tsx` y eventos de Socket.IO.                             |
+| `pqr.interface.ts`          | Define los tipos relacionados con PQR, mensajes del chat, archivos adjuntos, estados, prioridades, tipos de caso y datos usados en el módulo de solicitudes. | Se utiliza en servicios, hooks, componentes y páginas del módulo PQR para tipar solicitudes, mensajes, adjuntos y respuestas del backend. |
+| `user.interface.ts`         | Define los tipos relacionados con usuarios y roles.                                                                                                          | Se utiliza en administración de usuarios y componentes relacionados con roles.                                                            |
 
 ---
 
@@ -443,6 +443,7 @@ getAllPqrs()
 updatePqrStatus()
 updatePqrPriority()
 getPqrMessages()
+sendPqrMessageWithAttachment()
 getAvailablePqrs()
 takePqr()
 getMyAssignedPqrs()
@@ -478,6 +479,9 @@ El archivo `socketService.ts` es general porque el socket ahora se utiliza para 
 2. Notificaciones internas en tiempo real.
 ```
 
+En el chat de PQR, Socket.IO se utiliza para enviar mensajes de texto y recibir nuevos mensajes en tiempo real.
+
+Los archivos adjuntos no se envían directamente por Socket.IO. Primero se suben mediante HTTP usando `FormData`, y luego el backend emite el evento `new_pqr_message` para actualizar el chat en tiempo real.
 ---
 
 #### Funciones en `userService.ts`

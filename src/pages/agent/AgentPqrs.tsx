@@ -98,9 +98,11 @@ const AgentPqrs = () => {
         messageText,
         setMessageText,
         loadingMessages,
+        sendingAttachment,
         chatError,
         setChatError,
         handleSendMessage,
+        handleSendMessageWithAttachment,
     } = usePqrChat({
         pqrId: selectedChatPqrId,
         token,
@@ -246,11 +248,13 @@ const AgentPqrs = () => {
                     messages={messages}
                     messageText={messageText}
                     loadingMessages={loadingMessages}
+                    sendingAttachment={sendingAttachment}
                     chatError={chatError}
                     currentUserRole={user.role}
                     onBack={closePqrChat}
                     onMessageChange={setMessageText}
                     onSendMessage={handleSendMessage}
+                    onSendAttachment={handleSendMessageWithAttachment}
                     onClearError={() => setChatError("")}
                 />
 

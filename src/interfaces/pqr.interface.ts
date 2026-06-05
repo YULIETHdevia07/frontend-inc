@@ -13,12 +13,28 @@ export type AgentPqrView = "AVAILABLE" | "ASSIGNED";
 // Tipos de mensajes usados en alertas o snackbar.
 export type MessageType = "success" | "error" | "info" | "warning";
 
+// Tipos de archivos adjuntos permitidos en el chat de PQR.
+export type PqrAttachmentType = "IMAGE" | "DOCUMENT";
+
 // Usuario relacionado con una PQR.
 export interface PqrUser {
   id: number;
   name: string;
   email: string;
   role: UserRole;
+}
+
+// Archivo adjunto relacionado con un mensaje de PQR.
+export interface PqrMessageAttachment {
+  id: number;
+  fileName: string;
+  originalName: string;
+  fileUrl: string;
+  fileType: PqrAttachmentType;
+  mimeType: string;
+  fileSize: number;
+  createdAt: string;
+  messageId: number;
 }
 
 // Estructura principal de una PQR.
@@ -45,11 +61,12 @@ export interface Pqr {
 // Mensaje perteneciente al chat de una PQR.
 export interface PqrMessage {
   id: number;
-  content: string;
+  content: string | null;
   createdAt: string;
   pqrId: number;
   senderId: number;
-  sender: PqrUser
+  sender: PqrUser;
+  attachments: PqrMessageAttachment[];
 }
 
 // Datos necesarios para crear una nueva PQR.
@@ -92,6 +109,12 @@ export interface RatePqrResponse {
 export interface PqrMessagesResponse {
   message: string;
   messages: PqrMessage[];
+}
+
+// Respuesta al enviar un mensaje con archivo adjunto.
+export interface PqrMessageWithAttachmentResponse {
+  message: string;
+  pqrMessage: PqrMessage;
 }
 
 // Errores de validación del formulario para crear una PQR.

@@ -2,6 +2,7 @@ import api from "../api/axios";
 import type {
   CreatePqrData,
   PqrMessagesResponse,
+  PqrMessageWithAttachmentResponse,
   PqrPriority,
   PqrResponse,
   PqrStatus,
@@ -61,6 +62,28 @@ export const getPqrMessages = async (
 ): Promise<PqrMessagesResponse> => {
   const response = await api.get<PqrMessagesResponse>(
     `/pqrs/${pqrId}/messages`
+  );
+
+  return response.data;
+};
+
+// Envía un mensaje con archivo adjunto en una PQR.
+export const sendPqrMessageWithAttachment = async (
+  pqrId: number,
+  file: File,
+  content?: string
+): Promise<PqrMessageWithAttachmentResponse> => {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  if (content?.trim()) {
+    formData.append("content", content.trim());
+  }
+
+  const response = await api.post<PqrMessageWithAttachmentResponse>(
+    `/pqrs/${pqrId}/messages/attachment`,
+    formData
   );
 
   return response.data;

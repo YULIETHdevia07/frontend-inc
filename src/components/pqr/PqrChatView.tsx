@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import {
     Alert,
     Avatar,
@@ -5,6 +6,7 @@ import {
     Chip,
     CircularProgress,
     IconButton,
+    Link,
     Paper,
     TextField,
     Typography,
@@ -17,6 +19,8 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import HeadsetMicOutlinedIcon from "@mui/icons-material/HeadsetMicOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import AttachFileOutlinedIcon from "@mui/icons-material/AttachFileOutlined";
+import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 
 import type { Pqr, PqrMessage, UserRole } from "../../interfaces/pqr.interface";
 import {
@@ -27,16 +31,20 @@ import { pqrStatusOptions } from "../../data/pqrOptions";
 import { getInitials } from "../../utils/avatarUtils";
 import { formatDate } from "../../utils/dateUtils";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 interface PqrChatViewProps {
     pqr: Pqr;
     messages: PqrMessage[];
     messageText: string;
     loadingMessages: boolean;
+    sendingAttachment: boolean;
     chatError: string;
     currentUserRole: UserRole;
     onBack: () => void;
     onMessageChange: (value: string) => void;
     onSendMessage: () => void;
+    onSendAttachment: (file: File) => void | Promise<void>;
     onClearError: () => void;
 }
 
@@ -46,14 +54,19 @@ export const PqrChatView = ({
     messages,
     messageText,
     loadingMessages,
+    sendingAttachment,
     chatError,
     currentUserRole,
     onBack,
     onMessageChange,
     onSendMessage,
+    onSendAttachment,
     onClearError,
 }: PqrChatViewProps) => {
     const theme = useTheme();
+
+    // Referencia al input oculto para seleccionar archivos.
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const isClosed = pqr.status === "CERRADA";
 
@@ -62,6 +75,29 @@ export const PqrChatView = ({
             pqrStatusOptions.find((option) => option.value === pqr.status)
                 ?.label || pqr.status
         );
+    };
+
+    // Abre el selector de archivos.
+    const handleOpenFileInput = () => {
+        fileInputRef.current?.click();
+    };
+
+    // Envía el archivo seleccionado al hook del chat.
+    const handleFileChange = async (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const file = event.target.files?.[0];
+
+        if (!file) return;
+
+        await onSendAttachment(file);
+
+        event.target.value = "";
+    };
+
+    // Construye la URL completa del archivo.
+    const getAttachmentUrl = (fileUrl: string) => {
+        return `${BACKEND_URL}${fileUrl}`;
     };
 
     const style = {
@@ -318,6 +354,38 @@ export const PqrChatView = ({
             whiteSpace: "pre-wrap",
         },
 
+        attachmentImage: {
+            display: "block",
+            maxWidth: "240px",
+            width: "100%",
+            borderRadius: "12px",
+            mt: 1,
+            border: `1px solid ${alpha(theme.palette.common.black, 0.12)}`,
+        },
+
+        attachmentFile: {
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            mt: 1,
+            px: 1.25,
+            py: 1,
+            borderRadius: "10px",
+            backgroundColor: alpha(theme.palette.common.white, 0.16),
+            border: `1px solid ${alpha(theme.palette.common.white, 0.25)}`,
+        },
+
+        attachmentFileReceived: {
+            backgroundColor: theme.palette.background.default,
+            border: `1px solid ${theme.palette.divider}`,
+        },
+
+        attachmentFileName: {
+            fontSize: "0.78rem",
+            fontWeight: 600,
+            wordBreak: "break-word",
+        },
+
         msgTime: {
             fontSize: "0.7rem",
             color: theme.palette.text.disabled,
@@ -345,6 +413,21 @@ export const PqrChatView = ({
                 borderRadius: "12px",
                 fontSize: "0.875rem",
                 backgroundColor: theme.palette.background.default,
+            },
+        },
+
+        chatAttachBtn: {
+            flexShrink: 0,
+            width: 42,
+            height: 42,
+            borderRadius: "12px",
+            border: `1px solid ${theme.palette.divider}`,
+            color: theme.palette.text.secondary,
+            backgroundColor: theme.palette.background.default,
+            "&:hover": {
+                color: theme.palette.primary.main,
+                borderColor: alpha(theme.palette.primary.main, 0.35),
+                backgroundColor: alpha(theme.palette.primary.main, 0.08),
             },
         },
 
@@ -418,14 +501,18 @@ export const PqrChatView = ({
                                 {formatDate(pqr.createdAt)}
                             </Box>
 
-                            <Box sx={style.chatMetaDot} />
+                            {pqr.user && (
+                                <>
+                                    <Box sx={style.chatMetaDot} />
 
-                            <Box sx={style.chatMetaItem}>
-                                <PersonOutlineOutlinedIcon
-                                    sx={{ fontSize: 12 }}
-                                />
-                                {pqr.user?.name || "Sin usuario"}
-                            </Box>
+                                    <Box sx={style.chatMetaItem}>
+                                        <PersonOutlineOutlinedIcon
+                                            sx={{ fontSize: 12 }}
+                                        />
+                                        {pqr.user?.name || "Sin usuario"}
+                                    </Box>
+                                </>
+                            )}
 
                             {pqr.assignedTo && (
                                 <>
@@ -556,7 +643,85 @@ export const PqrChatView = ({
                                                         : style.bubbleReceived
                                                 }
                                             >
-                                                {msg.content}
+                                                {msg.content && (
+                                                    <Typography
+                                                        component="div"
+                                                        sx={{
+                                                            fontSize: "0.875rem",
+                                                            lineHeight: 1.55,
+                                                        }}
+                                                    >
+                                                        {msg.content}
+                                                    </Typography>
+                                                )}
+
+                                                {msg.attachments?.map((attachment) => {
+                                                    const attachmentUrl =
+                                                        getAttachmentUrl(
+                                                            attachment.fileUrl
+                                                        );
+
+                                                    if (
+                                                        attachment.fileType ===
+                                                        "IMAGE"
+                                                    ) {
+                                                        return (
+                                                            <Box
+                                                                key={
+                                                                    attachment.id
+                                                                }
+                                                                component="img"
+                                                                src={
+                                                                    attachmentUrl
+                                                                }
+                                                                alt={
+                                                                    attachment.originalName
+                                                                }
+                                                                sx={
+                                                                    style.attachmentImage
+                                                                }
+                                                            />
+                                                        );
+                                                    }
+
+                                                    return (
+                                                        <Link
+                                                            key={
+                                                                attachment.id
+                                                            }
+                                                            href={
+                                                                attachmentUrl
+                                                            }
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            underline="none"
+                                                            color="inherit"
+                                                            sx={{
+                                                                ...style.attachmentFile,
+                                                                ...(!isMine
+                                                                    ? style.attachmentFileReceived
+                                                                    : {}),
+                                                            }}
+                                                        >
+                                                            <InsertDriveFileOutlinedIcon
+                                                                sx={{
+                                                                    fontSize: 22,
+                                                                    flexShrink: 0,
+                                                                }}
+                                                            />
+
+                                                            <Typography
+                                                                sx={
+                                                                    style.attachmentFileName
+                                                                }
+                                                            >
+                                                                {
+                                                                    attachment.originalName
+                                                                }
+                                                            </Typography>
+                                                        </Link>
+                                                    );
+                                                })}
                                             </Box>
 
                                             <Typography sx={style.msgTime}>
@@ -596,6 +761,26 @@ export const PqrChatView = ({
                     </Box>
                 ) : (
                     <Box sx={style.chatFooter}>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            hidden
+                            accept=".jpg,.jpeg,.png,.webp,.pdf"
+                            onChange={handleFileChange}
+                        />
+
+                        <IconButton
+                            onClick={handleOpenFileInput}
+                            disabled={sendingAttachment}
+                            sx={style.chatAttachBtn}
+                        >
+                            {sendingAttachment ? (
+                                <CircularProgress size={18} />
+                            ) : (
+                                <AttachFileOutlinedIcon sx={{ fontSize: 18 }} />
+                            )}
+                        </IconButton>
+
                         <TextField
                             fullWidth
                             multiline

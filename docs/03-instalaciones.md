@@ -321,7 +321,7 @@ src/services/pqrSocketService.ts
 En este archivo se centralizó la conexión con el servidor de Socket.IO usando la variable de entorno:
 
 ```env
-VITE_SOCKET_URL=http://localhost:4000
+VITE_BACKEND_URL=http://localhost:4000
 ```
 
 Esta variable permite separar la URL del servidor de sockets del código fuente, facilitando la configuración del proyecto en diferentes entornos, como desarrollo o producción.

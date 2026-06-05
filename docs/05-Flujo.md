@@ -26,3 +26,18 @@
 ```
 
 ---
+
+### Flujo de archivos adjuntos en el chat de PQR
+
+```txt
+1. El usuario selecciona una imagen o documento desde el chat.
+2. PqrChatView envía el archivo al hook usePqrChat.
+3. usePqrChat llama a sendPqrMessageWithAttachment().
+4. pqrService envía el archivo al backend mediante FormData.
+5. El backend guarda el archivo y crea el mensaje asociado.
+6. El backend emite el evento new_pqr_message.
+7. El frontend recibe el nuevo mensaje por Socket.IO.
+8. PqrChatView muestra el mensaje con la imagen o documento adjunto.
+```
+
+---

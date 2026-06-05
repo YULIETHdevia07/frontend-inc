@@ -2,7 +2,7 @@ import { io, type Socket } from "socket.io-client";
 import type { Notification } from "../interfaces/notification.interface";
 import type { PqrMessage } from "../interfaces/pqr.interface";
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+const SOCKET_URL = import.meta.env.VITE_BACKEND_URL;
 
 // Evita conexiones duplicadas
 let socket: Socket | null = null;

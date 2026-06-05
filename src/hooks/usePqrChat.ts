@@ -3,7 +3,10 @@ import type {
     PqrMessage,
     UsePqrChatParams,
 } from "../interfaces/pqr.interface";
-import { getPqrMessages } from "../services/pqrService";
+import {
+    getPqrMessages,
+    sendPqrMessageWithAttachment,
+} from "../services/pqrService";
 import {
     connectSocket,
     getSocket,
@@ -26,6 +29,9 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
 
     // Controla la carga inicial del historial de mensajes.
     const [loadingMessages, setLoadingMessages] = useState(false);
+
+    // Controla el envío de archivos adjuntos.
+    const [sendingAttachment, setSendingAttachment] = useState(false);
 
     // Mensaje de error del chat o del socket.
     const [chatError, setChatError] = useState("");
@@ -65,7 +71,7 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
         }
     }, [pqrId]);
 
-    // Envía un mensaje al backend mediante Socket.IO.
+    // Envía un mensaje de texto al backend mediante Socket.IO.
     const handleSendMessage = useCallback(() => {
         if (!pqrId) return;
 
@@ -80,6 +86,36 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
         setMessageText("");
         setChatError("");
     }, [pqrId, messageText]);
+
+    // Envía un mensaje con archivo adjunto mediante HTTP.
+    const handleSendMessageWithAttachment = useCallback(
+        async (file: File) => {
+            if (!pqrId) return;
+
+            try {
+                setSendingAttachment(true);
+                setChatError("");
+
+                await sendPqrMessageWithAttachment(
+                    pqrId,
+                    file,
+                    messageText
+                );
+
+                setMessageText("");
+            } catch (error) {
+                setChatError(
+                    getErrorMessage(
+                        error,
+                        "Error al enviar el archivo adjunto."
+                    )
+                );
+            } finally {
+                setSendingAttachment(false);
+            }
+        },
+        [pqrId, messageText]
+    );
 
     useEffect(() => {
         isMountedRef.current = true;
@@ -170,10 +206,12 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
         messageText,
         setMessageText,
         loadingMessages,
+        sendingAttachment,
         chatError,
         setChatError,
         isSocketConnected,
         loadMessages,
         handleSendMessage,
+        handleSendMessageWithAttachment,
     };
 };
