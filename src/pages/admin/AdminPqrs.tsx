@@ -107,12 +107,14 @@ const AdminPqrs = () => {
         messages,
         messageText,
         setMessageText,
+        selectedFile,
+        handleSelectFile,
+        handleRemoveSelectedFile,
         loadingMessages,
         sendingAttachment,
         chatError,
         setChatError,
         handleSendMessage,
-        handleSendMessageWithAttachment,
     } = usePqrChat({
         pqrId: selectedChatPqrId,
         token,
@@ -247,6 +249,7 @@ const AdminPqrs = () => {
             borderRadius: 2,
         },
     };
+
     if (loading) {
         return <LoadingBox />;
     }
@@ -258,6 +261,7 @@ const AdminPqrs = () => {
                     pqr={selectedChatPqr}
                     messages={messages}
                     messageText={messageText}
+                    selectedFile={selectedFile}
                     loadingMessages={loadingMessages}
                     sendingAttachment={sendingAttachment}
                     chatError={chatError}
@@ -265,7 +269,8 @@ const AdminPqrs = () => {
                     onBack={closePqrChat}
                     onMessageChange={setMessageText}
                     onSendMessage={handleSendMessage}
-                    onSendAttachment={handleSendMessageWithAttachment}
+                    onSelectFile={handleSelectFile}
+                    onRemoveSelectedFile={handleRemoveSelectedFile}
                     onClearError={() => setChatError("")}
                 />
 

@@ -505,7 +505,6 @@ const PqrTicketCard = ({
 
                             <Button
                                 variant="outlined"
-                                disabled={pqr.status === "CERRADA"}
                                 onClick={() => onOpenChat(pqr.id)}
                                 startIcon={<ForumOutlinedIcon />}
                                 sx={style.chatButton}

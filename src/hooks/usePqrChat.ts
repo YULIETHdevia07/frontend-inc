@@ -27,6 +27,9 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
     // Texto que el usuario está escribiendo en el input del chat.
     const [messageText, setMessageText] = useState("");
 
+    // Archivo seleccionado, pero aún no enviado.
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
     // Controla la carga inicial del historial de mensajes.
     const [loadingMessages, setLoadingMessages] = useState(false);
 
@@ -71,51 +74,54 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
         }
     }, [pqrId]);
 
-    // Envía un mensaje de texto al backend mediante Socket.IO.
-    const handleSendMessage = useCallback(() => {
+    // Guarda el archivo seleccionado.
+    const handleSelectFile = useCallback((file: File | null) => {
+        setSelectedFile(file);
+        setChatError("");
+    }, []);
+
+    // Quita el archivo seleccionado.
+    const handleRemoveSelectedFile = useCallback(() => {
+        setSelectedFile(null);
+    }, []);
+
+    // Envía texto solo, archivo solo o texto con archivo.
+    const handleSendMessage = useCallback(async () => {
         if (!pqrId) return;
 
         const cleanMessage = messageText.trim();
 
-        if (!cleanMessage) {
-            setChatError("El mensaje no puede estar vacío.");
+        if (!cleanMessage && !selectedFile) {
+            setChatError("Debes escribir un mensaje o seleccionar un archivo.");
             return;
         }
 
-        sendPqrMessage(pqrId, cleanMessage);
-        setMessageText("");
-        setChatError("");
-    }, [pqrId, messageText]);
+        try {
+            setChatError("");
 
-    // Envía un mensaje con archivo adjunto mediante HTTP.
-    const handleSendMessageWithAttachment = useCallback(
-        async (file: File) => {
-            if (!pqrId) return;
-
-            try {
+            if (selectedFile) {
                 setSendingAttachment(true);
-                setChatError("");
 
                 await sendPqrMessageWithAttachment(
                     pqrId,
-                    file,
-                    messageText
+                    selectedFile,
+                    cleanMessage
                 );
 
-                setMessageText("");
-            } catch (error) {
-                setChatError(
-                    getErrorMessage(
-                        error,
-                        "Error al enviar el archivo adjunto."
-                    )
-                );
-            } finally {
-                setSendingAttachment(false);
+                setSelectedFile(null);
+            } else {
+                sendPqrMessage(pqrId, cleanMessage);
             }
-        },
-        [pqrId, messageText]
-    );
+
+            setMessageText("");
+        } catch (error) {
+            setChatError(
+                getErrorMessage(error, "Error al enviar el mensaje.")
+            );
+        } finally {
+            setSendingAttachment(false);
+        }
+    }, [pqrId, messageText, selectedFile]);
 
     useEffect(() => {
         isMountedRef.current = true;
@@ -124,6 +130,7 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
         if (!pqrId || !token) {
             setMessages([]);
             setMessageText("");
+            setSelectedFile(null);
             setChatError("");
             setIsSocketConnected(false);
             return;
@@ -132,6 +139,7 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
         // Limpia el estado visual cuando se cambia de PQR.
         setMessages([]);
         setMessageText("");
+        setSelectedFile(null);
         setChatError("");
 
         loadMessages();
@@ -205,6 +213,9 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
         messages,
         messageText,
         setMessageText,
+        selectedFile,
+        handleSelectFile,
+        handleRemoveSelectedFile,
         loadingMessages,
         sendingAttachment,
         chatError,
@@ -212,6 +223,5 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
         isSocketConnected,
         loadMessages,
         handleSendMessage,
-        handleSendMessageWithAttachment,
     };
 };
