@@ -26,6 +26,9 @@ export const useCreatePqr = () => {
     // Mensaje de éxito al crear la PQR.
     const [message, setMessage] = useState("");
 
+    // Controla si se muestra el mensaje visual de éxito.
+    const [openMessage, setOpenMessage] = useState(false);
+
     // Mensaje de error general.
     const [error, setError] = useState("");
 
@@ -36,6 +39,7 @@ export const useCreatePqr = () => {
     // Limpia mensajes generales y el error del campo que se está editando.
     const clearFieldError = (field: keyof CreatePqrFormErrors) => {
         setMessage("");
+        setOpenMessage(false);
         setError("");
 
         setFormErrors((prev) => ({
@@ -59,6 +63,7 @@ export const useCreatePqr = () => {
     // Guarda el archivo seleccionado.
     const handleFileChange = (file: File | null) => {
         setMessage("");
+        setOpenMessage(false);
         setError("");
 
         setFormErrors((prev) => ({
@@ -80,6 +85,11 @@ export const useCreatePqr = () => {
         }));
     };
 
+    // Cierra el mensaje visual de éxito.
+    const closeMessage = () => {
+        setOpenMessage(false);
+    };
+
     // Crea una nueva PQR usando validación Yup.
     const handleCreatePqr = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -98,8 +108,9 @@ export const useCreatePqr = () => {
             setFormErrors(initialFormErrors);
             setError("");
             setMessage("");
+            setOpenMessage(false);
 
-            await createPqr({
+            const response = await createPqr({
                 caseType: caseType.trim(),
                 description: description.trim(),
                 ...(selectedFile && {
@@ -111,7 +122,8 @@ export const useCreatePqr = () => {
             setDescription("");
             setSelectedFile(null);
 
-            setMessage("PQR creada correctamente.");
+            setMessage(response.message || "PQR creada correctamente.");
+            setOpenMessage(true);
         } catch (error: unknown) {
             if (error instanceof ValidationError) {
                 const errors: CreatePqrFormErrors = {
@@ -128,12 +140,14 @@ export const useCreatePqr = () => {
 
                 setFormErrors(errors);
                 setMessage("");
+                setOpenMessage(false);
                 return;
             }
 
             console.error(error);
             setError(getErrorMessage(error, "Error al crear la PQR."));
             setMessage("");
+            setOpenMessage(false);
         }
     };
 
@@ -143,6 +157,7 @@ export const useCreatePqr = () => {
         selectedFile,
 
         message,
+        openMessage,
         error,
         formErrors,
 
@@ -151,5 +166,6 @@ export const useCreatePqr = () => {
         handleFileChange,
         handleRemoveFile,
         handleCreatePqr,
+        closeMessage,
     };
 };

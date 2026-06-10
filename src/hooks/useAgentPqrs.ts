@@ -26,6 +26,9 @@ export const useAgentPqrs = () => {
     // Controla la carga inicial de la información.
     const [loading, setLoading] = useState(true);
 
+    // Guarda errores generales al cargar las PQR.
+    const [error, setError] = useState("");
+
     // Guarda el id de la PQR que se está tomando.
     const [takingPqrId, setTakingPqrId] = useState<number | null>(null);
 
@@ -107,10 +110,8 @@ export const useAgentPqrs = () => {
         } catch (error) {
             console.error(error);
 
-            showSnackbar(
-                getErrorMessage(error, "Error al cargar las PQR del agente."),
-                "error"
-            );
+            setError("Error al cargar las PQR. Verifica que el usuario tenga el rol ADMIN o AGENT.");
+
         } finally {
             setLoading(false);
         }
@@ -318,6 +319,7 @@ export const useAgentPqrs = () => {
         filteredPqrs,
 
         loading,
+        error,
         takingPqrId,
         updatingStatusId,
         updatingPriorityId,

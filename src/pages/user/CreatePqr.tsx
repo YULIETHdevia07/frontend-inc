@@ -15,9 +15,10 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 
 import { useCreatePqr } from "../../hooks/useCreatePqr";
 import { pqrCaseTypes } from "../../data/pqrOptions";
+import { formatFileSize } from "../../utils/fileUtils";
 
 import ClearableSelect from "../../components/common/ClearableSelect";
-import { formatFileSize } from "../../utils/fileUtils";
+import CustomSnackbar from "../../components/common/CustomSnackbar";
 
 // Página donde el usuario crea una nueva PQR.
 const CreatePqr = () => {
@@ -29,6 +30,7 @@ const CreatePqr = () => {
         selectedFile,
 
         message,
+        openMessage,
         error,
         formErrors,
 
@@ -37,6 +39,7 @@ const CreatePqr = () => {
         handleFileChange,
         handleRemoveFile,
         handleCreatePqr,
+        closeMessage,
     } = useCreatePqr();
 
     const style = {
@@ -77,12 +80,17 @@ const CreatePqr = () => {
             px: 1.5,
             py: 1.1,
             borderRadius: 2,
-            border: `1px solid ${theme.palette.divider}`,
+            border: `1px solid ${formErrors.file
+                ? theme.palette.error.main
+                : theme.palette.divider
+                }`,
             backgroundColor: alpha(theme.palette.common.white, 0.02),
             cursor: "pointer",
             transition: "all 0.2s ease",
             "&:hover": {
-                borderColor: alpha(theme.palette.primary.main, 0.45),
+                borderColor: formErrors.file
+                    ? theme.palette.error.main
+                    : alpha(theme.palette.primary.main, 0.45),
                 backgroundColor: alpha(theme.palette.primary.main, 0.05),
             },
         },
@@ -95,7 +103,9 @@ const CreatePqr = () => {
         },
 
         attachmentIcon: {
-            color: theme.palette.text.secondary,
+            color: formErrors.file
+                ? theme.palette.error.main
+                : theme.palette.text.secondary,
             fontSize: 18,
         },
 
@@ -119,7 +129,10 @@ const CreatePqr = () => {
             px: 1.2,
             py: 1,
             borderRadius: 2,
-            border: `1px solid ${theme.palette.divider}`,
+            border: `1px solid ${formErrors.file
+                ? theme.palette.error.main
+                : theme.palette.divider
+                }`,
             backgroundColor: alpha(theme.palette.common.white, 0.03),
         },
 
@@ -173,6 +186,13 @@ const CreatePqr = () => {
             },
         },
 
+        fileErrorText: {
+            mt: -1,
+            ml: 1.5,
+            fontSize: "0.75rem",
+            color: theme.palette.error.main,
+        },
+
         submitButton: {
             mt: 0.5,
             py: 1.15,
@@ -196,16 +216,9 @@ const CreatePqr = () => {
                     atendida.
                 </Typography>
 
-                {/* Mensaje cuando la PQR se crea correctamente. */}
-                {message && (
-                    <Alert severity="success" sx={{ mb: 2 }}>
-                        {message}
-                    </Alert>
-                )}
-
                 {/* Mensaje para errores generales del backend. */}
                 {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
+                    <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
                         {error}
                     </Alert>
                 )}
@@ -247,14 +260,11 @@ const CreatePqr = () => {
                     />
 
                     {!selectedFile ? (
-                        <Box
-                            component="label"
-                            sx={style.attachmentRow}
-                        >
+                        <Box component="label" sx={style.attachmentRow}>
                             <input
                                 type="file"
                                 hidden
-                                // accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                accept=".jpg,.jpeg,.png,.webp,.pdf"
                                 onChange={(event) =>
                                     handleFileChange(
                                         event.target.files?.[0] ?? null
@@ -263,7 +273,10 @@ const CreatePqr = () => {
                             />
 
                             <Box sx={style.attachmentLeft}>
-                                <AttachFileOutlinedIcon sx={style.attachmentIcon} />
+                                <AttachFileOutlinedIcon
+                                    sx={style.attachmentIcon}
+                                />
+
                                 <Typography sx={style.attachmentText}>
                                     Adjuntar evidencia
                                 </Typography>
@@ -277,7 +290,9 @@ const CreatePqr = () => {
                         <Box sx={style.selectedFileBox}>
                             <Box sx={style.selectedFileInfo}>
                                 <Box sx={style.selectedFileIconBox}>
-                                    <InsertDriveFileOutlinedIcon sx={{ fontSize: 18 }} />
+                                    <InsertDriveFileOutlinedIcon
+                                        sx={{ fontSize: 18 }}
+                                    />
                                 </Box>
 
                                 <Box sx={style.selectedFileTextBox}>
@@ -295,20 +310,15 @@ const CreatePqr = () => {
                                 size="small"
                                 onClick={handleRemoveFile}
                                 sx={style.removeFileButton}
+                                aria-label="Quitar archivo"
                             >
                                 <CloseOutlinedIcon fontSize="small" />
                             </IconButton>
                         </Box>
                     )}
+
                     {formErrors.file && (
-                        <Typography
-                            variant="caption"
-                            color="error"
-                            sx={{
-                                mt: -1,
-                                display: "block",
-                            }}
-                        >
+                        <Typography sx={style.fileErrorText}>
                             {formErrors.file}
                         </Typography>
                     )}
@@ -322,6 +332,13 @@ const CreatePqr = () => {
                     </Button>
                 </Box>
             </Paper>
+
+            <CustomSnackbar
+                open={openMessage}
+                message={message}
+                severity="success"
+                onClose={closeMessage}
+            />
         </Box>
     );
 };

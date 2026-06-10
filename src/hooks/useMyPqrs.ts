@@ -47,7 +47,7 @@ export const useMyPqrs = () => {
       setPqrs(response.pqrs);
     } catch (error) {
       console.error(error);
-      setError("Error al cargar las PQR.");
+      setError("Error al cargar las PQR. Verifica que el usuario tenga el rol USER.");
     } finally {
       setLoading(false);
     }

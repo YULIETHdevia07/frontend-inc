@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+    Alert,
     Box,
     Button,
     IconButton,
@@ -50,6 +51,7 @@ const AgentPqrs = () => {
         filteredPqrs,
 
         loading,
+        error,
         takingPqrId,
         updatingStatusId,
         updatingPriorityId,
@@ -423,6 +425,14 @@ const AgentPqrs = () => {
                 </Box>
             </Menu>
 
+            {/* Mensaje de error al cargar las PQR */}
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
+
+            {/* Estado vacío cuando el usuario no tiene PQR */}
             {filteredPqrs.length === 0 ? (
                 <EmptyState
                     title="No se encontraron PQR"
