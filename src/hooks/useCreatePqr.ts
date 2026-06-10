@@ -3,11 +3,13 @@ import { ValidationError } from "yup";
 import { createPqr } from "../services/pqrService";
 import { createPqrSchema } from "../validations/pqrValidation";
 import type { CreatePqrFormErrors } from "../interfaces/pqr.interface";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Estado inicial de los errores del formulario.
 const initialFormErrors: CreatePqrFormErrors = {
     caseType: "",
     description: "",
+    file: "",
 };
 
 // Hook encargado de manejar la lógica para crear una PQR.
@@ -17,6 +19,9 @@ export const useCreatePqr = () => {
 
     // Descripción escrita por el usuario.
     const [description, setDescription] = useState("");
+
+    // Archivo opcional adjunto a la PQR.
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     // Mensaje de éxito al crear la PQR.
     const [message, setMessage] = useState("");
@@ -51,6 +56,30 @@ export const useCreatePqr = () => {
         clearFieldError("description");
     };
 
+    // Guarda el archivo seleccionado.
+    const handleFileChange = (file: File | null) => {
+        setMessage("");
+        setError("");
+
+        setFormErrors((prev) => ({
+            ...prev,
+            file: "",
+        }));
+
+        setSelectedFile(file);
+    };
+
+    // Quita el archivo seleccionado.
+    const handleRemoveFile = () => {
+        setSelectedFile(null);
+        setError("");
+
+        setFormErrors((prev) => ({
+            ...prev,
+            file: "",
+        }));
+    };
+
     // Crea una nueva PQR usando validación Yup.
     const handleCreatePqr = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -58,6 +87,7 @@ export const useCreatePqr = () => {
         const formData = {
             caseType,
             description,
+            file: selectedFile,
         };
 
         try {
@@ -72,10 +102,14 @@ export const useCreatePqr = () => {
             await createPqr({
                 caseType: caseType.trim(),
                 description: description.trim(),
+                ...(selectedFile && {
+                    file: selectedFile,
+                }),
             });
 
             setCaseType("");
             setDescription("");
+            setSelectedFile(null);
 
             setMessage("PQR creada correctamente.");
         } catch (error: unknown) {
@@ -98,7 +132,7 @@ export const useCreatePqr = () => {
             }
 
             console.error(error);
-            setError("Error al crear la PQR.");
+            setError(getErrorMessage(error, "Error al crear la PQR."));
             setMessage("");
         }
     };
@@ -106,6 +140,7 @@ export const useCreatePqr = () => {
     return {
         caseType,
         description,
+        selectedFile,
 
         message,
         error,
@@ -113,6 +148,8 @@ export const useCreatePqr = () => {
 
         handleCaseTypeChange,
         handleDescriptionChange,
+        handleFileChange,
+        handleRemoveFile,
         handleCreatePqr,
     };
 };

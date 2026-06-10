@@ -16,7 +16,24 @@ import type {
 export const createPqr = async (
   data: CreatePqrData
 ): Promise<SinglePqrResponse> => {
-  const response = await api.post<SinglePqrResponse>("/pqrs", data);
+  // Si no hay archivo, se envía como JSON normal.
+  if (!data.file) {
+    const response = await api.post<SinglePqrResponse>("/pqrs", {
+      caseType: data.caseType,
+      description: data.description,
+    });
+
+    return response.data;
+  }
+
+  const formData = new FormData();
+
+  formData.append("caseType", data.caseType);
+  formData.append("description", data.description);
+  formData.append("file", data.file);
+
+  const response = await api.post<SinglePqrResponse>("/pqrs", formData);
+
   return response.data;
 };
 

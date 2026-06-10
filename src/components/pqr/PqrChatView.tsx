@@ -196,12 +196,6 @@ export const PqrChatView = ({
             px: 0.5,
         },
 
-        chatDescription: {
-            fontSize: "0.85rem",
-            color: theme.palette.text.secondary,
-            lineHeight: 1.5,
-        },
-
         chatMetaRow: {
             display: "flex",
             alignItems: "center",
@@ -525,10 +519,6 @@ export const PqrChatView = ({
                                 sx={style.chatStatusChip}
                             />
                         </Box>
-
-                        <Typography sx={style.chatDescription}>
-                            {pqr.description}
-                        </Typography>
 
                         <Box sx={style.chatMetaRow}>
                             <Box sx={style.chatMetaItem}>

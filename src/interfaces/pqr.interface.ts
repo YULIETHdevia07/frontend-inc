@@ -73,6 +73,7 @@ export interface PqrMessage {
 export interface CreatePqrData {
   caseType: string;
   description: string;
+  file?: File;
 }
 
 // Datos necesarios para calificar una PQR.
@@ -117,10 +118,11 @@ export interface PqrMessageWithAttachmentResponse {
   pqrMessage: PqrMessage;
 }
 
-// Errores de validación del formulario para crear una PQR.
+// Errores de validación YUP del formulario para crear una PQR.
 export interface CreatePqrFormErrors {
   caseType: string;
   description: string;
+  file: string;
 }
 
 // Parámetros necesarios para inicializar el hook del chat de una PQR.

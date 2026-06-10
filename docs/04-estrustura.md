@@ -596,6 +596,7 @@ utils/
 ├── avatarUtils.ts
 ├── dateUtils.ts
 ├── excelUtils.ts
+├── fileUtils.ts
 ├── formatText.ts
 ├── getErrorMessage.ts
 ├── pqrUtils.ts
@@ -645,6 +646,20 @@ toExcelColor()
 | Función               | Descripción                                                                                             | Uso dentro del proyecto                                                                                              |
 | --------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `toExcelColor(color)` | Convierte un color hexadecimal, como `#1565c0`, al formato ARGB utilizado por ExcelJS, como `FF1565C0`. | Se utiliza al generar archivos de Excel para aplicar colores personalizados a celdas, encabezados, bordes o estilos. |
+
+---
+
+#### `fileUtils.ts`
+
+Este archivo contiene funciones auxiliares relacionadas con la visualización y formato de información de archivos.
+
+```txt
+formatFileSize()
+```
+
+| Función | Descripción | Uso dentro del proyecto |
+| ------- | ----------- | ----------------------- |
+| `formatFileSize(size)` | Convierte el tamaño de un archivo de bytes a un formato legible en KB o MB. | Se utiliza para mostrar el tamaño de archivos seleccionados o adjuntos de una forma más clara para el usuario. |
 
 ---
 
