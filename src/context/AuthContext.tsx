@@ -1,11 +1,15 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/axios";
+import {
+    connectSocket,
+    disconnectSocket,
+} from "../services/socketService";
 
 interface User {
     id: number;
     name: string;
     email: string;
-    role: "ADMIN" | "USER";
+    role: "ADMIN" | "USER" | "AGENT";
 }
 
 interface AuthContextType {
@@ -47,11 +51,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const logout = () => {
+        disconnectSocket();
         localStorage.removeItem("token");
         setToken(null);
         setUser(null);
     };
 
+    // Carga el perfil del usuario cuando existe un token
     useEffect(() => {
         if (token) {
             getProfile();
@@ -59,6 +65,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setLoading(false);
         }
     }, [token]);
+
+    // Conecta Socket.IO cuando el usuario ya está autenticado
+    useEffect(() => {
+        if (token && user) {
+            connectSocket(token);
+        }
+    }, [token, user]);
 
     return (
         <AuthContext.Provider

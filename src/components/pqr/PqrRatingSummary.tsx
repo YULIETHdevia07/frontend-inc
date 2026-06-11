@@ -1,7 +1,7 @@
 import { Box, Rating, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-import { formatDate } from "../../utils/pqrUtils";
+import { formatDate } from "../../utils/dateUtils";
 
 interface PqrRatingSummaryProps {
     rating?: number | null;

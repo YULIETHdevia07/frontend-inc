@@ -37,7 +37,7 @@ import UserRoleChip from "../../components/users/UserRoleChip";
 import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
 import { getFilterStyles } from "../../styles/filterStyles";
 import BulkUploadDialog from "../../components/common/BulkUploadDialog";
-import { downloadBulkUsersTemplate } from "../../utils/downloadBulkUsersTemplate";
+import { downloadBulkUsersTemplate } from "../../template/downloadBulkUsersTemplate";
 
 // Página principal para administrar usuarios y roles
 const AdminUsers = () => {

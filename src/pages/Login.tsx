@@ -1,18 +1,34 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography, Link, Alert } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Link,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import api from "../api/axios";
-import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
+import { useLogin } from "../hooks/useLogin";
+import { appBrand } from "../data/appBrand";
 
 const Login = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const { login } = useAuth();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const {
+    email,
+    password,
+    loading,
+
+    error,
+    formErrors,
+
+    handleEmailChange,
+    handlePasswordChange,
+    handleLogin,
+  } = useLogin();
 
   const style = {
     container: {
@@ -22,10 +38,10 @@ const Login = () => {
       alignItems: "center",
 
       background: `linear-gradient(
-      135deg,
-      ${theme.palette.primary.light},
-      ${theme.palette.background.default}
-    )`,
+        135deg,
+        ${theme.palette.primary.light},
+        ${theme.palette.background.default}
+      )`,
     },
 
     form: {
@@ -43,6 +59,13 @@ const Login = () => {
       gap: "16px",
 
       boxShadow: "0 10px 30px rgba(0, 0, 0, 0.12)",
+    },
+
+    logo: {
+      width: "160px",
+      height: "auto",
+      objectFit: "contain",
+      marginBottom: "0.5rem",
     },
 
     input: {
@@ -77,47 +100,15 @@ const Login = () => {
     },
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    setErrorMessage("");
-
-    if (!email.trim() || !password.trim()) {
-      setErrorMessage("Todos los campos son obligatorios.");
-      return;
-    }
-
-    try {
-      const response = await api.post("/users/login", {
-        email,
-        password,
-      });
-
-      const token = response.data.token;
-
-      await login(token);
-
-      navigate("/dashboard");
-    } catch (error) {
-      console.log(error);
-      setErrorMessage(
-        "Correo o contraseña incorrectos."
-      );
-    }
-  };
-
   return (
     <Box sx={style.container}>
-      <Box component="form" onSubmit={handleLogin} sx={style.form}>
-        <Typography
-          sx={{
-            fontSize: "2rem",
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-          }}
-        >
-          App
-        </Typography>
+      <Box component="form" onSubmit={handleLogin} sx={style.form} noValidate>
+        <Box
+          component="img"
+          src={appBrand.logo}
+          alt={appBrand.logoAlt}
+          sx={style.logo}
+        />
 
         <Typography
           sx={{
@@ -129,42 +120,48 @@ const Login = () => {
           Bienvenido a tu plataforma de gestión
         </Typography>
 
+        {error && (
+          <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+            {error}
+          </Alert>
+        )}
+
         <TextField
           label="Correo electrónico"
-          type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(event) => handleEmailChange(event.target.value)}
           sx={style.input}
           fullWidth
           required
+          disabled={loading}
+          error={!!formErrors.email}
+          helperText={formErrors.email}
         />
 
         <TextField
           label="Contraseña"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(event) => handlePasswordChange(event.target.value)}
           sx={style.input}
           fullWidth
           required
+          disabled={loading}
+          error={!!formErrors.password}
+          helperText={formErrors.password}
         />
 
-        {errorMessage && (
-          <Alert
-            severity="error"
-            sx={{
-              width: "100%",
-              borderRadius: "10px",
-              fontSize: "0.9rem",
-              alignItems: "center",
-            }}
-          >
-            {errorMessage}
-          </Alert>
-        )}
-
-        <Button type="submit" variant="contained" sx={style.button}>
-          Iniciar sesión
+        <Button
+          type="submit"
+          variant="contained"
+          sx={style.button}
+          disabled={loading}
+        >
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Iniciar sesión"
+          )}
         </Button>
 
         <Link sx={style.link}>¿Olvidaste tu contraseña?</Link>
@@ -177,7 +174,9 @@ const Login = () => {
         >
           ¿No tienes una cuenta?{" "}
           <Link
-            onClick={() => navigate("/register")}
+            onClick={() => {
+              if (!loading) navigate("/register");
+            }}
             sx={style.link}
           >
             Regístrate aquí

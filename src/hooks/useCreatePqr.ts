@@ -3,11 +3,13 @@ import { ValidationError } from "yup";
 import { createPqr } from "../services/pqrService";
 import { createPqrSchema } from "../validations/pqrValidation";
 import type { CreatePqrFormErrors } from "../interfaces/pqr.interface";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Estado inicial de los errores del formulario.
 const initialFormErrors: CreatePqrFormErrors = {
     caseType: "",
     description: "",
+    file: "",
 };
 
 // Hook encargado de manejar la lógica para crear una PQR.
@@ -18,8 +20,14 @@ export const useCreatePqr = () => {
     // Descripción escrita por el usuario.
     const [description, setDescription] = useState("");
 
+    // Archivo opcional adjunto a la PQR.
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
     // Mensaje de éxito al crear la PQR.
     const [message, setMessage] = useState("");
+
+    // Controla si se muestra el mensaje visual de éxito.
+    const [openMessage, setOpenMessage] = useState(false);
 
     // Mensaje de error general.
     const [error, setError] = useState("");
@@ -31,6 +39,7 @@ export const useCreatePqr = () => {
     // Limpia mensajes generales y el error del campo que se está editando.
     const clearFieldError = (field: keyof CreatePqrFormErrors) => {
         setMessage("");
+        setOpenMessage(false);
         setError("");
 
         setFormErrors((prev) => ({
@@ -51,6 +60,36 @@ export const useCreatePqr = () => {
         clearFieldError("description");
     };
 
+    // Guarda el archivo seleccionado.
+    const handleFileChange = (file: File | null) => {
+        setMessage("");
+        setOpenMessage(false);
+        setError("");
+
+        setFormErrors((prev) => ({
+            ...prev,
+            file: "",
+        }));
+
+        setSelectedFile(file);
+    };
+
+    // Quita el archivo seleccionado.
+    const handleRemoveFile = () => {
+        setSelectedFile(null);
+        setError("");
+
+        setFormErrors((prev) => ({
+            ...prev,
+            file: "",
+        }));
+    };
+
+    // Cierra el mensaje visual de éxito.
+    const closeMessage = () => {
+        setOpenMessage(false);
+    };
+
     // Crea una nueva PQR usando validación Yup.
     const handleCreatePqr = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -58,6 +97,7 @@ export const useCreatePqr = () => {
         const formData = {
             caseType,
             description,
+            file: selectedFile,
         };
 
         try {
@@ -68,16 +108,22 @@ export const useCreatePqr = () => {
             setFormErrors(initialFormErrors);
             setError("");
             setMessage("");
+            setOpenMessage(false);
 
-            await createPqr({
+            const response = await createPqr({
                 caseType: caseType.trim(),
                 description: description.trim(),
+                ...(selectedFile && {
+                    file: selectedFile,
+                }),
             });
 
             setCaseType("");
             setDescription("");
+            setSelectedFile(null);
 
-            setMessage("PQR creada correctamente.");
+            setMessage(response.message || "PQR creada correctamente.");
+            setOpenMessage(true);
         } catch (error: unknown) {
             if (error instanceof ValidationError) {
                 const errors: CreatePqrFormErrors = {
@@ -94,25 +140,32 @@ export const useCreatePqr = () => {
 
                 setFormErrors(errors);
                 setMessage("");
+                setOpenMessage(false);
                 return;
             }
 
             console.error(error);
-            setError("Error al crear la PQR.");
+            setError(getErrorMessage(error, "Error al crear la PQR."));
             setMessage("");
+            setOpenMessage(false);
         }
     };
 
     return {
         caseType,
         description,
+        selectedFile,
 
         message,
+        openMessage,
         error,
         formErrors,
 
         handleCaseTypeChange,
         handleDescriptionChange,
+        handleFileChange,
+        handleRemoveFile,
         handleCreatePqr,
+        closeMessage,
     };
 };

@@ -1,6 +1,8 @@
 import api from "../api/axios";
 import type {
   CreatePqrData,
+  PqrMessagesResponse,
+  PqrMessageWithAttachmentResponse,
   PqrPriority,
   PqrResponse,
   PqrStatus,
@@ -14,7 +16,24 @@ import type {
 export const createPqr = async (
   data: CreatePqrData
 ): Promise<SinglePqrResponse> => {
-  const response = await api.post<SinglePqrResponse>("/pqrs", data);
+  // Si no hay archivo, se envía como JSON normal.
+  if (!data.file) {
+    const response = await api.post<SinglePqrResponse>("/pqrs", {
+      caseType: data.caseType,
+      description: data.description,
+    });
+
+    return response.data;
+  }
+
+  const formData = new FormData();
+
+  formData.append("caseType", data.caseType);
+  formData.append("description", data.description);
+  formData.append("file", data.file);
+
+  const response = await api.post<SinglePqrResponse>("/pqrs", formData);
+
   return response.data;
 };
 
@@ -54,14 +73,35 @@ export const updatePqrPriority = async (
   return response.data;
 };
 
-// Responde una PQR. Endpoint usado por ADMIN o AGENT según tu backend.
-export const respondPqr = async (
-  id: number,
-  responseText: string
-): Promise<SinglePqrResponse> => {
-  const response = await api.patch<SinglePqrResponse>(`/pqrs/${id}/respond`, {
-    response: responseText,
-  });
+// Obtiene el historial de mensajes de una PQR.
+export const getPqrMessages = async (
+  pqrId: number
+): Promise<PqrMessagesResponse> => {
+  const response = await api.get<PqrMessagesResponse>(
+    `/pqrs/${pqrId}/messages`
+  );
+
+  return response.data;
+};
+
+// Envía un mensaje con archivo adjunto en una PQR.
+export const sendPqrMessageWithAttachment = async (
+  pqrId: number,
+  file: File,
+  content?: string
+): Promise<PqrMessageWithAttachmentResponse> => {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  if (content?.trim()) {
+    formData.append("content", content.trim());
+  }
+
+  const response = await api.post<PqrMessageWithAttachmentResponse>(
+    `/pqrs/${pqrId}/messages/attachment`,
+    formData
+  );
 
   return response.data;
 };

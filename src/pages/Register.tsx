@@ -1,26 +1,40 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
+  Link,
   TextField,
   Typography,
-  Link,
-  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import api from "../api/axios";
+import { useNavigate } from "react-router-dom";
+
+import { appBrand } from "../data/appBrand";
+import { useRegister } from "../hooks/useRegister";
+import CustomSnackbar from "../components/common/CustomSnackbar";
 
 const Register = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    name,
+    email,
+    password,
+    loading,
 
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+    message,
+    openMessage,
+    error,
+    formErrors,
+
+    handleNameChange,
+    handleEmailChange,
+    handlePasswordChange,
+    handleRegister,
+    closeMessage,
+  } = useRegister();
 
   const style = {
     container: {
@@ -28,108 +42,79 @@ const Register = () => {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.background.default})`,
+
+      background: `linear-gradient(
+        135deg,
+        ${theme.palette.primary.light},
+        ${theme.palette.background.default}
+      )`,
     },
+
     form: {
       width: "420px",
       minHeight: "480px",
+
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
+
       backgroundColor: theme.palette.background.paper,
+
       padding: "2rem",
       borderRadius: "12px",
       gap: "16px",
+
       boxShadow: "0 10px 30px rgba(0, 0, 0, 0.12)",
     },
+
+    logo: {
+      width: "160px",
+      height: "auto",
+      objectFit: "contain",
+      marginBottom: "0.5rem",
+    },
+
     input: {
       width: "100%",
     },
+
     button: {
       width: "100%",
       height: "45px",
+
       textTransform: "none",
+
       backgroundColor: theme.palette.primary.main,
+
       fontWeight: 600,
+
       "&:hover": {
         backgroundColor: theme.palette.primary.dark,
       },
     },
+
     link: {
       marginTop: "0.5rem",
+
       cursor: "pointer",
+
       textDecoration: "none",
+
       color: theme.palette.primary.main,
+
       fontWeight: 500,
     },
-    alert: {
-      width: "100%",
-      borderRadius: "10px",
-      fontSize: "0.9rem",
-      alignItems: "center",
-    },
-  };
-
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    setErrorMessage("");
-    setSuccessMessage("");
-
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      setErrorMessage("Todos los campos son obligatorios.");
-      return;
-    }
-
-    if (!isValidEmail(email)) {
-      setErrorMessage("Ingresa un correo electrónico válido.");
-      return;
-    }
-
-    if (password.length < 6) {
-      setErrorMessage("La contraseña debe tener mínimo 6 caracteres.");
-      return;
-    }
-
-    try {
-      await api.post("/auth/register", {
-        name,
-        email,
-        password,
-      });
-
-      setSuccessMessage("Usuario registrado correctamente.");
-
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
-    } catch (error: any) {
-      console.log(error);
-
-      setErrorMessage(
-        error.response?.data?.message ||
-        "Error al registrar usuario."
-      );
-    }
   };
 
   return (
     <Box sx={style.container}>
-      <Box component="form" onSubmit={handleRegister} sx={style.form}>
-        <Typography
-          sx={{
-            fontSize: "2rem",
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-          }}
-        >
-          Crear cuenta
-        </Typography>
+      <Box component="form" onSubmit={handleRegister} sx={style.form} noValidate>
+        <Box
+          component="img"
+          src={appBrand.logo}
+          alt={appBrand.logoAlt}
+          sx={style.logo}
+        />
 
         <Typography
           sx={{
@@ -141,50 +126,61 @@ const Register = () => {
           Regístrate para acceder a App-INC
         </Typography>
 
+        {error && (
+          <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+            {error}
+          </Alert>
+        )}
+
         <TextField
           label="Nombre completo"
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(event) => handleNameChange(event.target.value)}
           sx={style.input}
           fullWidth
           required
+          disabled={loading}
+          error={!!formErrors.name}
+          helperText={formErrors.name}
         />
 
         <TextField
           label="Correo electrónico"
-          type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(event) => handleEmailChange(event.target.value)}
           sx={style.input}
           fullWidth
           required
+          disabled={loading}
+          error={!!formErrors.email}
+          helperText={formErrors.email}
         />
 
         <TextField
           label="Contraseña"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(event) => handlePasswordChange(event.target.value)}
           sx={style.input}
           fullWidth
           required
+          disabled={loading}
+          error={!!formErrors.password}
+          helperText={formErrors.password}
         />
 
-        {errorMessage && (
-          <Alert severity="error" sx={style.alert}>
-            {errorMessage}
-          </Alert>
-        )}
-
-        {successMessage && (
-          <Alert severity="success" sx={style.alert}>
-            {successMessage}
-          </Alert>
-        )}
-
-        <Button type="submit" variant="contained" sx={style.button}>
-          Registrarse
+        <Button
+          type="submit"
+          variant="contained"
+          sx={style.button}
+          disabled={loading}
+        >
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Registrarse"
+          )}
         </Button>
 
         <Typography
@@ -194,11 +190,23 @@ const Register = () => {
           }}
         >
           ¿Ya tienes cuenta?{" "}
-          <Link sx={style.link} onClick={() => navigate("/")}>
+          <Link
+            sx={style.link}
+            onClick={() => {
+              if (!loading) navigate("/");
+            }}
+          >
             Inicia sesión
           </Link>
         </Typography>
       </Box>
+
+      <CustomSnackbar
+        open={openMessage}
+        message={message}
+        severity="success"
+        onClose={closeMessage}
+      />
     </Box>
   );
 };

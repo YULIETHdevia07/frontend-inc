@@ -12,6 +12,10 @@ La idea principal de esta organización es que cada carpeta tenga una función c
 ## 2. Estructura principal del proyecto
 
 ```txt
+public/
+│
+├── assets/
+│
 src/
 │
 ├── api/
@@ -24,6 +28,7 @@ src/
 ├── routes/
 ├── services/
 ├── styles/
+├── templates/
 ├── theme/
 ├── utils/
 ├── validations/
@@ -37,7 +42,54 @@ src/
 
 ## 3. Descripción de cada carpeta
 
-### `api/`
+### `public/`
+
+La carpeta `public/` contiene archivos estáticos que se sirven directamente desde la raíz del proyecto cuando la aplicación se ejecuta o se compila.
+
+En proyectos desarrollados con Vite, los archivos ubicados dentro de `public/` pueden utilizarse directamente mediante rutas absolutas, sin necesidad de importarlos en los componentes.
+
+Responsabilidad principal:
+
+```txt
+Guardar archivos públicos que deben estar disponibles directamente para la aplicación.
+```
+
+---
+
+### `public/assets/`
+
+La carpeta contiene los recursos gráficos públicos del sistema.
+
+En este proyecto, se utiliza para guardar los logos e íconos principales de la aplicación.
+
+```txt
+public/
+└── assets/
+    ├── logo.png
+    ├── logo-blanco.png
+    ├── logo-icono.png
+    ├── logo-blanco-icono.png
+    └── logo-icono-web.png
+```
+
+Responsabilidad principal:
+
+```txt
+Guardar los logos e íconos públicos del sistema.
+```
+
+En Vite, los archivos que están dentro de `public/assets/` no se importan con `import`.
+Estos archivos se utilizan directamente mediante rutas públicas.
+
+Se usa en el código como:
+
+```txt
+/assets/logo.png
+```
+
+---
+
+### `src/api/`
 
 Esta carpeta contiene la configuración base para la comunicación con el backend.
 
@@ -58,115 +110,128 @@ Configurar la conexión HTTP con el backend.
 
 ---
 
-### `components/`
+### `src/components/`
 
-Esta carpeta contiene los componentes visuales reutilizables del proyecto.
+Esta carpeta contiene los componentes visuales del proyecto. Su objetivo principal es organizar la interfaz en piezas reutilizables, evitando repetir código y facilitando el mantenimiento del sistema.
 
-Los componentes no deben crearse pensando únicamente en una vista específica, sino con la intención de que puedan reutilizarse en diferentes módulos cuando sea posible.
-
-Para mantener una estructura ordenada, esta carpeta se divide en componentes comunes, componentes específicos por módulo y componentes de estructura visual.
+Los componentes se organizan según su nivel de reutilización y el módulo al que pertenecen.
 
 ```txt
 components/
 │
 ├── common/
+│   ├── BulkUploadDialog.tsx
 │   ├── ClearableSelect.tsx
 │   ├── CustomSnackbar.tsx
 │   ├── DataTable.tsx
 │   ├── EmptyState.tsx
 │   ├── Header.tsx
 │   ├── LoadingBox.tsx
+│   ├── NotificationBell.tsx
 │   ├── PageContainer.tsx
 │   ├── PageHeader.tsx
-│   └── SidebarMenu.tsx
+│   ├── SidebarMenu.tsx
+│   ├── StatsSummary.tsx
+│   └── ViewToggleButtons.tsx
 │
-├── users/
-│   ├── ChangeUserRoleDialog.tsx
-│   └── UserRoleChip.tsx
+├── layouts/
+│   └── DashboardLayout.tsx
 │
-└── layouts/
-    └── DashboardLayout.tsx
+├── pqr/
+│   ├── PqrChatView.tsx
+│   ├── PqrRatingSummary.tsx
+│   └── PqrTicketCard.tsx
+│
+└── users/
+    ├── ChangeUserRoleDialog.tsx
+    └── UserRoleChip.tsx
 ```
-
-#### `components/common/`
-
-Aquí van los componentes globales que pueden usarse en diferentes vistas del sistema.
-
-Estos componentes no dependen directamente de un módulo específico, por lo tanto, pueden reutilizarse en distintas partes del proyecto.
-
-
-Estos componentes pueden utilizarse en módulos como:
-
-```txt
-Usuarios
-PQR
-EtC ...
-```
-
-Por ejemplo, `DataTable.tsx` puede utilizarse para mostrar usuarios, PQR, roles o cualquier otro listado del sistema, siempre que se configure correctamente desde la vista donde se use.
-
-#### `components/users/`
-
-Aquí van los componentes específicos del módulo de usuarios.
-
-Estos componentes dependen directamente de la lógica, información o acciones relacionadas con usuarios.
-
-Ejemplos:
-
-```txt
-ChangeUserRoleDialog.tsx
-UserRoleChip.tsx
-```
-
-Estos componentes no se ubican en `components/common/` porque su uso está relacionado únicamente con el módulo de usuarios.
-
-#### `components/layouts/`
-
-Aquí van los componentes encargados de definir la estructura visual general de una página.
-
-Estos componentes pueden organizar elementos como el encabezado, el menú lateral y el contenedor principal donde se muestra el contenido.
-
-Ejemplo:
-
-```txt
-DashboardLayout.tsx
-```
-
-#### `DashboardLayout.tsx`
-
-Este componente define la estructura principal de las páginas internas del sistema.
-
-Se utiliza para envolver las vistas que necesitan una misma distribución visual, como el menú lateral, el encabezado y el área principal de contenido.
-
-Ejemplos de páginas que pueden usar este layout:
-
-```txt
-Dashboard
-Usuarios
-PQR
-Roles
-Reportes
-Solicitudes
-```
-
-El objetivo de este layout es evitar repetir la misma estructura visual en cada página protegida del sistema.
-
-#### Regla importante
-
-```txt
-Si el componente sirve para varias vistas, debe ir en components/common.
-Si el componente solo sirve para un módulo específico, debe ir en components/nombreModulo.
-Si el componente define la estructura general de una página, debe ir en components/layouts.
-```
-
-Esta organización ayuda a mantener el proyecto más limpio, ordenado y fácil de mantener.
 
 ---
-### `context/`
+
+#### `src/components/common/`
+
+En esta carpeta se ubican los componentes comunes o reutilizables del sistema.
+Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, pueden usarse en diferentes vistas como usuarios, PQR, reportes, roles u otros módulos futuros.
+
+| Componente              | Descripción                                                                                                                                                                                               | Reutilización dentro del proyecto                                                                                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BulkUploadDialog.tsx`  | Componente reutilizable para mostrar un modal de carga masiva de archivos. Permite seleccionar o cargar archivos, mostrar información del proceso y ejecutar acciones relacionadas con importaciones.     | Puede utilizarse en usuarios, PQR, reportes u otros módulos que requieran carga masiva de datos.                                                                              |
+| `ClearableSelect.tsx`   | Componente reutilizable de selección que permite escoger una opción y también limpiar el valor seleccionado.                                                                                              | Puede utilizarse en filtros, formularios, búsquedas avanzadas o selección de estados, roles y tipos de PQR.                                                                   |
+| `CustomSnackbar.tsx`    | Componente reutilizable para mostrar mensajes temporales al usuario, como acciones exitosas, errores, advertencias o información.                                                                         | Puede utilizarse en cualquier vista que necesite notificar resultados de acciones realizadas.                                                                                 |
+| `DataTable.tsx`         | Componente reutilizable para mostrar información en formato de tabla. Puede recibir columnas, filas y acciones configuradas desde la vista donde se use.                                                  | Puede utilizarse para listar usuarios, PQR, roles, reportes u otros registros del sistema.                                                                                    |
+| `EmptyState.tsx`        | Componente reutilizable para mostrar un mensaje cuando no existen datos disponibles en una vista.                                                                                                         | Puede utilizarse cuando no hay usuarios, PQR, resultados de búsqueda o registros para mostrar.                                                                                |
+| `Header.tsx`            | Componente reutilizable que representa el encabezado superior del sistema. Puede mostrar información del usuario autenticado, acciones rápidas o el botón para abrir y cerrar el menú lateral.            | Se utiliza principalmente dentro del layout principal de las vistas protegidas.                                                                                               |
+| `LoadingBox.tsx`        | Componente reutilizable para mostrar un estado de carga mientras se obtiene información del backend.                                                                                                      | Puede utilizarse en tablas, formularios, vistas de detalle o cualquier módulo que cargue datos.                                                                               |
+| `NotificationBell.tsx`  | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                         | Se utiliza dentro de `Header.tsx` para mostrar novedades importantes del sistema, como creación, asignación, cierre o calificación de PQR.                                    |
+| `PageContainer.tsx`     | Componente reutilizable que sirve como contenedor general para organizar el contenido de una página. Ayuda a mantener márgenes, espaciados y estructura visual consistente.                               | Puede utilizarse en páginas como usuarios, PQR, dashboard, reportes y demás vistas internas.                                                                                  |
+| `PageHeader.tsx`        | Componente reutilizable para mostrar el encabezado de una página, incluyendo título, descripción y acciones principales.                                                                                  | Puede utilizarse en vistas como administración de usuarios, listado de PQR, creación de registros o reportes.                                                                 |
+| `SidebarMenu.tsx`       | Componente reutilizable que representa el menú lateral del sistema. Permite mostrar opciones de navegación según los módulos disponibles y el rol del usuario.                                            | Se utiliza dentro del layout principal para navegar entre las secciones del sistema.                                                                                          |
+| `StatsSummary.tsx`      | Componente reutilizable para mostrar tarjetas de resumen con un ícono, una etiqueta y un valor numérico o textual. Permite presentar indicadores importantes de una vista de forma clara y compacta.      | Puede utilizarse en módulos como PQR, usuarios, dashboard o reportes para mostrar conteos como total de registros, pendientes, cerrados, asignados o por calificar.           |
+| `ViewToggleButtons.tsx` | Componente reutilizable para mostrar botones de cambio de vista. Recibe opciones con etiqueta, valor, ícono y contador opcional, permitiendo alternar entre diferentes estados o secciones de una página. | Puede utilizarse en vistas que necesiten cambiar entre categorías, por ejemplo PQR disponibles y PQR asignadas, registros activos e inactivos, o diferentes tipos de listado. |
+
+El objetivo de `components/common/` es centralizar todos los elementos visuales que pueden servir en varias partes del sistema. Por ejemplo, `DataTable.tsx` no debe ser una tabla exclusiva para usuarios, sino una tabla general que pueda adaptarse a usuarios, PQR, roles o cualquier otro listado.
+
+---
+
+#### `src/components/layouts/`
+
+En esta carpeta se ubican los componentes encargados de definir la estructura visual general de las páginas.
+
+| Componente            | Descripción                                                                                                                                                                | Uso dentro del proyecto                                                                                       |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `DashboardLayout.tsx` | Define la estructura principal de las páginas internas del sistema. Organiza elementos como el header, el sidebar y el área donde se renderiza el contenido de cada vista. | Se utiliza para envolver páginas protegidas como Dashboard, Usuarios, PQR, Reportes u otros módulos internos. |
+
+El layout permite mantener una misma estructura visual en las páginas principales del sistema y evita repetir el mismo diseño en cada vista.
+
+---
+
+#### `src/components/pqr/`
+
+En esta carpeta se ubican los componentes específicos del módulo de PQR.
+Estos componentes están relacionados directamente con la lógica visual de las solicitudes, el chat y la calificación del servicio.
+
+| Componente             | Descripción                                                                                                                                                                                                                                                                                                     | Uso dentro del proyecto                                                                                                                             |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PqrChatView.tsx`      | Componente encargado de mostrar la vista visual del chat de una PQR. Presenta la información de la solicitud, los mensajes enviados y recibidos, el campo de escritura, el botón para enviar mensajes, el botón para adjuntar archivos y la visualización de imágenes o documentos enviados en la conversación. | Se utiliza en el módulo de PQR para permitir la comunicación entre usuario, agente o administrador mediante mensajes de texto y archivos adjuntos.  |
+| `PqrRatingSummary.tsx` | Componente encargado de mostrar el resumen de la calificación realizada por el usuario sobre una PQR. Puede incluir la puntuación, comentario y fecha de calificación.                                                                                                                                          | Se utiliza en vistas donde se necesita mostrar la valoración dada a una PQR respondida o cerrada.                                                   |
+| `PqrTicketCard.tsx`    | Componente encargado de mostrar una PQR en formato de tarjeta compacta. Presenta el identificador de la PQR, tipo de caso, estado, prioridad, fecha, usuario, agente asignado cuando aplica, descripción, calificación y acciones relacionadas con estado, prioridad y chat.                                    | Se utiliza en vistas como `AgentPqrs` y `AdminPqrs` para reutilizar el diseño visual de las tarjetas de PQR y evitar repetir código en cada página. |
+
+Estos componentes se ubican en `components/pqr/` porque dependen directamente del módulo de PQR y no son elementos generales del sistema.
+
+---
+
+#### `src/components/users/`
+
+En esta carpeta se ubican los componentes específicos del módulo de usuarios.
+Estos componentes dependen directamente de la información, acciones o reglas relacionadas con los usuarios del sistema.
+
+| Componente                 | Descripción                                                                                                                                            | Uso dentro del proyecto                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `ChangeUserRoleDialog.tsx` | Componente que muestra un modal para cambiar el rol de un usuario seleccionado. Permite visualizar información del usuario y seleccionar un nuevo rol. | Se utiliza en la administración de usuarios.                                              |
+| `UserRoleChip.tsx`         | Componente visual que muestra el rol de un usuario mediante una etiqueta o chip con color, texto e ícono.                                              | Se utiliza en tablas, listados o detalles donde se necesite mostrar el rol de un usuario. |
+
+Estos componentes no se ubican en `components/common/` porque su uso está relacionado directamente con el módulo de usuarios.
+
+---
+
+#### Regla de organización de componentes
+
+```txt
+Si el componente puede usarse en varias vistas, debe ir en components/common.
+Si el componente solo pertenece a un módulo específico, debe ir en components/nombreModulo.
+Si el componente define la estructura visual general de una página, debe ir en components/layouts.
+```
+
+Esta organización permite que el proyecto sea más limpio, escalable y fácil de mantener, ya que cada componente tiene una responsabilidad clara y una ubicación lógica dentro de la estructura del frontend.
+
+---
+
+### `src/context/`
 
 Esta carpeta contiene los contextos globales de React.
 
-Se utiliza para manejar información que debe estar disponible en varias partes de la aplicación, como la autenticación del usuario.
+Se utiliza para manejar información que debe estar disponible en varias partes de la aplicación, como la autenticación del usuario, el token, la sesión activa y el cierre de sesión.
 
 Ejemplo:
 
@@ -175,33 +240,60 @@ context/
 └── AuthContext.tsx
 ```
 
-Responsabilidad principal:
+| Archivo           | Descripción                                                                                                                                                                        | Uso dentro del proyecto                                                                                                                                        |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AuthContext.tsx` | Contexto encargado de manejar el usuario autenticado, el token, el inicio de sesión, el cierre de sesión y la conexión global con Socket.IO cuando el usuario ya está autenticado. | Se utiliza para permitir que componentes, hooks y páginas accedan al usuario actual, validen si existe sesión activa y desconecten el socket al cerrar sesión. |
+
+---
+
+#### Responsabilidad principal
 
 ```txt
-Manejar estados globales como usuario autenticado, token, login y logout.
+Manejar el estado global de autenticación.
+Guardar y eliminar el token del localStorage.
+Consultar el perfil del usuario autenticado.
+Conectar Socket.IO cuando existe token y usuario.
+Desconectar Socket.IO cuando el usuario cierra sesión.
 ```
 
 ---
 
-### `data/`
+#### Funcionamiento general de `AuthContext.tsx`
+
+El contexto de autenticación administra la sesión del usuario dentro del frontend.
+
+Cuando el usuario inicia sesión, el token se guarda en el `localStorage` y también en el estado global del contexto. Luego, el sistema consulta el perfil del usuario autenticado mediante el endpoint correspondiente.
+
+Si el perfil se obtiene correctamente, se guarda la información del usuario en el estado global. Cuando ya existe un token válido y un usuario cargado, el sistema conecta Socket.IO para habilitar funcionalidades en tiempo real, como el chat de PQR y las notificaciones internas.
+
+Cuando el usuario cierra sesión, se desconecta Socket.IO, se elimina el token del `localStorage` y se limpia la información del usuario autenticado.
+
+---
+
+### `src/data/`
 
 Esta carpeta contiene datos estáticos o listas reutilizables dentro del frontend.
+
+Los archivos ubicados en `data/` no manejan lógica compleja ni realizan peticiones al backend. Su función principal es centralizar información fija que se usa en diferentes partes del sistema, evitando escribir los mismos datos repetidamente dentro de los componentes.
 
 Ejemplos:
 
 ```txt
 data/
+├── appBrand.ts
 ├── menuItems.ts
 └── userRoles.ts
 ```
 
-Aquí pueden ir listas como:
+Aquí pueden ir datos como:
 
 ```txt
+Información de la marca
 Roles disponibles
 Opciones de menú
 Estados de una PQR
 Tipos de solicitudes
+Textos o configuraciones fijas del sistema
 ```
 
 Responsabilidad principal:
@@ -212,67 +304,126 @@ Centralizar datos fijos para evitar escribirlos repetidamente en los componentes
 
 ---
 
-### `hooks/`
+#### `appBrand.ts`
+
+El archivo `appBrand.ts` contiene la información visual fija de la marca del sistema.
+
+Su objetivo principal es centralizar los datos relacionados con el nombre de la aplicación, el logo principal, el ícono del logo y los textos alternativos de las imágenes.
+
+
+| Propiedad       | Descripción                                             | Uso dentro del proyecto                                                                                              |
+| --------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `name`          | Contiene el nombre oficial de la aplicación o empresa.  | Se puede utilizar en títulos, encabezados, menús o pantallas principales.                                            |
+| `logo`          | Contiene la ruta del logo principal de INCOBRA a color. | Se utiliza para mostrar el logo completo en pantallas claras como login, header o sidebar.                           |
+| `logoWhite`     | Contiene la ruta del logo principal en color blanco.    | Se utiliza cuando el logo debe mostrarse sobre fondos oscuros o fondos institucionales.                              |
+| `logoIcon`      | Contiene la ruta del ícono del logo a color.            | Se utiliza cuando se necesita una versión más pequeña del logo, por ejemplo en menús contraídos o vistas responsive. |
+| `logoIconWhite` | Contiene la ruta del ícono del logo en color blanco.    | Se utiliza en fondos oscuros, barras laterales o encabezados institucionales.                                        |
+| `logoAlt`       | Contiene el texto alternativo de la imagen.             | Mejora la accesibilidad y sirve como descripción si la imagen no carga.                                              |
+
+---
+
+#### `menuItems.ts`
+
+Este archivo contiene las opciones principales del menú del sistema.
+
+Puede incluir información como el nombre de la opción, la ruta a la que debe navegar, el ícono que se va a mostrar y los roles que tienen permiso para verla.
+
+Responsabilidad principal:
+
+```txt
+Centralizar las opciones de navegación del sistema.
+```
+---
+
+#### `userRoles.ts`
+
+Este archivo contiene la información relacionada con los roles disponibles en el sistema.
+
+Puede utilizarse para definir listas de roles, etiquetas visibles para el usuario o valores utilizados en formularios y filtros.
+
+
+Responsabilidad principal:
+
+```txt
+Centralizar los roles del sistema para reutilizarlos en formularios, tablas, filtros y componentes visuales.
+```
+
+---
+
+### `src/hooks/`
 
 Esta carpeta contiene hooks personalizados.
 
-Los hooks permiten separar la lógica de una página o componente, dejando el componente más limpio y fácil de entender.
+Los hooks permiten separar la lógica de una página o componente, dejando el componente visual más limpio y fácil de entender.
 
 Ejemplos:
 
 ```txt
 hooks/
+├── useAdminPqrs.ts
 ├── useAdminUsers.ts
-└── useAuth.ts
+├── useAgentPqrs.ts
+├── useCreatePqr.ts
+├── useLogin.ts
+├── useMyPqrs.ts
+├── useNotifications.ts
+├── usePqrChat.ts
+└── useRegister.ts
 ```
+| Hook                  | Descripción                                                                                                                                                           | Uso dentro del proyecto                             |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `useAdminPqrs.ts`     | Maneja la lógica relacionada con la administración de PQR, consulta de solicitudes, cambio de estados, prioridades, asignación de agentes y acciones administrativas. | Se utiliza en el módulo administrativo de PQR.      |
+| `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios, carga de usuarios, cambio de roles, carga masiva y mensajes de respuesta.                             | Se utiliza en el módulo administrativo de usuarios. |
+| `useAgentPqrs.ts`     | Maneja la lógica de las PQR disponibles y asignadas a los agentes, permitiendo consultar solicitudes, tomar casos y gestionar la atención de las PQR.                 | Se utiliza en el módulo de agente.                  |
+| `useCreatePqr.ts`     | Maneja la lógica del formulario para crear una nueva PQR, incluyendo datos del formulario, archivo adjunto, validaciones, mensajes de éxito y errores.                | Se utiliza en la página `CreatePqr.tsx`.            |
+| `useLogin.ts`         | Maneja la lógica del inicio de sesión, validación del formulario, mensajes de error, estado de carga y redirección del usuario.                                       | Se utiliza en la página `Login.tsx`.                |
+| `useMyPqrs.ts`        | Maneja la lógica para consultar y mostrar las PQR creadas por el usuario autenticado, incluyendo sus estados, detalles, chat y calificación cuando aplica.            | Se utiliza en la página `MyPqrs.tsx`.               |
+| `useNotifications.ts` | Maneja la lógica de notificaciones del usuario autenticado, contador de no leídas, marcado de notificaciones y escucha de nuevas notificaciones por Socket.IO.        | Se utiliza en `NotificationBell.tsx`.               |
+| `usePqrChat.ts`       | Maneja la lógica del chat de una PQR, carga de mensajes, envío de mensajes, archivos adjuntos y escucha de nuevos mensajes en tiempo real por Socket.IO.              | Se utiliza en `PqrChatView.tsx`.                    |
+| `useRegister.ts`      | Maneja la lógica del registro de usuarios, validación del formulario, mensajes de éxito o error, estado de carga y redirección al inicio de sesión.                   | Se utiliza en la página `Register.tsx`.             |
 
-En el caso de `useAdminUsers.ts`, se puede manejar:
+---
 
-```txt
-Cargar usuarios
-Actualizar roles
-Abrir y cerrar modal
-Manejar mensajes
-Controlar errores
-```
-
-Responsabilidad principal:
+#### Responsabilidad principal
 
 ```txt
 Separar la lógica del componente visual.
 ```
 
+Los hooks permiten que los componentes se enfoquen en mostrar la interfaz, mientras que la carga de datos, conexión con servicios, manejo de estados y eventos queda centralizada en archivos reutilizables.
+
 ---
 
-### `interfaces/`
+### `src/interfaces/`
 
 Esta carpeta contiene las interfaces y tipos de TypeScript que definen la estructura de los datos utilizados en el proyecto.
 
-Aquí se declaran los tipos que representan entidades como usuarios, roles, PQR, respuestas del backend o datos que se envían desde formularios.
+Aquí se declaran los tipos que representan entidades como usuarios, roles, PQR, mensajes, notificaciones, respuestas del backend o datos que se envían desde formularios.
 
 Ejemplos:
 
 ```txt
 interfaces/
-├── user.interface.ts
+├── auth.interface.ts
+├── bulkUpload.interface.ts
+├── excel.interface.ts
+├── notification.interface.ts
 ├── pqr.interface.ts
-└── auth.interface.ts
+└── user.interface.ts
 ```
 
-Ejemplo de uso:
+| Archivo                     | Descripción                                                                                                                                                  | Uso dentro del proyecto                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.interface.ts`         | Define los tipos relacionados con autenticación, login, registro, respuestas del backend y errores de validación de los formularios.                         | Se utiliza en servicios, hooks, contexto y páginas relacionadas con inicio de sesión y registro.                                          |
+| `bulkUpload.interface.ts`   | Define los tipos relacionados con la carga masiva de datos, archivos seleccionados, resultados del proceso y posibles errores de importación.                | Se utiliza en componentes, hooks o servicios relacionados con la carga masiva de usuarios u otros registros.                              |
+| `excel.interface.ts`        | Define los tipos relacionados con la estructura y manejo de archivos Excel dentro del frontend.                                                              | Se utiliza en funciones o plantillas encargadas de generar, leer o preparar archivos de Excel.                                            |
+| `notification.interface.ts` | Define los tipos e interfaces relacionados con las notificaciones del sistema.                                                                               | Se utiliza en `notificationService.ts`, `useNotifications.ts`, `NotificationBell.tsx` y eventos de Socket.IO.                             |
+| `pqr.interface.ts`          | Define los tipos relacionados con PQR, mensajes del chat, archivos adjuntos, estados, prioridades, tipos de caso y datos usados en el módulo de solicitudes. | Se utiliza en servicios, hooks, componentes y páginas del módulo PQR para tipar solicitudes, mensajes, adjuntos y respuestas del backend. |
+| `user.interface.ts`         | Define los tipos relacionados con usuarios, roles y datos utilizados en la administración de usuarios.                                                       | Se utiliza en administración de usuarios, servicios, hooks y componentes relacionados con roles.                                          |
 
-```ts
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: UserRole;
-}
+---
 
-export type UserRole = "USER" | "ADMIN" | "AGENT";
-```
-
-Responsabilidad principal:
+#### Responsabilidad principal
 
 ```txt
 Centralizar los tipos e interfaces para evitar repetir estructuras en diferentes archivos.
@@ -282,28 +433,7 @@ Esta carpeta ayuda a que el código sea más seguro, claro y fácil de mantener,
 
 ---
 
-### `layouts/`
-
-Esta carpeta contiene estructuras generales de pantalla.
-
-Los layouts definen cómo se organiza visualmente una sección principal de la aplicación, por ejemplo, una vista con header, sidebar y contenido.
-
-Ejemplo:
-
-```txt
-layouts/
-└── DashboardLayout.tsx
-```
-
-Responsabilidad principal:
-
-```txt
-Organizar la estructura visual general de las páginas protegidas o principales.
-```
-
----
-
-### `pages/`
+### `src/pages/`
 
 Esta carpeta contiene las páginas principales del sistema.
 
@@ -318,9 +448,16 @@ pages/
 ├── Register.tsx
 ├── Dashboard.tsx
 │
-└── admin/
-    ├── AdminUsers.tsx
-    └── AdminPqrs.tsx
+├── admin/
+│   ├── AdminUsers.tsx
+│   └── AdminPqrs.tsx
+│
+├── agent/
+│   └── AgentPqrs.tsx
+│
+└── user/
+    ├── CreatePqr.tsx
+    └── MyPqrs.tsx
 ```
 
 Responsabilidad principal:
@@ -333,7 +470,7 @@ Una página no debería tener demasiada lógica interna. La lógica debe separar
 
 ---
 
-### `routes/`
+### `src/routes/`
 
 Esta carpeta contiene la configuración de rutas del proyecto.
 
@@ -355,58 +492,167 @@ Centralizar la navegación del sistema.
 
 ---
 
-### `services/`
+### `src/services/`
 
-Esta carpeta contiene las funciones que se comunican con el backend.
+Esta carpeta contiene las funciones encargadas de comunicarse con el backend.
 
-Cada servicio representa un grupo de funciones relacionadas con un módulo.
+Aquí se centralizan tanto las peticiones HTTP realizadas con Axios como la comunicación en tiempo real mediante Socket.IO.
 
-Ejemplos:
+Estructura:
 
 ```txt
 services/
 ├── authService.ts
-├── userService.ts
-└── pqrService.ts
+├── notificationService.ts
+├── pqrService.ts
+├── socketService.ts
+└── userService.ts
 ```
 
-Ejemplo de funciones en `userService.ts`:
+| Archivo                  | Descripción                                                                              | Uso dentro del proyecto                                                                                                                                         |
+| ------------------------ | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `authService.ts`         | Contiene las funciones relacionadas con la autenticación del usuario.                    | Se utiliza para iniciar sesión, registrar usuarios y manejar procesos relacionados con el acceso al sistema.                                                    |
+| `notificationService.ts` | Contiene las funciones HTTP relacionadas con las notificaciones del usuario autenticado. | Se utiliza para consultar notificaciones, obtener el contador de no leídas y marcar notificaciones como leídas.                                                 |
+| `pqrService.ts`          | Contiene las funciones HTTP relacionadas con las PQR.                                    | Se utiliza para crear PQR, consultar solicitudes, cambiar estados, asignar agentes, cambiar prioridad, calificar el servicio y cargar el historial de mensajes. |
+| `socketService.ts`       | Contiene la configuración y funciones generales de Socket.IO para el frontend.           | Se utiliza para conectar el socket, desconectarlo, manejar el chat de PQR y escuchar notificaciones en tiempo real.                                             |
+| `userService.ts`         | Contiene las funciones relacionadas con la administración de usuarios.                   | Se utiliza para consultar usuarios, actualizar roles y realizar carga masiva de usuarios.                                                                       |
+
+---
+
+#### Funciones en `authService.ts`
+
+```txt
+login()
+register()
+```
+
+Estas funciones permiten enviar los datos del usuario al backend para iniciar sesión o crear una nueva cuenta.
+
+---
+
+#### Funciones en `notificationService.ts`
+
+```txt
+getNotifications()
+getUnreadNotificationsCount()
+markNotificationAsRead()
+markAllNotificationsAsRead()
+```
+
+Estas funciones permiten comunicarse con los endpoints de notificaciones del backend.
+
+Se utilizan para:
+
+```txt
+Consultar las notificaciones del usuario autenticado.
+Consultar la cantidad de notificaciones no leídas.
+Marcar una notificación como leída.
+Marcar todas las notificaciones como leídas.
+```
+
+---
+
+#### Funciones en `pqrService.ts`
+
+```txt
+createPqr()
+getMyPqrs()
+getAllPqrs()
+updatePqrStatus()
+updatePqrPriority()
+getPqrMessages()
+sendPqrMessageWithAttachment()
+getAvailablePqrs()
+takePqr()
+getMyAssignedPqrs()
+ratePqr()
+```
+
+Estas funciones permiten manejar las operaciones principales del módulo de PQR mediante peticiones HTTP al backend.
+
+---
+
+#### Funciones en `socketService.ts`
+
+```txt
+connectSocket()
+getSocket()
+disconnectSocket()
+joinPqrRoom()
+sendPqrMessage()
+listenJoinedPqrRoom()
+listenNewPqrMessage()
+listenNewNotification()
+listenSocketError()
+removePqrSocketListeners()
+removeNotificationSocketListeners()
+```
+
+Estas funciones permiten manejar la comunicación en tiempo real mediante Socket.IO.
+
+El archivo `socketService.ts` es general porque el socket ahora se utiliza para dos funcionalidades:
+
+```txt
+1. Chat en tiempo real de PQR.
+2. Notificaciones internas en tiempo real.
+```
+
+En el chat de PQR, Socket.IO se utiliza para enviar mensajes de texto y recibir nuevos mensajes en tiempo real.
+
+Los archivos adjuntos no se envían directamente por Socket.IO. Primero se suben mediante HTTP usando `FormData`, y luego el backend emite el evento `new_pqr_message` para actualizar el chat en tiempo real.
+---
+
+#### Funciones en `userService.ts`
 
 ```txt
 getAllUsers()
 updateUserRole()
+uploadUsersBulk()
 ```
 
-Responsabilidad principal:
+Estas funciones permiten consultar los usuarios registrados y actualizar el rol de un usuario desde el módulo administrativo.
+
+---
+#### Responsabilidad principal de `services/`
 
 ```txt
-Separar las peticiones HTTP de los componentes.
+Separar las peticiones HTTP y la comunicación en tiempo real de los componentes visuales.
 ```
 
-Los componentes no deberían llamar directamente a Axios. Lo ideal es que usen funciones de los servicios.
+Los componentes no deberían llamar directamente a Axios ni configurar directamente Socket.IO.
+
+Lo ideal es que usen funciones centralizadas en los servicios. Esto permite que páginas, hooks y componentes se enfoquen en mostrar información y manejar la interacción del usuario, mientras que los servicios se encargan de la comunicación con el backend.
 
 ---
 
-### `styles/`
+### `src/styles/`
 
-Esta carpeta puede contener estilos globales o archivos relacionados con personalización visual general.
+Esta carpeta contiene archivos de estilos globales o estilos reutilizables que no pertenecen directamente a un componente específico.
 
-Ejemplo:
+Estructura:
 
 ```txt
 styles/
-└── global.css
+└── filterStyles.css
 ```
 
-Responsabilidad principal:
-
-```txt
-Guardar estilos globales del proyecto.
-```
+| Archivo            | Descripción                                                                                                                       | Uso dentro del proyecto                                                             |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `filterStyles.css` | Archivo de estilos utilizado para personalizar elementos visuales relacionados con filtros, contenedores o controles de búsqueda. | Puede aplicarse en vistas que tengan filtros, formularios de búsqueda, carga masiva |
 
 ---
 
-### `theme/`
+#### Responsabilidad principal
+
+```txt
+Guardar estilos globales o reutilizables del proyecto.
+```
+
+La carpeta `styles/` ayuda a mantener separados los estilos generales de la lógica de los componentes. Esto permite que el proyecto conserve una mejor organización visual y que ciertos estilos puedan reutilizarse sin repetir código.
+
+---
+
+### `src/theme/`
 
 Esta carpeta contiene la configuración del tema visual de Material UI.
 
@@ -427,62 +673,234 @@ Centralizar la identidad visual del proyecto.
 
 ---
 
-### `utils/`
+### `src/templates/`
+
+Esta carpeta contiene archivos encargados de generar plantillas descargables desde el frontend.
+
+A diferencia de `utils/`, esta carpeta no se usa para guardar funciones auxiliares pequeñas, sino archivos que construyen documentos completos, como plantillas de Excel, formatos de carga masiva o archivos base que el usuario puede descargar y diligenciar.
+
+Estructura:
+
+```txt
+templates/
+└── downloadBulkUsersTemplate.ts
+```
+
+---
+
+#### `downloadBulkUsersTemplate.ts`
+
+Este archivo contiene la función encargada de generar y descargar la plantilla de Excel para la carga masiva.
+
+```txt
+downloadBulkUsersTemplate()
+```
+
+| Función                       | Descripción                                                                                                                                                                                       | Uso dentro del proyecto                                                                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `downloadBulkUsersTemplate()` | Genera un archivo Excel con las columnas necesarias para registrar usuarios de forma masiva. También aplica estilos, comentarios de ayuda, validación de roles y descarga automática del archivo. | Se utiliza en el módulo de administración de usuarios para que el administrador pueda descargar una plantilla base y registrar varios usuarios desde un archivo Excel. |
+
+---
+
+### `src/utils/`
 
 Esta carpeta contiene funciones auxiliares reutilizables del proyecto.
 
 Los archivos ubicados en `utils/` no representan componentes visuales, páginas ni servicios. Su función es guardar lógica pequeña y reutilizable que puede usarse en diferentes partes del sistema.
 
-Ejemplo:
-
 ```txt
 utils/
+│
+├── avatarUtils.ts
+├── dateUtils.ts
+├── excelUtils.ts
+├── fileUtils.ts
+├── formatText.ts
 ├── getErrorMessage.ts
-├── userRoleUtils.tsx
 ├── pqrUtils.ts
+└── userRoleUtils.tsx
 ```
-
-Aquí pueden ir funciones como:
-
-```txt
-Extraer mensajes de error del backend
-Formatear fechas
-Convertir roles en etiquetas visibles
-Asignar colores a estados
-Transformar datos antes de mostrarlos
-```
-
-Responsabilidad principal:
-
-```txt
-Guardar funciones reutilizables que no dependen directamente de una pantalla.
-```
-
-#### `getErrorMessage.ts`
-
-Este archivo contiene una función auxiliar encargada de obtener el mensaje de error enviado por el backend.
-
-Su objetivo es evitar repetir la misma lógica de manejo de errores en diferentes hooks, páginas o componentes.
 
 ---
 
-### `validations/`
+#### `avatarUtils.ts`
 
-Esta carpeta contiene esquemas de validación, normalmente usando Yup.
+Este archivo contiene funciones auxiliares relacionadas con la visualización de nombres o avatares dentro del sistema.
+
+```txt
+getInitials()
+```
+
+| Función             | Descripción                                                                              | Uso dentro del proyecto                                                                                         |
+| ------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `getInitials(name)` | Obtiene las iniciales de un nombre completo. Si no recibe un nombre válido, retorna `?`. | Se utiliza para mostrar iniciales en componentes visuales como avatares de usuarios, administradores o agentes. |
+
+---
+
+#### `dateUtils.ts`
+
+Este archivo contiene funciones auxiliares relacionadas con el formato de fechas.
+
+```txt
+formatDate()
+```
+
+| Función            | Descripción                                                    | Uso dentro del proyecto                                                                                                      |
+| ------------------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `formatDate(date)` | Convierte una fecha en formato legible en español de Colombia. | Se utiliza para mostrar fechas de creación, actualización, mensajes, registros o cualquier dato temporal dentro del sistema. |
+
+Este archivo se separó de `pqrUtils.ts` porque el formato de fechas no pertenece exclusivamente al módulo de PQR. De esta manera, puede reutilizarse en otros módulos como usuarios, dashboard, reportes o solicitudes.
+
+---
+
+#### `excelUtils.ts`
+
+Este archivo contiene funciones auxiliares relacionadas con el manejo de datos o formatos utilizados en archivos de Excel.
+
+```txt
+toExcelColor()
+```
+
+| Función               | Descripción                                                                                             | Uso dentro del proyecto                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `toExcelColor(color)` | Convierte un color hexadecimal, como `#1565c0`, al formato ARGB utilizado por ExcelJS, como `FF1565C0`. | Se utiliza al generar archivos de Excel para aplicar colores personalizados a celdas, encabezados, bordes o estilos. |
+
+---
+
+#### `fileUtils.ts`
+
+Este archivo contiene funciones auxiliares relacionadas con la visualización y formato de información de archivos.
+
+```txt
+formatFileSize()
+```
+
+| Función                | Descripción                                                                 | Uso dentro del proyecto                                                                                        |
+| ---------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `formatFileSize(size)` | Convierte el tamaño de un archivo de bytes a un formato legible en KB o MB. | Se utiliza para mostrar el tamaño de archivos seleccionados o adjuntos de una forma más clara para el usuario. |
+
+---
+
+#### `formatText.ts`
+
+Este archivo contiene funciones auxiliares para transformar textos antes de mostrarlos en la interfaz.
+
+```txt
+capitalizeText()
+```
+
+| Función                | Descripción                                                                                                                                                | Uso dentro del proyecto                                                                                                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `capitalizeText(text)` | Convierte un texto a formato capitalizado, dejando solo la primera letra en mayúscula y el resto en minúscula. Por ejemplo, transforma `ADMIN` en `Admin`. | Se utiliza para mostrar textos técnicos del sistema de una forma más amigable para el usuario, como roles, estados u otros valores que vienen en mayúscula desde el backend. |
+
+Este archivo se ubica en `utils/` porque contiene una función pequeña y reutilizable de formato de texto.
+
+---
+
+#### `getErrorMessage.ts`
+
+Este archivo contiene una función auxiliar encargada de extraer mensajes de error enviados por el backend.
+
+```txt
+getErrorMessage()
+```
+
+| Función                                  | Descripción                                                                                                                                        | Uso dentro del proyecto                                                                                                 |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `getErrorMessage(error, defaultMessage)` | Recibe un error desconocido y verifica si es un error de Axios. Si el backend envía un mensaje, lo retorna; si no, retorna un mensaje por defecto. | Se utiliza en hooks, páginas o componentes para mostrar errores claros al usuario cuando una petición al backend falla. |
+
+---
+
+#### `pqrUtils.ts`
+
+Este archivo contiene funciones auxiliares relacionadas con la visualización de información del módulo de PQR.
+
+```txt
+getStatusColor()
+getCaseTypeLabel()
+```
+
+| Función                      | Descripción                                                                                            | Uso dentro del proyecto                                                                                                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `getStatusColor(status)`     | Devuelve el color que debe mostrarse en un componente `Chip` de Material UI según el estado de la PQR. | Se utiliza para representar visualmente estados como `PENDIENTE`, `EN_PROCESO` o `CERRADA`.                                                                                 |
+| `getCaseTypeLabel(caseType)` | Convierte el tipo de caso de una PQR en un texto más claro y legible para el usuario.                  | Se utiliza para mostrar tipos como `SAP`, `BEAS`, `Terminal`, `Correo`, `Intranet`, `Soporte Equipos`, `Soporte Red`, `Mi Portal SAP`, `LegalisApp` o `Nuevas Solicitudes`. |
+
+---
+
+#### `userRoleUtils.tsx`
+
+Este archivo contiene funciones auxiliares relacionadas con la visualización de los roles de usuario dentro del sistema.
+
+```txt
+getUserRoleColor()
+getUserRoleIcon()
+getUserRoleLabel()
+```
+
+| Función                  | Descripción                                                                                          | Uso dentro del proyecto                                                             |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `getUserRoleColor(role)` | Devuelve el color visual que debe tener un rol de usuario en componentes como `Chip` de Material UI. | Se utiliza para diferenciar visualmente roles como administrador, agente o usuario. |
+| `getUserRoleIcon(role)`  | Retorna el ícono correspondiente según el rol del usuario.                                           | Se utiliza en componentes visuales donde se muestra el rol acompañado de un ícono.  |
+| `getUserRoleLabel(role)` | Convierte el rol técnico del sistema en un texto más claro para mostrar al usuario.                  | Se utiliza para mostrar etiquetas como `Administrador`, `Agente` o `Usuario`.       |
+
+Este archivo conserva la extensión `.tsx` porque una de sus funciones retorna íconos de Material UI como componentes JSX.
+
+---
+
+#### Regla de organización de `utils/`
+
+```txt
+Si una función transforma, formatea o adapta datos pequeños, puede ir en utils/.
+Si una función genera un archivo completo o una plantilla descargable, debe ir en templates/.
+Si una función se comunica con el backend, debe ir en services/.
+Si una función maneja estado o lógica de una vista, debe ir en hooks/.
+Si una función contiene validaciones de formularios, debe ir en validations/.
+```
+
+---
+
+### `src/validations/`
+
+Esta carpeta contiene los esquemas de validación del proyecto, normalmente creados con Yup.
+
+Las validaciones permiten controlar que los datos ingresados en los formularios cumplan con las reglas necesarias antes de ser enviados al backend.
 
 Ejemplos:
 
 ```txt
 validations/
-├── loginValidation.ts
-├── registerValidation.ts
+├── authValidation.ts
 └── pqrValidation.ts
 ```
 
-Responsabilidad principal:
+| Archivo             | Descripción                                                                                                          | Uso dentro del proyecto                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `authValidation.ts` | Contiene las reglas de validación para los formularios de inicio de sesión y registro de usuarios.                   | Se utiliza en `useLogin.ts` y `useRegister.ts`.                  |
+| `pqrValidation.ts`  | Contiene las reglas de validación relacionadas con la creación de  una solicitud PQR. | Se utiliza en hooks y páginas relacionadas con el módulo de PQR. |
+
+---
+
+#### Responsabilidad principal
 
 ```txt
 Centralizar reglas de validación de formularios.
+```
+
+---
+
+#### `authValidation.ts`
+
+```txt
+loginSchema()
+registerSchema()
+```
+
+---
+
+#### `pqrValidation.ts`
+
+```txt
+createPqrSchema()
 ```
 
 ---
@@ -520,304 +938,6 @@ Responsabilidad principal:
 
 ```txt
 Inicializar la aplicación.
-```
-
----
-
-## 5. Organización recomendada para el módulo de usuarios
-
-Para la vista de administración de usuarios, la estructura recomendada es:
-
-```txt
-src/
-│
-├── components/
-│   ├── common/
-│   │   ├── DataTable.tsx
-│   │   ├── PageHeader.tsx
-│   │   ├── EmptyState.tsx
-│   │   ├── LoadingBox.tsx
-│   │   └── CustomSnackbar.tsx
-│   │
-│   └── users/
-│       ├── ChangeUserRoleDialog.tsx
-│       └── UserRoleChip.tsx
-│
-├── data/
-│   └── userRoles.ts
-│
-├── hooks/
-│   └── useAdminUsers.ts
-│
-├── interfaces/
-│   └── user.interface.ts
-│
-├── pages/
-│   └── admin/
-│       └── AdminUsers.tsx
-│
-├── services/
-│   └── userService.ts
-│
-└── utils/
-    └── userRoleUtils.tsx
-```
-
----
-
-## 6. Función de cada archivo en `AdminUsers`
-
-### `pages/admin/AdminUsers.tsx`
-
-Contiene la página principal de administración de usuarios.
-
-Responsabilidad:
-
-```txt
-Mostrar la vista, conectar el hook, renderizar la tabla, el modal y los mensajes.
-```
-
----
-
-### `hooks/useAdminUsers.ts`
-
-Contiene la lógica de la vista de usuarios.
-
-Responsabilidad:
-
-```txt
-Cargar usuarios.
-Actualizar roles.
-Controlar el usuario seleccionado.
-Abrir y cerrar el modal.
-Manejar mensajes de éxito o error.
-```
-
----
-
-### `interfaces/user.interface.ts`
-
-Contiene los tipos e interfaces relacionados con los usuarios.
-
-Responsabilidad:
-
-```txt
-Definir la estructura de un usuario.
-Definir los roles permitidos.
-Reutilizar los tipos en componentes, hooks y servicios.
-```
-
-Ejemplo:
-
-```ts
-export type UserRole = "USER" | "ADMIN" | "AGENT";
-
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: UserRole;
-}
-```
-
----
-
-### `components/common/DataTable.tsx`
-
-Componente reutilizable para mostrar tablas.
-
-Responsabilidad:
-
-```txt
-Mostrar columnas dinámicas, registros y paginación.
-```
-
-Este componente no debe depender únicamente de usuarios. Debe poder reutilizarse en otras vistas.
-
----
-
-### `components/common/PageHeader.tsx`
-
-Componente reutilizable para encabezados de páginas.
-
-Responsabilidad:
-
-```txt
-Mostrar título, descripción y acciones principales de una página.
-```
-
----
-
-### `components/common/EmptyState.tsx`
-
-Componente reutilizable para mostrar mensajes cuando no hay datos.
-
-Responsabilidad:
-
-```txt
-Mostrar un estado vacío con título y descripción.
-```
-
----
-
-### `components/common/LoadingBox.tsx`
-
-Componente reutilizable para mostrar carga.
-
-Responsabilidad:
-
-```txt
-Mostrar un indicador de carga centrado.
-```
-
----
-
-### `components/common/CustomSnackbar.tsx`
-
-Componente reutilizable para mensajes temporales.
-
-Responsabilidad:
-
-```txt
-Mostrar mensajes de éxito, error, advertencia o información.
-```
-
----
-
-### `components/users/ChangeUserRoleDialog.tsx`
-
-Componente específico del módulo de usuarios.
-
-Responsabilidad:
-
-```txt
-Mostrar la información del usuario seleccionado y permitir cambiar su rol.
-```
-
----
-
-### `components/users/UserRoleChip.tsx`
-
-Componente específico para mostrar visualmente el rol de un usuario.
-
-Responsabilidad:
-
-```txt
-Mostrar el rol con color, ícono y etiqueta.
-```
-
----
-
-### `data/userRoles.ts`
-
-Contiene la lista de roles disponibles.
-
-Responsabilidad:
-
-```txt
-Centralizar los roles para no repetirlos en diferentes archivos.
-```
-
----
-
-### `utils/userRoleUtils.tsx`
-
-Contiene funciones relacionadas con la visualización de roles.
-
-Responsabilidad:
-
-```txt
-Obtener el texto visible del rol.
-Obtener el color del rol.
-Obtener el ícono del rol.
-```
-
----
-
-### `services/userService.ts`
-
-Contiene las peticiones relacionadas con usuarios.
-
-Responsabilidad:
-
-```txt
-Consultar usuarios.
-Actualizar roles.
-Conectarse con el backend.
-```
-
----
-
-## 7. Buenas prácticas del proyecto
-
-### Separar responsabilidades
-
-Cada archivo debe tener una responsabilidad clara.
-
-```txt
-La página arma la vista.
-El hook maneja la lógica.
-El service se comunica con el backend.
-El componente muestra interfaz.
-El interface define tipos y estructuras de datos.
-El utils transforma o formatea información.
-```
-
----
-
-### Crear componentes reutilizables
-
-Los componentes deben pensarse para ser usados en varias vistas cuando sea posible.
-
-Correcto:
-
-```txt
-components/common/DataTable.tsx
-```
-
-No recomendado si se puede reutilizar:
-
-```txt
-components/users/UsersTable.tsx
-```
-
-La tabla debe ser general para que pueda usarse en usuarios, PQR, roles u otros módulos.
-
----
-
-### Evitar lógica pesada en las páginas
-
-Las páginas no deberían tener demasiadas funciones internas.  
-Cuando una página tiene mucha lógica, se recomienda crear un hook personalizado.
-
-Ejemplo:
-
-```txt
-useAdminUsers.ts
-```
-
----
-
-### Evitar repetir datos fijos
-
-Listas como roles, estados o tipos deben ir en `data/`.
-
-Ejemplo:
-
-```txt
-data/userRoles.ts
-```
-
----
-
-### Evitar repetir funciones auxiliares
-
-Funciones como obtener etiquetas, colores o formatear fechas deben ir en `utils/`.
-
-Ejemplo:
-
-```txt
-utils/userRoleUtils.tsx
 ```
 
 ---
