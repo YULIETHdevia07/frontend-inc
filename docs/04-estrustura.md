@@ -12,6 +12,10 @@ La idea principal de esta organización es que cada carpeta tenga una función c
 ## 2. Estructura principal del proyecto
 
 ```txt
+public/
+│
+├── assets/
+│
 src/
 │
 ├── api/
@@ -38,7 +42,54 @@ src/
 
 ## 3. Descripción de cada carpeta
 
-### `api/`
+### `public/`
+
+La carpeta `public/` contiene archivos estáticos que se sirven directamente desde la raíz del proyecto cuando la aplicación se ejecuta o se compila.
+
+En proyectos desarrollados con Vite, los archivos ubicados dentro de `public/` pueden utilizarse directamente mediante rutas absolutas, sin necesidad de importarlos en los componentes.
+
+Responsabilidad principal:
+
+```txt
+Guardar archivos públicos que deben estar disponibles directamente para la aplicación.
+```
+
+---
+
+### `public/assets/`
+
+La carpeta contiene los recursos gráficos públicos del sistema.
+
+En este proyecto, se utiliza para guardar los logos e íconos principales de la aplicación.
+
+```txt
+public/
+└── assets/
+    ├── logo.png
+    ├── logo-blanco.png
+    ├── logo-icono.png
+    ├── logo-blanco-icono.png
+    └── logo-icono-web.png
+```
+
+Responsabilidad principal:
+
+```txt
+Guardar los logos e íconos públicos del sistema.
+```
+
+En Vite, los archivos que están dentro de `public/assets/` no se importan con `import`.
+Estos archivos se utilizan directamente mediante rutas públicas.
+
+Se usa en el código como:
+
+```txt
+/assets/logo.png
+```
+
+---
+
+### `src/api/`
 
 Esta carpeta contiene la configuración base para la comunicación con el backend.
 
@@ -59,7 +110,7 @@ Configurar la conexión HTTP con el backend.
 
 ---
 
-### `components/`
+### `src/components/`
 
 Esta carpeta contiene los componentes visuales del proyecto. Su objetivo principal es organizar la interfaz en piezas reutilizables, evitando repetir código y facilitando el mantenimiento del sistema.
 
@@ -98,7 +149,7 @@ components/
 
 ---
 
-#### `components/common/`
+#### `src/components/common/`
 
 En esta carpeta se ubican los componentes comunes o reutilizables del sistema.
 Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, pueden usarse en diferentes vistas como usuarios, PQR, reportes, roles u otros módulos futuros.
@@ -123,7 +174,7 @@ El objetivo de `components/common/` es centralizar todos los elementos visuales 
 
 ---
 
-#### `components/layouts/`
+#### `src/components/layouts/`
 
 En esta carpeta se ubican los componentes encargados de definir la estructura visual general de las páginas.
 
@@ -135,7 +186,7 @@ El layout permite mantener una misma estructura visual en las páginas principal
 
 ---
 
-#### `components/pqr/`
+#### `src/components/pqr/`
 
 En esta carpeta se ubican los componentes específicos del módulo de PQR.
 Estos componentes están relacionados directamente con la lógica visual de las solicitudes, el chat y la calificación del servicio.
@@ -150,7 +201,7 @@ Estos componentes se ubican en `components/pqr/` porque dependen directamente de
 
 ---
 
-#### `components/users/`
+#### `src/components/users/`
 
 En esta carpeta se ubican los componentes específicos del módulo de usuarios.
 Estos componentes dependen directamente de la información, acciones o reglas relacionadas con los usuarios del sistema.
@@ -176,7 +227,7 @@ Esta organización permite que el proyecto sea más limpio, escalable y fácil d
 
 ---
 
-### `context/`
+### `src/context/`
 
 Esta carpeta contiene los contextos globales de React.
 
@@ -219,25 +270,30 @@ Cuando el usuario cierra sesión, se desconecta Socket.IO, se elimina el token d
 
 ---
 
-### `data/`
+### `src/data/`
 
 Esta carpeta contiene datos estáticos o listas reutilizables dentro del frontend.
+
+Los archivos ubicados en `data/` no manejan lógica compleja ni realizan peticiones al backend. Su función principal es centralizar información fija que se usa en diferentes partes del sistema, evitando escribir los mismos datos repetidamente dentro de los componentes.
 
 Ejemplos:
 
 ```txt
 data/
+├── appBrand.ts
 ├── menuItems.ts
 └── userRoles.ts
 ```
 
-Aquí pueden ir listas como:
+Aquí pueden ir datos como:
 
 ```txt
+Información de la marca
 Roles disponibles
 Opciones de menú
 Estados de una PQR
 Tipos de solicitudes
+Textos o configuraciones fijas del sistema
 ```
 
 Responsabilidad principal:
@@ -248,7 +304,53 @@ Centralizar datos fijos para evitar escribirlos repetidamente en los componentes
 
 ---
 
-### `hooks/`
+#### `appBrand.ts`
+
+El archivo `appBrand.ts` contiene la información visual fija de la marca del sistema.
+
+Su objetivo principal es centralizar los datos relacionados con el nombre de la aplicación, el logo principal, el ícono del logo y los textos alternativos de las imágenes.
+
+
+| Propiedad       | Descripción                                             | Uso dentro del proyecto                                                                                              |
+| --------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `name`          | Contiene el nombre oficial de la aplicación o empresa.  | Se puede utilizar en títulos, encabezados, menús o pantallas principales.                                            |
+| `logo`          | Contiene la ruta del logo principal de INCOBRA a color. | Se utiliza para mostrar el logo completo en pantallas claras como login, header o sidebar.                           |
+| `logoWhite`     | Contiene la ruta del logo principal en color blanco.    | Se utiliza cuando el logo debe mostrarse sobre fondos oscuros o fondos institucionales.                              |
+| `logoIcon`      | Contiene la ruta del ícono del logo a color.            | Se utiliza cuando se necesita una versión más pequeña del logo, por ejemplo en menús contraídos o vistas responsive. |
+| `logoIconWhite` | Contiene la ruta del ícono del logo en color blanco.    | Se utiliza en fondos oscuros, barras laterales o encabezados institucionales.                                        |
+| `logoAlt`       | Contiene el texto alternativo de la imagen.             | Mejora la accesibilidad y sirve como descripción si la imagen no carga.                                              |
+
+---
+
+#### `menuItems.ts`
+
+Este archivo contiene las opciones principales del menú del sistema.
+
+Puede incluir información como el nombre de la opción, la ruta a la que debe navegar, el ícono que se va a mostrar y los roles que tienen permiso para verla.
+
+Responsabilidad principal:
+
+```txt
+Centralizar las opciones de navegación del sistema.
+```
+---
+
+#### `userRoles.ts`
+
+Este archivo contiene la información relacionada con los roles disponibles en el sistema.
+
+Puede utilizarse para definir listas de roles, etiquetas visibles para el usuario o valores utilizados en formularios y filtros.
+
+
+Responsabilidad principal:
+
+```txt
+Centralizar los roles del sistema para reutilizarlos en formularios, tablas, filtros y componentes visuales.
+```
+
+---
+
+### `src/hooks/`
 
 Esta carpeta contiene hooks personalizados.
 
@@ -283,7 +385,7 @@ Los hooks permiten que los componentes se enfoquen en mostrar la interfaz, mient
 
 ---
 
-### `interfaces/`
+### `src/interfaces/`
 
 Esta carpeta contiene las interfaces y tipos de TypeScript que definen la estructura de los datos utilizados en el proyecto.
 
@@ -318,7 +420,7 @@ Esta carpeta ayuda a que el código sea más seguro, claro y fácil de mantener,
 
 ---
 
-### `pages/`
+### `src/pages/`
 
 Esta carpeta contiene las páginas principales del sistema.
 
@@ -352,7 +454,7 @@ Una página no debería tener demasiada lógica interna. La lógica debe separar
 
 ---
 
-### `routes/`
+### `src/routes/`
 
 Esta carpeta contiene la configuración de rutas del proyecto.
 
@@ -374,7 +476,7 @@ Centralizar la navegación del sistema.
 
 ---
 
-### `services/`
+### `src/services/`
 
 Esta carpeta contiene las funciones encargadas de comunicarse con el backend.
 
@@ -507,7 +609,7 @@ Lo ideal es que usen funciones centralizadas en los servicios. Esto permite que 
 
 ---
 
-### `styles/`
+### `src/styles/`
 
 Esta carpeta contiene archivos de estilos globales o estilos reutilizables que no pertenecen directamente a un componente específico.
 
@@ -534,7 +636,7 @@ La carpeta `styles/` ayuda a mantener separados los estilos generales de la lóg
 
 ---
 
-### `theme/`
+### `src/theme/`
 
 Esta carpeta contiene la configuración del tema visual de Material UI.
 
@@ -555,7 +657,7 @@ Centralizar la identidad visual del proyecto.
 
 ---
 
-### `templates/`
+### `src/templates/`
 
 Esta carpeta contiene archivos encargados de generar plantillas descargables desde el frontend.
 
@@ -584,7 +686,7 @@ downloadBulkUsersTemplate()
 
 ---
 
-### `utils/`
+### `src/utils/`
 
 Esta carpeta contiene funciones auxiliares reutilizables del proyecto.
 
@@ -657,8 +759,8 @@ Este archivo contiene funciones auxiliares relacionadas con la visualización y 
 formatFileSize()
 ```
 
-| Función | Descripción | Uso dentro del proyecto |
-| ------- | ----------- | ----------------------- |
+| Función                | Descripción                                                                 | Uso dentro del proyecto                                                                                        |
+| ---------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `formatFileSize(size)` | Convierte el tamaño de un archivo de bytes a un formato legible en KB o MB. | Se utiliza para mostrar el tamaño de archivos seleccionados o adjuntos de una forma más clara para el usuario. |
 
 ---
@@ -702,10 +804,10 @@ getStatusColor()
 getCaseTypeLabel()
 ```
 
-| Función                      | Descripción                                                                                            | Uso dentro del proyecto                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| `getStatusColor(status)`     | Devuelve el color que debe mostrarse en un componente `Chip` de Material UI según el estado de la PQR. | Se utiliza para representar visualmente estados como `PENDIENTE`, `EN_PROCESO` o `CERRADA`. |
-| `getCaseTypeLabel(caseType)` | Convierte el tipo de caso de una PQR en un texto más claro para el usuario.                            | Se utiliza para mostrar tipos como `SAP`, `Daño de equipo`, `Instalación` u `Otro`.         |
+| Función                      | Descripción                                                                                            | Uso dentro del proyecto                                                                                                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `getStatusColor(status)`     | Devuelve el color que debe mostrarse en un componente `Chip` de Material UI según el estado de la PQR. | Se utiliza para representar visualmente estados como `PENDIENTE`, `EN_PROCESO` o `CERRADA`.                                                                                 |
+| `getCaseTypeLabel(caseType)` | Convierte el tipo de caso de una PQR en un texto más claro y legible para el usuario.                  | Se utiliza para mostrar tipos como `SAP`, `BEAS`, `Terminal`, `Correo`, `Intranet`, `Soporte Equipos`, `Soporte Red`, `Mi Portal SAP`, `LegalisApp` o `Nuevas Solicitudes`. |
 
 ---
 
@@ -741,7 +843,7 @@ Si una función contiene validaciones de formularios, debe ir en validations/.
 
 ---
 
-### `validations/`
+### `src/validations/`
 
 Esta carpeta contiene esquemas de validación, normalmente usando Yup.
 

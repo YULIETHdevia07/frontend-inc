@@ -17,6 +17,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationBell from "./NotificationBell";
 import { getUserRoleLabel } from "../../utils/userRoleUtils";
+import { appBrand } from "../../data/appBrand";
 
 interface HeaderProps {
     openSidebar: boolean;
@@ -30,12 +31,13 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
 
     const handleLogout = () => {
         logout();
-        navigate("/");
+        navigate("/dashboard");
     };
 
     const style = {
         appBar: {
             backgroundColor: theme.palette.background.paper,
+            // backgroundColor: "red",
             color: theme.palette.text.primary,
             borderBottom: `1px solid ${theme.palette.divider}`,
         },
@@ -44,23 +46,39 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
             minHeight: "72px",
             display: "flex",
             justifyContent: "space-between",
-            px: 3,
+            px: {
+                xs: 1.5,
+                sm: 2,
+                md: 3,
+            },
+            gap: 2,
         },
 
         leftContent: {
             display: "flex",
             alignItems: "center",
-            gap: 2,
+            gap: {
+                xs: 1,
+                sm: 2,
+            },
+            minWidth: 0,
         },
 
         menuButton: {
-            width: 44,
-            height: 44,
+            width: {
+                xs: 40,
+                sm: 44,
+            },
+            height: {
+                xs: 40,
+                sm: 44,
+            },
             borderRadius: "14px",
             backgroundColor: theme.palette.primary.main,
             color: theme.palette.primary.contrastText,
             boxShadow: "0 6px 14px rgba(0,0,0,0.12)",
             transition: "all 0.25s ease",
+            flexShrink: 0,
 
             "&:hover": {
                 backgroundColor: theme.palette.primary.dark,
@@ -68,18 +86,58 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
             },
         },
 
-        titleBox: {
+        brandBox: {
             display: "flex",
+            alignItems: "center",
+            gap: 1.2,
+            minWidth: 0,
+        },
+
+        logo: {
+            display: {
+                xs: "none",
+                sm: "block",
+            },
+            width: {
+                sm: 120,
+                md: 145,
+            },
+            height: "auto",
+            objectFit: "contain",
+        },
+
+        logoIcon: {
+            display: {
+                xs: "block",
+                sm: "none",
+            },
+            width: 42,
+            height: 42,
+            objectFit: "contain",
+        },
+
+        titleBox: {
+            display: {
+                xs: "none",
+                md: "flex",
+            },
             flexDirection: "column",
+            alignItems: "flex-end",
         },
 
         title: {
-            fontWeight: 900,
+            fontSize: "0.9rem",
+            fontWeight: 800,
+            color: theme.palette.text.primary,
+            maxWidth: 220,
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
             lineHeight: 1.1,
         },
 
         subtitle: {
-            fontSize: "0.78rem",
+            fontSize: "0.75rem",
             color: theme.palette.text.secondary,
             fontWeight: 500,
         },
@@ -87,32 +145,23 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
         rightContent: {
             display: "flex",
             alignItems: "center",
-            gap: 2,
-        },
-
-        userBox: {
-            display: {
-                xs: "none",
-                sm: "flex",
+            gap: {
+                xs: 1,
+                sm: 1.5,
+                md: 2,
             },
-            flexDirection: "column",
-            alignItems: "flex-end",
-        },
-
-        userName: {
-            fontSize: "0.9rem",
-            fontWeight: 800,
-            color: theme.palette.text.primary,
-        },
-
-        userRole: {
-            fontSize: "0.75rem",
-            color: theme.palette.text.secondary,
+            flexShrink: 0,
         },
 
         avatar: {
-            width: 42,
-            height: 42,
+            width: {
+                xs: 38,
+                sm: 42,
+            },
+            height: {
+                xs: 38,
+                sm: 42,
+            },
             backgroundColor: `${theme.palette.primary.main}22`,
             color: theme.palette.primary.main,
             fontWeight: 900,
@@ -121,15 +170,40 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
 
         logoutButton: {
             borderRadius: "14px",
-            px: 2,
+            px: {
+                xs: 1,
+                sm: 2,
+            },
             py: 1,
+            minWidth: {
+                xs: 44,
+                sm: "auto",
+            },
             textTransform: "none",
             fontWeight: 800,
             backgroundColor: `${theme.palette.error.main}12`,
             color: theme.palette.error.main,
 
+            "& .MuiButton-startIcon": {
+                mr: {
+                    xs: 0,
+                    sm: 1,
+                },
+                ml: {
+                    xs: 0,
+                    sm: -0.5,
+                },
+            },
+
             "&:hover": {
                 backgroundColor: `${theme.palette.error.main}22`,
+            },
+        },
+
+        logoutText: {
+            display: {
+                xs: "none",
+                sm: "inline",
             },
         },
     };
@@ -145,19 +219,34 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
                             onClick={() => setOpenSidebar((prev) => !prev)}
                             sx={style.menuButton}
                         >
-
                             <MenuIcon />
                         </IconButton>
                     </Tooltip>
+
+                    <Box sx={style.brandBox}>
+                        <Box
+                            component="img"
+                            src={appBrand.logo}
+                            alt={appBrand.logoAlt}
+                            sx={style.logo}
+                        />
+
+                        <Box
+                            component="img"
+                            src={appBrand.logoIcon}
+                            alt={appBrand.logoAlt}
+                            sx={style.logoIcon}
+                        />
+                    </Box>
                 </Box>
 
                 <Box sx={style.rightContent}>
-                    <Box sx={style.userBox}>
-                        <Typography sx={style.userName}>
+                    <Box sx={style.titleBox}>
+                        <Typography sx={style.title}>
                             {user ? `${getUserRoleLabel(user.role)}, ${user.name}` : "Usuario"}
                         </Typography>
 
-                        <Typography sx={style.userRole}>
+                        <Typography sx={style.subtitle}>
                             Bienvenido nuevamente
                         </Typography>
                     </Box>
@@ -168,13 +257,17 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
                         {user ? userInitial : <PersonIcon />}
                     </Avatar>
 
-                    <Button
-                        onClick={handleLogout}
-                        startIcon={<LogoutIcon />}
-                        sx={style.logoutButton}
-                    >
-                        Cerrar sesión
-                    </Button>
+                    <Tooltip title="Cerrar sesión" arrow>
+                        <Button
+                            onClick={handleLogout}
+                            startIcon={<LogoutIcon />}
+                            sx={style.logoutButton}
+                        >
+                            <Box component="span" sx={style.logoutText}>
+                                Cerrar sesión
+                            </Box>
+                        </Button>
+                    </Tooltip>
                 </Box>
             </Toolbar>
         </AppBar>

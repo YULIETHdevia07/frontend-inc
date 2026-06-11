@@ -4,6 +4,7 @@ import { Box, Button, TextField, Typography, Link, Alert } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import { appBrand } from "../data/appBrand";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -43,6 +44,13 @@ const Login = () => {
       gap: "16px",
 
       boxShadow: "0 10px 30px rgba(0, 0, 0, 0.12)",
+    },
+
+    logo: {
+      width: "160px",
+      height: "auto",
+      objectFit: "contain",
+      marginBottom: "0.5rem",
     },
 
     input: {
@@ -100,24 +108,19 @@ const Login = () => {
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
-      setErrorMessage(
-        "Correo o contraseña incorrectos."
-      );
+      setErrorMessage("Correo o contraseña incorrectos.");
     }
   };
 
   return (
     <Box sx={style.container}>
       <Box component="form" onSubmit={handleLogin} sx={style.form}>
-        <Typography
-          sx={{
-            fontSize: "2rem",
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-          }}
-        >
-          App
-        </Typography>
+        <Box
+          component="img"
+          src={appBrand.logo}
+          alt={appBrand.logoAlt}
+          sx={style.logo}
+        />
 
         <Typography
           sx={{
@@ -176,10 +179,7 @@ const Login = () => {
           }}
         >
           ¿No tienes una cuenta?{" "}
-          <Link
-            onClick={() => navigate("/register")}
-            sx={style.link}
-          >
+          <Link onClick={() => navigate("/register")} sx={style.link}>
             Regístrate aquí
           </Link>
         </Typography>

@@ -5,24 +5,48 @@ export const pqrCaseTypes = [
         value: "SAP",
     },
     {
-        label: "Daño de equipo",
-        value: "DANO_EQUIPO",
+        label: "BEAS",
+        value: "BEAS",
     },
     {
-        label: "Instalación",
-        value: "INSTALACION",
+        label: "Terminal",
+        value: "TERMINAL",
     },
     {
-        label: "Otro",
-        value: "OTRO",
+        label: "Correo",
+        value: "CORREO",
+    },
+    {
+        label: "Intranet",
+        value: "INTRANET",
+    },
+    {
+        label: "Soporte Equipos",
+        value: "SOPORTE_EQUIPOS",
+    },
+    {
+        label: "Soporte Red",
+        value: "SOPORTE_RED",
+    },
+    {
+        label: "Mi Portal SAP",
+        value: "MI_PORTAL_SAP",
+    },
+    {
+        label: "LegalisApp",
+        value: "LEGALISAPP",
+    },
+    {
+        label: "Nuevas Solicitudes",
+        value: "NUEVAS_SOLICITUDES",
     },
 ];
 
 // Opciones disponibles para los estados de una PQR.
 export const pqrStatusOptions = [
-  { label: "PENDIENTE", value: "PENDIENTE" },
-  { label: "EN PROCESO", value: "EN_PROCESO" },
-  { label: "CERRADA", value: "CERRADA" },
+    { label: "PENDIENTE", value: "PENDIENTE" },
+    { label: "EN PROCESO", value: "EN_PROCESO" },
+    { label: "CERRADA", value: "CERRADA" },
 ];
 
 // Opciones disponibles para la prioridad de una PQR.

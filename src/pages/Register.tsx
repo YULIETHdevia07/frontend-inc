@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import api from "../api/axios";
+import { appBrand } from "../data/appBrand";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -41,6 +42,12 @@ const Register = () => {
       borderRadius: "12px",
       gap: "16px",
       boxShadow: "0 10px 30px rgba(0, 0, 0, 0.12)",
+    },
+    logo: {
+      width: "160px",
+      height: "auto",
+      objectFit: "contain",
+      marginBottom: "0.5rem",
     },
     input: {
       width: "100%",
@@ -121,15 +128,12 @@ const Register = () => {
   return (
     <Box sx={style.container}>
       <Box component="form" onSubmit={handleRegister} sx={style.form}>
-        <Typography
-          sx={{
-            fontSize: "2rem",
-            fontWeight: 700,
-            color: theme.palette.text.primary,
-          }}
-        >
-          Crear cuenta
-        </Typography>
+        <Box
+          component="img"
+          src={appBrand.logo}
+          alt={appBrand.logoAlt}
+          sx={style.logo}
+        />
 
         <Typography
           sx={{

@@ -26,14 +26,32 @@ export const getCaseTypeLabel = (caseType: string) => {
     case "SAP":
       return "SAP";
 
-    case "DANO_EQUIPO":
-      return "Daño de equipo";
+    case "BEAS":
+      return "BEAS";
 
-    case "INSTALACION":
-      return "Instalación";
+    case "TERMINAL":
+      return "Terminal";
 
-    case "OTRO":
-      return "Otro";
+    case "CORREO":
+      return "Correo";
+
+    case "INTRANET":
+      return "Intranet";
+
+    case "SOPORTE_EQUIPOS":
+      return "Soporte Equipos";
+
+    case "SOPORTE_RED":
+      return "Soporte Red";
+
+    case "MI_PORTAL_SAP":
+      return "Mi Portal SAP";
+
+    case "LEGALISAPP":
+      return "LegalisApp";
+
+    case "NUEVAS_SOLICITUDES":
+      return "Nuevas Solicitudes";
 
     default:
       return caseType;
