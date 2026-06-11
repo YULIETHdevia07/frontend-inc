@@ -72,11 +72,24 @@ export const useMyPqrs = () => {
   // Abre la vista de chat de una PQR.
   const openPqrChat = (pqrId: number) => {
     setSelectedChatPqrId(pqrId);
+
+    // Limpia visualmente el contador al abrir el chat.
+    setPqrs((currentPqrs) =>
+      currentPqrs.map((pqr) =>
+        pqr.id === pqrId
+          ? {
+            ...pqr,
+            unreadMessagesCount: 0,
+          }
+          : pqr
+      )
+    );
   };
 
   // Cierra la vista de chat y regresa al listado de PQR del usuario.
   const closePqrChat = () => {
     setSelectedChatPqrId(null);
+    loadMyPqrs();
   };
 
   // PQR seleccionada para mostrar en la vista del chat.

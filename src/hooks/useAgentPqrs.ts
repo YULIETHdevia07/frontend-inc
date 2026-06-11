@@ -252,11 +252,24 @@ export const useAgentPqrs = () => {
     // Abre la vista de chat para responder una PQR asignada.
     const openPqrChat = (pqrId: number) => {
         setSelectedChatPqrId(pqrId);
+
+        // Limpia visualmente el contador al abrir el chat.
+        setAssignedPqrs((currentPqrs) =>
+            currentPqrs.map((pqr) =>
+                pqr.id === pqrId
+                    ? {
+                        ...pqr,
+                        unreadMessagesCount: 0,
+                    }
+                    : pqr
+            )
+        );
     };
 
     // Cierra la vista de chat y regresa al listado del agente.
     const closePqrChat = () => {
         setSelectedChatPqrId(null);
+        loadAgentPqrs();
     };
 
     // Actualiza el texto del buscador.

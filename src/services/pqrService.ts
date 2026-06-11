@@ -84,6 +84,17 @@ export const getPqrMessages = async (
   return response.data;
 };
 
+// Marca como leído el chat de una PQR para el usuario autenticado.
+export const markPqrChatAsRead = async (
+  pqrId: number
+): Promise<{ message: string }> => {
+  const response = await api.patch<{ message: string }>(
+    `/pqrs/${pqrId}/messages/read`
+  );
+
+  return response.data;
+};
+
 // Envía un mensaje con archivo adjunto en una PQR.
 export const sendPqrMessageWithAttachment = async (
   pqrId: number,

@@ -1,4 +1,5 @@
 import {
+    Badge,
     Box,
     Button,
     Chip,
@@ -37,6 +38,7 @@ type PqrTicketCardProps = {
         status: PqrStatus;
         priority?: PqrPriority | null;
         createdAt: string;
+        unreadMessagesCount?: number;
         rating?: number | null;
         ratingComment?: string | null;
         ratedAt?: string | null;
@@ -82,7 +84,10 @@ const PqrTicketCard = ({
     onUpdatePriority,
     onOpenChat,
 }: PqrTicketCardProps) => {
+
     const theme = useTheme();
+
+    const unreadMessagesCount = pqr.unreadMessagesCount ?? 0;
 
     const getPriorityLabel = (priority?: PqrPriority | null) => {
         return (
@@ -506,7 +511,15 @@ const PqrTicketCard = ({
                             <Button
                                 variant="outlined"
                                 onClick={() => onOpenChat(pqr.id)}
-                                startIcon={<ForumOutlinedIcon />}
+                                startIcon={
+                                    <Badge
+                                        badgeContent={unreadMessagesCount}
+                                        color="error"
+                                        invisible={unreadMessagesCount === 0}
+                                    >
+                                        <ForumOutlinedIcon />
+                                    </Badge>
+                                }
                                 sx={style.chatButton}
                             >
                                 Responder por chat

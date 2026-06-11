@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
     Alert,
+    Badge,
     Box,
     Button,
     Chip,
@@ -683,7 +684,15 @@ const MyPqrs = () => {
                                     {/* Botón para abrir el chat de seguimiento */}
                                     <Button
                                         variant="outlined"
-                                        startIcon={<ForumOutlinedIcon />}
+                                        startIcon={
+                                            <Badge
+                                                badgeContent={pqr.unreadMessagesCount ?? 0}
+                                                color="error"
+                                                invisible={(pqr.unreadMessagesCount ?? 0) === 0}
+                                            >
+                                                <ForumOutlinedIcon />
+                                            </Badge>
+                                        }
                                         sx={style.chatButton}
                                         onClick={() => openPqrChat(pqr.id)}
                                     >

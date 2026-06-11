@@ -5,6 +5,7 @@ import type {
 } from "../interfaces/pqr.interface";
 import {
     getPqrMessages,
+    markPqrChatAsRead,
     sendPqrMessageWithAttachment,
 } from "../services/pqrService";
 import {
@@ -57,6 +58,8 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
             setChatError("");
 
             const response = await getPqrMessages(pqrId);
+
+            await markPqrChatAsRead(pqrId);
 
             if (!isMountedRef.current) return;
 
@@ -190,6 +193,8 @@ export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {
 
                 return [...prevMessages, newMessage];
             });
+
+            markPqrChatAsRead(newMessage.pqrId).catch(() => { });
         });
 
         listenSocketError((error) => {

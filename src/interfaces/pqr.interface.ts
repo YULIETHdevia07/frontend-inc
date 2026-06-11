@@ -49,6 +49,7 @@ export interface Pqr {
   assignedToId: number | null;
   user?: PqrUser;
   assignedTo?: PqrUser | null;
+  unreadMessagesCount?: number;
 
   // Datos de calificación de la PQR.
   rating?: number | null;
