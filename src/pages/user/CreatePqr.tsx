@@ -224,7 +224,7 @@ const CreatePqr = () => {
                 )}
 
                 {/* Formulario de creación de PQR. */}
-                <Box component="form" sx={style.form} onSubmit={handleCreatePqr}>
+                <Box component="form" sx={style.form} onSubmit={handleCreatePqr} noValidate>
                     <ClearableSelect
                         label="Tipo de caso"
                         value={caseType}

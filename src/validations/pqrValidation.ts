@@ -12,13 +12,13 @@ const maxFileSize = 5 * 1024 * 1024;
 export const createPqrSchema = Yup.object({
     caseType: Yup.string()
         .trim()
-        .required("Debes seleccionar el tipo de caso."),
+        .required("Campo obligatorio."),
 
     description: Yup.string()
         .trim()
-        .required("La descripción es obligatoria.")
-        .min(3, "La descripción debe tener mínimo 3 caracteres.")
-        .max(500, "La descripción no puede superar los 500 caracteres."),
+        .required("Campo obligatorio.")
+        .min(3, "Mínimo 3 caracteres.")
+        .max(500, "Maximo 500 caracteres."),
 
     file: Yup.mixed<File>()
         .nullable()

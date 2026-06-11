@@ -360,18 +360,27 @@ Ejemplos:
 
 ```txt
 hooks/
+├── useAdminPqrs.ts
 ├── useAdminUsers.ts
-├── useAuth.ts
+├── useAgentPqrs.ts
+├── useCreatePqr.ts
+├── useLogin.ts
+├── useMyPqrs.ts
 ├── useNotifications.ts
-└── usePqrChat.ts
+├── usePqrChat.ts
+└── useRegister.ts
 ```
-
-| Hook                  | Descripción                                                                                                                                                                                                                      | Uso dentro del proyecto                                                                                        |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios, carga de usuarios, cambio de roles, carga masiva y mensajes de respuesta.                                                                                        | Se utiliza en el módulo administrativo de usuarios.                                                            |
-| `useAuth.ts`          | Permite acceder al contexto de autenticación desde cualquier componente.                                                                                                                                                         | Se utiliza para obtener el usuario autenticado, el token, el estado de carga, login, logout e isAuthenticated. |
-| `useNotifications.ts` | Maneja la lógica de notificaciones del usuario autenticado. Carga notificaciones, obtiene el contador de no leídas, marca una o todas como leídas y escucha nuevas notificaciones por Socket.IO.                                 | Se utiliza en `NotificationBell.tsx`.                                                                          |
-| `usePqrChat.ts`       | Maneja la lógica del chat de una PQR. Carga el historial de mensajes, une al usuario a la sala de la PQR, envía mensajes de texto, envía archivos adjuntos mediante HTTP y escucha nuevos mensajes en tiempo real por Socket.IO. | Se utiliza en `PqrChatView.tsx` y en las páginas que abren el chat de una PQR.                                 |
+| Hook                  | Descripción                                                                                                                                                           | Uso dentro del proyecto                             |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `useAdminPqrs.ts`     | Maneja la lógica relacionada con la administración de PQR, consulta de solicitudes, cambio de estados, prioridades, asignación de agentes y acciones administrativas. | Se utiliza en el módulo administrativo de PQR.      |
+| `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios, carga de usuarios, cambio de roles, carga masiva y mensajes de respuesta.                             | Se utiliza en el módulo administrativo de usuarios. |
+| `useAgentPqrs.ts`     | Maneja la lógica de las PQR disponibles y asignadas a los agentes, permitiendo consultar solicitudes, tomar casos y gestionar la atención de las PQR.                 | Se utiliza en el módulo de agente.                  |
+| `useCreatePqr.ts`     | Maneja la lógica del formulario para crear una nueva PQR, incluyendo datos del formulario, archivo adjunto, validaciones, mensajes de éxito y errores.                | Se utiliza en la página `CreatePqr.tsx`.            |
+| `useLogin.ts`         | Maneja la lógica del inicio de sesión, validación del formulario, mensajes de error, estado de carga y redirección del usuario.                                       | Se utiliza en la página `Login.tsx`.                |
+| `useMyPqrs.ts`        | Maneja la lógica para consultar y mostrar las PQR creadas por el usuario autenticado, incluyendo sus estados, detalles, chat y calificación cuando aplica.            | Se utiliza en la página `MyPqrs.tsx`.               |
+| `useNotifications.ts` | Maneja la lógica de notificaciones del usuario autenticado, contador de no leídas, marcado de notificaciones y escucha de nuevas notificaciones por Socket.IO.        | Se utiliza en `NotificationBell.tsx`.               |
+| `usePqrChat.ts`       | Maneja la lógica del chat de una PQR, carga de mensajes, envío de mensajes, archivos adjuntos y escucha de nuevos mensajes en tiempo real por Socket.IO.              | Se utiliza en `PqrChatView.tsx`.                    |
+| `useRegister.ts`      | Maneja la lógica del registro de usuarios, validación del formulario, mensajes de éxito o error, estado de carga y redirección al inicio de sesión.                   | Se utiliza en la página `Register.tsx`.             |
 
 ---
 
@@ -396,6 +405,8 @@ Ejemplos:
 ```txt
 interfaces/
 ├── auth.interface.ts
+├── bulkUpload.interface.ts
+├── excel.interface.ts
 ├── notification.interface.ts
 ├── pqr.interface.ts
 └── user.interface.ts
@@ -403,10 +414,12 @@ interfaces/
 
 | Archivo                     | Descripción                                                                                                                                                  | Uso dentro del proyecto                                                                                                                   |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.interface.ts`         | Define tipos relacionados con autenticación, usuario autenticado o respuestas del login.                                                                     | Se utiliza en contexto, servicios o componentes relacionados con sesión.                                                                  |
+| `auth.interface.ts`         | Define los tipos relacionados con autenticación, login, registro, respuestas del backend y errores de validación de los formularios.                         | Se utiliza en servicios, hooks, contexto y páginas relacionadas con inicio de sesión y registro.                                          |
+| `bulkUpload.interface.ts`   | Define los tipos relacionados con la carga masiva de datos, archivos seleccionados, resultados del proceso y posibles errores de importación.                | Se utiliza en componentes, hooks o servicios relacionados con la carga masiva de usuarios u otros registros.                              |
+| `excel.interface.ts`        | Define los tipos relacionados con la estructura y manejo de archivos Excel dentro del frontend.                                                              | Se utiliza en funciones o plantillas encargadas de generar, leer o preparar archivos de Excel.                                            |
 | `notification.interface.ts` | Define los tipos e interfaces relacionados con las notificaciones del sistema.                                                                               | Se utiliza en `notificationService.ts`, `useNotifications.ts`, `NotificationBell.tsx` y eventos de Socket.IO.                             |
 | `pqr.interface.ts`          | Define los tipos relacionados con PQR, mensajes del chat, archivos adjuntos, estados, prioridades, tipos de caso y datos usados en el módulo de solicitudes. | Se utiliza en servicios, hooks, componentes y páginas del módulo PQR para tipar solicitudes, mensajes, adjuntos y respuestas del backend. |
-| `user.interface.ts`         | Define los tipos relacionados con usuarios y roles.                                                                                                          | Se utiliza en administración de usuarios y componentes relacionados con roles.                                                            |
+| `user.interface.ts`         | Define los tipos relacionados con usuarios, roles y datos utilizados en la administración de usuarios.                                                       | Se utiliza en administración de usuarios, servicios, hooks y componentes relacionados con roles.                                          |
 
 ---
 
@@ -438,6 +451,9 @@ pages/
 ├── admin/
 │   ├── AdminUsers.tsx
 │   └── AdminPqrs.tsx
+│
+├── agent/
+│   └── AgentPqrs.tsx
 │
 └── user/
     ├── CreatePqr.tsx
@@ -845,27 +861,45 @@ Si una función contiene validaciones de formularios, debe ir en validations/.
 
 ### `src/validations/`
 
-Esta carpeta contiene esquemas de validación, normalmente usando Yup.
+Esta carpeta contiene los esquemas de validación del proyecto, normalmente creados con Yup.
+
+Las validaciones permiten controlar que los datos ingresados en los formularios cumplan con las reglas necesarias antes de ser enviados al backend.
 
 Ejemplos:
 
 ```txt
 validations/
-├── loginValidation.ts
-├── registerValidation.ts
+├── authValidation.ts
 └── pqrValidation.ts
 ```
 
-Responsabilidad principal:
+| Archivo             | Descripción                                                                                                          | Uso dentro del proyecto                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `authValidation.ts` | Contiene las reglas de validación para los formularios de inicio de sesión y registro de usuarios.                   | Se utiliza en `useLogin.ts` y `useRegister.ts`.                  |
+| `pqrValidation.ts`  | Contiene las reglas de validación relacionadas con la creación de  una solicitud PQR. | Se utiliza en hooks y páginas relacionadas con el módulo de PQR. |
+
+---
+
+#### Responsabilidad principal
 
 ```txt
 Centralizar reglas de validación de formularios.
 ```
 
+---
+
+#### `authValidation.ts`
+
+```txt
+loginSchema()
+registerSchema()
+```
+
+---
+
 #### `pqrValidation.ts`
 
 ```txt
-responsePqrSchema()
 createPqrSchema()
 ```
 
