@@ -70,6 +70,12 @@ export interface PqrMessage {
   attachments: PqrMessageAttachment[];
 }
 
+// Datos recibidos cuando se actualiza el contador de mensajes no revisados.
+export interface PqrUnreadCountUpdatedData {
+  pqrId: number;
+  unreadMessagesCount: number;
+}
+
 // Datos necesarios para crear una nueva PQR.
 export interface CreatePqrData {
   caseType: string;

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import type { MessageType, Pqr } from "../interfaces/pqr.interface";
 import { getMyPqrs, ratePqr } from "../services/pqrService";
+import {
+  getSocket,
+  listenPqrUnreadCountUpdated,
+} from "../services/socketService";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Hook encargado de manejar las PQR del usuario autenticado.
@@ -145,9 +149,26 @@ export const useMyPqrs = () => {
     }
   };
 
-  // Carga las PQR cuando se abre la vista.
+  // Carga las PQR y escucha actualizaciones del contador de mensajes en tiempo real.
   useEffect(() => {
     loadMyPqrs();
+
+    listenPqrUnreadCountUpdated((data) => {
+      setPqrs((currentPqrs) =>
+        currentPqrs.map((pqr) =>
+          pqr.id === data.pqrId
+            ? {
+              ...pqr,
+              unreadMessagesCount: data.unreadMessagesCount,
+            }
+            : pqr
+        )
+      );
+    });
+
+    return () => {
+      getSocket()?.off("pqr_unread_count_updated");
+    };
   }, []);
 
   return {

@@ -181,10 +181,13 @@ const AdminPqrs = () => {
 
         const matchesSearch =
             !normalizedSearch ||
+            `${pqr.id}`.includes(normalizedSearch) ||
+            `pqr-${pqr.id}`.includes(normalizedSearch) ||
+            `#pqr-${pqr.id}`.includes(normalizedSearch) ||
             pqr.description.toLowerCase().includes(normalizedSearch) ||
             pqr.caseType.toLowerCase().includes(normalizedSearch) ||
-            pqr.status.toLowerCase().includes(normalizedSearch) ||
-            pqr.priority?.toLowerCase().includes(normalizedSearch) ||
+            // pqr.status.toLowerCase().includes(normalizedSearch) ||
+            // pqr.priority?.toLowerCase().includes(normalizedSearch) ||
             pqr.user?.name?.toLowerCase().includes(normalizedSearch) ||
             pqr.user?.email?.toLowerCase().includes(normalizedSearch) ||
             pqr.assignedTo?.name?.toLowerCase().includes(normalizedSearch) ||

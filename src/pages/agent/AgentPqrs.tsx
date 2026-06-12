@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
     Alert,
     Box,
@@ -39,6 +39,7 @@ import { PqrChatView } from "../../components/pqr/PqrChatView";
 import StatsSummary from "../../components/common/StatsSummary";
 import PqrTicketCard from "../../components/pqr/PqrTicketCard";
 import ViewToggleButtons from "../../components/common/ViewToggleButtons";
+import { getCaseTypeLabel } from "../../utils/pqrUtils";
 
 // Página del agente para tomar PQR, responderlas por chat y cambiar su estado y prioridad.
 const AgentPqrs = () => {
@@ -48,7 +49,6 @@ const AgentPqrs = () => {
     const {
         availablePqrs,
         assignedPqrs,
-        filteredPqrs,
 
         loading,
         error,
@@ -58,18 +58,6 @@ const AgentPqrs = () => {
 
         activeView,
         setActiveView,
-
-        statusFilter,
-        setStatusFilter,
-
-        priorityFilter,
-        setPriorityFilter,
-
-        searchTerm,
-        showSearch,
-        handleSearchChange,
-        toggleSearch,
-        clearSearch,
 
         statusByPqrId,
         priorityByPqrId,
@@ -112,30 +100,66 @@ const AgentPqrs = () => {
         token,
     });
 
-    // Controla el menú desplegable del filtro por estado.
+    // Controla el menú desplegable del filtro.
     const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(
         null
     );
 
     const openFilterMenu = Boolean(filterAnchorEl);
 
+    // Controla el filtro por estado.
+    const [statusFilter, setStatusFilter] = useState<"ALL" | PqrStatus>("ALL");
+
+    // Controla el filtro por prioridad.
+    const [priorityFilter, setPriorityFilter] = useState<
+        "ALL" | PqrPriority
+    >("ALL");
+
+    // Controla el filtro por tipo de caso.
+    const [caseTypeFilter, setCaseTypeFilter] = useState("ALL");
+
+    // Guarda el texto escrito en el buscador.
+    const [searchTerm, setSearchTerm] = useState("");
+
+    // Controla si el campo de búsqueda está visible.
+    const [showSearch, setShowSearch] = useState(false);
+
     // Abre el menú de filtros.
     const openFilters = (event: React.MouseEvent<HTMLButtonElement>) => {
         setFilterAnchorEl(event.currentTarget);
     };
+
     // Cierra el menú de filtros.
     const closeFilters = () => {
         setFilterAnchorEl(null);
+    };
+
+    // Actualiza el texto del buscador.
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
+
+    // Abre o cierra el campo de búsqueda.
+    const toggleSearch = () => {
+        setShowSearch((prev) => !prev);
+    };
+
+    // Limpia el buscador y lo oculta.
+    const clearSearch = () => {
+        setSearchTerm("");
+        setShowSearch(false);
     };
 
     // Cambia el filtro por estado.
     const handleStatusFilterChange = (event: { target: { value: string } }) => {
         setStatusFilter(event.target.value as "ALL" | PqrStatus);
     };
+
     // Limpia el filtro por estado.
     const clearStatusFilter = () => {
         setStatusFilter("ALL");
     };
+
     // Cambia el filtro por prioridad.
     const handlePriorityFilterChange = (event: {
         target: { value: string };
@@ -146,6 +170,16 @@ const AgentPqrs = () => {
     // Limpia el filtro por prioridad.
     const clearPriorityFilter = () => {
         setPriorityFilter("ALL");
+    };
+
+    // Cambia el filtro por tipo de caso.
+    const handleCaseTypeFilterChange = (event: { target: { value: string } }) => {
+        setCaseTypeFilter(event.target.value);
+    };
+
+    // Limpia el filtro por tipo de caso.
+    const clearCaseTypeFilter = () => {
+        setCaseTypeFilter("ALL");
     };
 
     // Cuenta las PQR asignadas que aún están en seguimiento.
@@ -197,6 +231,51 @@ const AgentPqrs = () => {
             icon: <AssignmentOutlinedIcon />,
         },
     ];
+
+    // Define qué lista se debe mostrar según la vista activa.
+    const currentPqrs =
+        activeView === "AVAILABLE" ? availablePqrs : assignedPqrs;
+
+    // Obtiene los tipos de caso existentes en las PQR actuales.
+    const caseTypeOptions = useMemo(() => {
+        return Array.from(
+            new Set(
+                currentPqrs
+                    .map((pqr) => pqr.caseType)
+                    .filter(Boolean)
+            )
+        );
+    }, [currentPqrs]);
+
+    // Filtra las PQR por búsqueda, estado y prioridad.
+    const filteredPqrs = useMemo(() => {
+        const normalizedSearch = searchTerm.toLowerCase().trim();
+
+        return currentPqrs.filter((pqr) => {
+            const matchesSearch =
+                !normalizedSearch ||
+                `${pqr.id}`.includes(normalizedSearch) ||
+                `pqr-${pqr.id}`.includes(normalizedSearch) ||
+                `#pqr-${pqr.id}`.includes(normalizedSearch) ||
+                pqr.description.toLowerCase().includes(normalizedSearch) ||
+                pqr.caseType.toLowerCase().includes(normalizedSearch) ||
+                // pqr.status.toLowerCase().includes(normalizedSearch) ||
+                // pqr.priority?.toLowerCase().includes(normalizedSearch) ||
+                pqr.user?.name?.toLowerCase().includes(normalizedSearch) ||
+                pqr.user?.email?.toLowerCase().includes(normalizedSearch);
+
+            const matchesStatus =
+                statusFilter === "ALL" || pqr.status === statusFilter;
+
+            const matchesPriority =
+                priorityFilter === "ALL" || pqr.priority === priorityFilter;
+
+            const matchesCaseType =
+                caseTypeFilter === "ALL" || pqr.caseType === caseTypeFilter;
+
+            return matchesSearch && matchesStatus && matchesPriority && matchesCaseType;
+        });
+    }, [currentPqrs, searchTerm, statusFilter, priorityFilter, caseTypeFilter]);
 
     const style = {
         container: {
@@ -341,7 +420,8 @@ const AgentPqrs = () => {
                             onClick={openFilters}
                             sx={
                                 statusFilter !== "ALL" ||
-                                    priorityFilter !== "ALL"
+                                    priorityFilter !== "ALL" ||
+                                    caseTypeFilter !== "ALL"
                                     ? filterStyles.activeIconButton
                                     : filterStyles.iconButton
                             }
@@ -408,15 +488,33 @@ const AgentPqrs = () => {
                         ))}
                     </Select>
 
+                    <Select
+                        fullWidth
+                        value={caseTypeFilter}
+                        onChange={handleCaseTypeFilterChange}
+                        size="small"
+                        sx={filterStyles.filterSelect}
+                    >
+                        <MenuItem value="ALL">Todos los tipos de caso</MenuItem>
+
+                        {caseTypeOptions.map((caseType) => (
+                            <MenuItem key={caseType} value={caseType}>
+                                {getCaseTypeLabel(caseType)}
+                            </MenuItem>
+                        ))}
+                    </Select>
+
                     <Button
                         fullWidth
                         variant="text"
                         onClick={() => {
                             clearStatusFilter();
                             clearPriorityFilter();
+                            clearCaseTypeFilter();
                         }}
                         disabled={
-                            statusFilter === "ALL" && priorityFilter === "ALL"
+                            statusFilter === "ALL" && priorityFilter === "ALL" &&
+                            caseTypeFilter === "ALL"
                         }
                         sx={filterStyles.clearFilterButton}
                     >
@@ -453,7 +551,9 @@ const AgentPqrs = () => {
                             updatingStatusId={updatingStatusId}
                             updatingPriorityId={updatingPriorityId}
                             statusValue={statusByPqrId[pqr.id] || pqr.status}
-                            priorityValue={priorityByPqrId[pqr.id] || pqr.priority || ""}
+                            priorityValue={
+                                priorityByPqrId[pqr.id] || pqr.priority || ""
+                            }
                             onTakePqr={handleTakePqr}
                             onStatusChange={handleStatusChange}
                             onUpdateStatus={handleUpdateStatus}

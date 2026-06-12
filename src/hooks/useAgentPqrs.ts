@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type {
     AgentPqrView,
     MessageType,
@@ -13,9 +13,13 @@ import {
     updatePqrPriority,
     updatePqrStatus,
 } from "../services/pqrService";
+import {
+    getSocket,
+    listenPqrUnreadCountUpdated,
+} from "../services/socketService";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
-// Hook encargado de manejar la lógica de las PQR del agente.
+// Hook encargado de manejar la lógica principal de las PQR del agente.
 export const useAgentPqrs = () => {
     // PQR disponibles para ser tomadas por el agente.
     const [availablePqrs, setAvailablePqrs] = useState<Pqr[]>([]);
@@ -44,20 +48,6 @@ export const useAgentPqrs = () => {
 
     // Controla si se muestran PQR disponibles o asignadas.
     const [activeView, setActiveView] = useState<AgentPqrView>("AVAILABLE");
-
-    // Controla el filtro por estado.
-    const [statusFilter, setStatusFilter] = useState<"ALL" | PqrStatus>("ALL");
-
-    // Controla el filtro por prioridad.
-    const [priorityFilter, setPriorityFilter] = useState<
-        "ALL" | PqrPriority
-    >("ALL");
-
-    // Guarda el texto escrito en el buscador.
-    const [searchTerm, setSearchTerm] = useState("");
-
-    // Controla si el campo de búsqueda está visible.
-    const [showSearch, setShowSearch] = useState(false);
 
     // Guarda temporalmente el estado seleccionado por cada PQR.
     const [statusByPqrId, setStatusByPqrId] = useState<
@@ -110,8 +100,9 @@ export const useAgentPqrs = () => {
         } catch (error) {
             console.error(error);
 
-            setError("Error al cargar las PQR. Verifica que el usuario tenga el rol ADMIN o AGENT.");
-
+            setError(
+                "Error al cargar las PQR. Verifica que el usuario tenga el rol ADMIN o AGENT."
+            );
         } finally {
             setLoading(false);
         }
@@ -272,64 +263,36 @@ export const useAgentPqrs = () => {
         loadAgentPqrs();
     };
 
-    // Actualiza el texto del buscador.
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    };
-
-    // Abre o cierra el campo de búsqueda.
-    const toggleSearch = () => {
-        setShowSearch((prev) => !prev);
-    };
-
-    // Limpia el buscador y lo oculta.
-    const clearSearch = () => {
-        setSearchTerm("");
-        setShowSearch(false);
-    };
-
-    // Define qué lista se debe mostrar según la vista activa.
-    const currentPqrs =
-        activeView === "AVAILABLE" ? availablePqrs : assignedPqrs;
-
     // PQR seleccionada para mostrar en la vista del chat.
     const selectedChatPqr = assignedPqrs.find(
         (pqr) => pqr.id === selectedChatPqrId
     );
 
-    // Filtra las PQR por búsqueda, estado y prioridad.
-    const filteredPqrs = useMemo(() => {
-        const normalizedSearch = searchTerm.toLowerCase().trim();
-
-        return currentPqrs.filter((pqr) => {
-            const matchesSearch =
-                !normalizedSearch ||
-                pqr.description.toLowerCase().includes(normalizedSearch) ||
-                pqr.caseType.toLowerCase().includes(normalizedSearch) ||
-                pqr.status.toLowerCase().includes(normalizedSearch) ||
-                pqr.priority?.toLowerCase().includes(normalizedSearch) ||
-                pqr.user?.name?.toLowerCase().includes(normalizedSearch) ||
-                pqr.user?.email?.toLowerCase().includes(normalizedSearch);
-
-            const matchesStatus =
-                statusFilter === "ALL" || pqr.status === statusFilter;
-
-            const matchesPriority =
-                priorityFilter === "ALL" || pqr.priority === priorityFilter;
-
-            return matchesSearch && matchesStatus && matchesPriority;
-        });
-    }, [currentPqrs, searchTerm, statusFilter, priorityFilter]);
-
-    // Carga la información al abrir la vista.
+    // Carga la información al abrir la vista y escucha actualizaciones del contador de mensajes en tiempo real.
     useEffect(() => {
         loadAgentPqrs();
+
+        listenPqrUnreadCountUpdated((data) => {
+            setAssignedPqrs((currentPqrs) =>
+                currentPqrs.map((pqr) =>
+                    pqr.id === data.pqrId
+                        ? {
+                            ...pqr,
+                            unreadMessagesCount: data.unreadMessagesCount,
+                        }
+                        : pqr
+                )
+            );
+        });
+
+        return () => {
+            getSocket()?.off("pqr_unread_count_updated");
+        };
     }, []);
 
     return {
         availablePqrs,
         assignedPqrs,
-        filteredPqrs,
 
         loading,
         error,
@@ -339,18 +302,6 @@ export const useAgentPqrs = () => {
 
         activeView,
         setActiveView,
-
-        statusFilter,
-        setStatusFilter,
-
-        priorityFilter,
-        setPriorityFilter,
-
-        searchTerm,
-        showSearch,
-        handleSearchChange,
-        toggleSearch,
-        clearSearch,
 
         statusByPqrId,
         priorityByPqrId,

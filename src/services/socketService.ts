@@ -1,6 +1,6 @@
 import { io, type Socket } from "socket.io-client";
 import type { Notification } from "../interfaces/notification.interface";
-import type { PqrMessage } from "../interfaces/pqr.interface";
+import type { PqrMessage, PqrUnreadCountUpdatedData } from "../interfaces/pqr.interface";
 
 const SOCKET_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -56,6 +56,13 @@ export const listenNewPqrMessage = (
     socket?.on("new_pqr_message", callback);
 };
 
+// Escucha cuando se actualiza el contador de mensajes no revisados de una PQR.
+export const listenPqrUnreadCountUpdated = (
+    callback: (data: PqrUnreadCountUpdatedData) => void
+): void => {
+    socket?.on("pqr_unread_count_updated", callback);
+};
+
 // Escucha cuando llega una nueva notificación en tiempo real
 export const listenNewNotification = (
     callback: (notification: Notification) => void
@@ -73,6 +80,7 @@ export const listenSocketError = (
 // Limpia los listeners del chat para evitar duplicados
 export const removePqrSocketListeners = (): void => {
     socket?.off("new_pqr_message");
+    socket?.off("pqr_unread_count_updated");
     socket?.off("socket_error");
     socket?.off("joined_pqr");
 };
