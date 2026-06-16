@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
     Alert,
     Avatar,
@@ -74,6 +74,9 @@ export const PqrChatView = ({
     // Referencia al input oculto para seleccionar archivos.
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+    // Referencia del chat para bajar automáticamente al último mensaje.
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
     const isClosed = pqr.status === "CERRADA";
 
     const getStatusLabel = () => {
@@ -101,6 +104,13 @@ export const PqrChatView = ({
     const getAttachmentUrl = (fileUrl: string) => {
         return `${BACKEND_URL}${fileUrl}`;
     };
+
+    // Baja automáticamente al último mensaje cuando cambia el historial del chat.
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    }, [messages]);
 
     const style = {
         chatViewContainer: {
@@ -777,6 +787,8 @@ export const PqrChatView = ({
                             {chatError}
                         </Alert>
                     )}
+
+                    <Box ref={messagesEndRef} />
                 </Box>
 
                 {isClosed ? (
