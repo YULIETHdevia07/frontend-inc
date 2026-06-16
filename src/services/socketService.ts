@@ -80,7 +80,6 @@ export const listenSocketError = (
 // Limpia los listeners del chat para evitar duplicados
 export const removePqrSocketListeners = (): void => {
     socket?.off("new_pqr_message");
-    socket?.off("pqr_unread_count_updated");
     socket?.off("socket_error");
     socket?.off("joined_pqr");
 };
