@@ -5,17 +5,23 @@ import type {
     PqrPriority,
     PqrStatus,
 } from "../interfaces/pqr.interface";
+import type { User } from "../interfaces/user.interface";
 import {
+    assignPqr,
     getAllPqrs,
     updatePqrPriority,
     updatePqrStatus,
 } from "../services/pqrService";
+import { getAgents } from "../services/userService";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
 // Hook encargado de manejar la lógica administrativa de PQR.
 export const useAdminPqrs = () => {
     // Lista de todas las PQR del sistema.
     const [pqrs, setPqrs] = useState<Pqr[]>([]);
+
+    // Lista de agentes disponibles para asignar o reasignar PQR.
+    const [agents, setAgents] = useState<User[]>([]);
 
     // Controla la carga inicial de la vista.
     const [loading, setLoading] = useState(true);
@@ -33,6 +39,10 @@ export const useAdminPqrs = () => {
         null
     );
 
+    // Guarda el id de la PQR que se está asignando o reasignando.
+    const [assigningPqrId, setAssigningPqrId] = useState<number | null>(null);
+
+
     // Guarda temporalmente los estados seleccionados.
     const [statusChanges, setStatusChanges] = useState<Record<number, PqrStatus>>(
         {}
@@ -42,6 +52,9 @@ export const useAdminPqrs = () => {
     const [priorityChanges, setPriorityChanges] = useState<
         Record<number, PqrPriority>
     >({});
+
+    // Guarda temporalmente el agente seleccionado para cada PQR.
+    const [agentChanges, setAgentChanges] = useState<Record<number, number>>({});
 
     // Mensaje mostrado en el snackbar.
     const [message, setMessage] = useState("");
@@ -64,15 +77,19 @@ export const useAdminPqrs = () => {
         setOpenMessage(false);
     };
 
-    // Carga todas las PQR para el administrador.
+    // Carga todas las PQR y los agentes para el administrador.
     const loadAllPqrs = async () => {
         try {
             setLoading(true);
             setError("");
 
-            const response = await getAllPqrs();
+            const [pqrsResponse, agentsResponse] = await Promise.all([
+                getAllPqrs(),
+                getAgents(),
+            ]);
 
-            setPqrs(response.pqrs);
+            setPqrs(pqrsResponse.pqrs);
+            setAgents(agentsResponse.agents);
         } catch (error) {
             console.error(error);
 
@@ -113,7 +130,7 @@ export const useAdminPqrs = () => {
 
             const response = await updatePqrStatus(pqrId, newStatus);
 
-            // Actualiza inmediatamente la PQR modificada sin recargar toda la vista.
+             // Actualiza inmediatamente la PQR modificada sin recargar toda la vista.
             setPqrs((prev) =>
                 prev.map((pqr) =>
                     pqr.id === pqrId
@@ -126,7 +143,7 @@ export const useAdminPqrs = () => {
                 )
             );
 
-            // Limpia el cambio temporal después de actualizar la PQR.
+              // Limpia el cambio temporal después de actualizar la PQR.
             setStatusChanges((prev) => {
                 const updated = { ...prev };
                 delete updated[pqrId];
@@ -215,6 +232,72 @@ export const useAdminPqrs = () => {
         }
     };
 
+    // Guarda el agente seleccionado para una PQR.
+    const handleAgentChange = (pqrId: number, agentId: string) => {
+        setAgentChanges((prev) => {
+            const updated = { ...prev };
+
+            if (!agentId) {
+                delete updated[pqrId];
+                return updated;
+            }
+
+            updated[pqrId] = Number(agentId);
+            return updated;
+        });
+    };
+
+    // Asigna o reasigna una PQR a un agente.
+    const handleAssignPqr = async (pqrId: number) => {
+        const agentId = agentChanges[pqrId];
+
+        if (!agentId) {
+            showSnackbar("Debes seleccionar un agente.", "warning");
+            return;
+        }
+
+        try {
+            setAssigningPqrId(pqrId);
+
+            const response = await assignPqr(pqrId, agentId);
+
+            setPqrs((prev) =>
+                prev.map((pqr) =>
+                    pqr.id === pqrId
+                        ? {
+                            ...pqr,
+                            ...response.pqr,
+                        }
+                        : pqr
+                )
+            );
+
+            setAgentChanges((prev) => {
+                const updated = { ...prev };
+                delete updated[pqrId];
+                return updated;
+            });
+
+            showSnackbar(
+                response.message || "Responsable actualizado correctamente.",
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+
+            showSnackbar(
+                getErrorMessage(
+                    error,
+                    "Error al asignar o reasignar la PQR."
+                ),
+                "error"
+            );
+        } finally {
+            setAssigningPqrId(null);
+        }
+    };
+
+
     // Carga las PQR cuando se abre la vista.
     useEffect(() => {
         loadAllPqrs();
@@ -222,14 +305,17 @@ export const useAdminPqrs = () => {
 
     return {
         pqrs,
+        agents,
         loading,
         error,
 
         updatingStatusId,
         updatingPriorityId,
+        assigningPqrId,
 
         statusChanges,
         priorityChanges,
+        agentChanges,
 
         message,
         messageType,
@@ -241,5 +327,7 @@ export const useAdminPqrs = () => {
         handleUpdateStatus,
         handlePriorityChange,
         handleUpdatePriority,
+        handleAgentChange,
+        handleAssignPqr,
     };
 };

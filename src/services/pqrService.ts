@@ -129,6 +129,32 @@ export const takePqr = async (pqrId: number): Promise<TakePqrResponse> => {
   return response.data;
 };
 
+// Permite que un ADMIN asigne o reasigne una PQR a un AGENT.
+export const assignPqr = async (
+  pqrId: number,
+  agentId: number
+): Promise<SinglePqrResponse> => {
+  const response = await api.patch<SinglePqrResponse>(
+    `/pqrs/${pqrId}/assign`,
+    {
+      agentId,
+    }
+  );
+
+  return response.data;
+};
+
+// Permite que un ADMIN desasigne una PQR.
+export const unassignPqr = async (
+  pqrId: number
+): Promise<SinglePqrResponse> => {
+  const response = await api.patch<SinglePqrResponse>(
+    `/pqrs/${pqrId}/unassign`
+  );
+
+  return response.data;
+};
+
 // Obtiene las PQR asignadas al AGENT autenticado.
 export const getMyAssignedPqrs = async (): Promise<PqrResponse> => {
   const response = await api.get<PqrResponse>("/pqrs/assigned/my");

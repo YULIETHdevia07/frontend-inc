@@ -565,6 +565,8 @@ markPqrChatAsRead()
 sendPqrMessageWithAttachment()
 getAvailablePqrs()
 takePqr()
+assignPqr()
+unassignPqr()
 getMyAssignedPqrs()
 ratePqr()
 ```
@@ -608,6 +610,7 @@ Los archivos adjuntos no se envían directamente por Socket.IO. Primero se suben
 
 ```txt
 getAllUsers()
+getAgents()
 updateUserRole()
 uploadUsersBulk()
 ```
