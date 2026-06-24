@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ValidationError } from "yup";
-
-import { registerUser } from "../services/authService";
-import { registerSchema } from "../validations/authValidation";
-import type { RegisterFormErrors } from "../interfaces/auth.interface";
-import { getErrorMessage } from "../utils/getErrorMessage";
+import { registerUser } from "../../services/auth/authService";
+import { registerSchema } from "../../validations/auth/authValidation";
+import type { RegisterFormErrors } from "../../interfaces/auth/auth.interface";
+import { getErrorMessage } from "../../utils/common/getErrorMessage";
 
 // Estado inicial de los errores del formulario.
 const initialFormErrors: RegisterFormErrors = {

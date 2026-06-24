@@ -13,9 +13,9 @@ import AttachFileOutlinedIcon from "@mui/icons-material/AttachFileOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 
-import { useCreatePqr } from "../../hooks/useCreatePqr";
+import { useCreatePqr } from "../../hooks/pqrs/useCreatePqr";
 import { pqrCaseTypes } from "../../data/pqrOptions";
-import { formatFileSize } from "../../utils/fileUtils";
+import { formatFileSize } from "../../utils/common/fileUtils";
 
 import ClearableSelect from "../../components/common/ClearableSelect";
 import CustomSnackbar from "../../components/common/CustomSnackbar";

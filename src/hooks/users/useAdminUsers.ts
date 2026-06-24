@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import type { AlertColor } from "@mui/material";
-import type { User, UserRole } from "../interfaces/user.interface";
-import type { BulkUploadResult } from "../interfaces/bulkUpload.interface";
+import type { User, UserRole } from "../../interfaces/users/user.interface";
+import type { BulkUploadResult } from "../../interfaces/users/bulkUpload.interface";
 import {
     getAllUsers,
     updateUserRole,
     uploadUsersBulk,
-} from "../services/userService";
-import { getErrorMessage } from "../utils/getErrorMessage";
+} from "../../services/users/userService";
+import { getErrorMessage } from "../../utils/common/getErrorMessage";
 
 // Hook que centraliza la lógica de administración de usuarios
 export const useAdminUsers = () => {

@@ -3,7 +3,7 @@ import api from "../api/axios";
 import {
     connectSocket,
     disconnectSocket,
-} from "../services/socketService";
+} from "../services/sockets/socketService";
 
 interface User {
     id: number;

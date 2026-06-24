@@ -3,46 +3,46 @@ import { createTheme } from "@mui/material/styles";
 export const theme = createTheme({
   palette: {
     primary: {
-      main: "#1f2a7a",   // Azul oscuro del logo, menos morado
-      light: "#e6e9ff",  // Azul claro suave
-      dark: "#141a4d",   // Azul más oscuro para hover
+      main: "#044D9E",   // Azul principal del logo
+      light: "#E6F0FF",  // Azul claro suave para fondos
+      dark: "#073F84",   // Azul oscuro para hover
       contrastText: "#ffffff",
     },
 
     secondary: {
-      main: "#f2d31b",   // Amarillo del logo
-      light: "#fff7b0",
-      dark: "#c6a900",
-      contrastText: "#141a4d",
+      main: "#1AAD46",   // Verde principal del logo
+      light: "#DFF8E8",  // Verde claro suave
+      dark: "#0C9E40",   // Verde oscuro para hover
+      contrastText: "#ffffff",
     },
 
     background: {
-      default: "#f7f8ff",
+      default: "#F5F9FF", // Fondo general claro con tono azul
       paper: "#ffffff",
     },
 
     text: {
-      primary: "#141a4d",
-      secondary: "#5f6478",
+      primary: "#073F84",   // Azul oscuro del logo
+      secondary: "#5F6478",
     },
 
     error: {
-      main: "#d32f2f",
+      main: "#D32F2F",
     },
 
     success: {
-      main: "#2e7d32",
+      main: "#1AAD46", // Verde del logo
     },
 
     warning: {
-      main: "#ecca09",
+      main: "#F2C94C", // Amarillo suave solo para alertas
     },
 
     info: {
-      main:  "#0d47a1",
+      main: "#116CC2", // Azul medio del logo
     },
 
-    divider: "#dfe3f5",
+    divider: "#DDE8F7",
   },
 
   typography: {

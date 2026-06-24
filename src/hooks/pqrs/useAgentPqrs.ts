@@ -5,19 +5,19 @@ import type {
     Pqr,
     PqrPriority,
     PqrStatus,
-} from "../interfaces/pqr.interface";
+} from "../../interfaces/pqrs/pqr.interface";
 import {
     getAvailablePqrs,
     getMyAssignedPqrs,
     takePqr,
     updatePqrPriority,
     updatePqrStatus,
-} from "../services/pqrService";
+} from "../../services/pqrs/pqrService";
 import {
     getSocket,
     listenPqrUnreadCountUpdated,
-} from "../services/socketService";
-import { getErrorMessage } from "../utils/getErrorMessage";
+} from "../../services/sockets/socketService";
+import { getErrorMessage } from "../../utils/common/getErrorMessage";
 
 // Hook encargado de manejar la lógica principal de las PQR del agente.
 export const useAgentPqrs = () => {

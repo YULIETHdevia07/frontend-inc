@@ -16,7 +16,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationBell from "./NotificationBell";
-import { getUserRoleLabel } from "../../utils/userRoleUtils";
+import { getUserRoleLabel } from "../../utils/users/userRoleUtils";
 import { appBrand } from "../../data/appBrand";
 
 interface HeaderProps {

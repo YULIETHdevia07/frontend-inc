@@ -2,12 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type {
     PqrMessage,
     UsePqrChatParams,
-} from "../interfaces/pqr.interface";
+} from "../../interfaces/pqrs/pqr.interface";
 import {
     getPqrMessages,
     markPqrChatAsRead,
     sendPqrMessageWithAttachment,
-} from "../services/pqrService";
+} from "../../services/pqrs/pqrService";
 import {
     connectSocket,
     getSocket,
@@ -17,8 +17,8 @@ import {
     listenSocketError,
     removePqrSocketListeners,
     sendPqrMessage,
-} from "../services/socketService";
-import { getErrorMessage } from "../utils/getErrorMessage";
+} from "../../services/sockets/socketService";
+import { getErrorMessage } from "../../utils/common/getErrorMessage";
 
 // Hook encargado de manejar el historial, conexión y envío de mensajes del chat PQR.
 export const usePqrChat = ({ pqrId, token }: UsePqrChatParams) => {

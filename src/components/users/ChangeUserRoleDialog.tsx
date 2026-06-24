@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material";
 
-import type { User, UserRole } from "../../interfaces/user.interface";
+import type { User, UserRole } from "../../interfaces/users/user.interface";
 import { userRoles } from "../../data/userRoles";
-import { getUserRoleLabel } from "../../utils/userRoleUtils";
+import { getUserRoleLabel } from "../../utils/users/userRoleUtils";
 import UserRoleChip from "./UserRoleChip";
 
 interface ChangeUserRoleDialogProps {

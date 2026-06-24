@@ -19,12 +19,14 @@ import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 
-import type { PqrPriority, PqrStatus } from "../../interfaces/pqr.interface";
-import { formatDate } from "../../utils/dateUtils";
+import type { PqrPriority, PqrStatus } from "../../interfaces/pqrs/pqr.interface";
+import type { User } from "../../interfaces/users/user.interface";
+
+import { formatDate } from "../../utils/common/dateUtils";
 import {
     getCaseTypeLabel,
     getStatusColor,
-} from "../../utils/pqrUtils";
+} from "../../utils/pqrs/pqrUtils";
 import { pqrPriorityOptions, pqrStatusOptions } from "../../data/pqrOptions";
 
 import ClearableSelect from "../common/ClearableSelect";
@@ -38,6 +40,7 @@ type PqrTicketCardProps = {
         status: PqrStatus;
         priority?: PqrPriority | null;
         createdAt: string;
+        assignedToId?: number | null;
         unreadMessagesCount?: number;
         rating?: number | null;
         ratingComment?: string | null;
@@ -58,8 +61,13 @@ type PqrTicketCardProps = {
     updatingStatusId: number | null;
     updatingPriorityId: number | null;
 
+    assigningPqrId?: number | null;
+
     statusValue: PqrStatus;
     priorityValue: PqrPriority | "";
+
+    agents?: User[];
+    selectedAgentId?: number | "";
 
     onTakePqr: (pqrId: number) => void;
     onStatusChange: (pqrId: number, value: PqrStatus) => void;
@@ -67,6 +75,9 @@ type PqrTicketCardProps = {
     onPriorityChange: (pqrId: number, value: PqrPriority) => void;
     onUpdatePriority: (pqrId: number) => void;
     onOpenChat: (pqrId: number) => void;
+
+    onAgentChange?: (pqrId: number, value: string) => void;
+    onAssignPqr?: (pqrId: number) => void;
 };
 
 const PqrTicketCard = ({
@@ -75,20 +86,75 @@ const PqrTicketCard = ({
     takingPqrId,
     updatingStatusId,
     updatingPriorityId,
+    assigningPqrId,
     statusValue,
     priorityValue,
+    agents = [],
+    selectedAgentId = "",
     onTakePqr,
     onStatusChange,
     onUpdateStatus,
     onPriorityChange,
     onUpdatePriority,
     onOpenChat,
+    onAgentChange,
+    onAssignPqr,
 }: PqrTicketCardProps) => {
-
     const theme = useTheme();
 
+    // Obtiene la cantidad de mensajes no leídos de la PQR.
     const unreadMessagesCount = pqr.unreadMessagesCount ?? 0;
 
+    // Convierte la lista de agentes en opciones para el selector.
+    const agentOptions = agents.map((agent) => ({
+        value: String(agent.id),
+        label: `${agent.name} (${agent.email})`,
+    }));
+
+    // Convierte el agente seleccionado a número para poder compararlo.
+    const selectedAgentNumber = selectedAgentId
+        ? Number(selectedAgentId)
+        : null;
+
+    // Obtiene el agente que actualmente tiene asignada la PQR.
+    const currentAssignedAgentId = pqr.assignedToId ?? null;
+
+    // Valida si el agente seleccionado es el mismo que ya está asignado.
+    const isSameAssignedAgent =
+        currentAssignedAgentId !== null &&
+        selectedAgentNumber === currentAssignedAgentId;
+
+    // Controla si el botón Asignar o Reasignar debe estar habilitado.
+    const canAssignOrReassign =
+        selectedAgentNumber !== null &&
+        !isSameAssignedAgent &&
+        pqr.status !== "CERRADA";
+
+    // Obtiene el estado seleccionado en el formulario.
+    const selectedStatus = statusValue || null;
+
+    // Obtiene el estado actual de la PQR.
+    const currentStatus = pqr.status;
+
+    // Controla si el botón Guardar estado debe estar habilitado.
+    const canUpdateStatus =
+        selectedStatus !== null &&
+        selectedStatus !== currentStatus &&
+        pqr.status !== "CERRADA";
+
+    // Obtiene la prioridad seleccionada en el formulario.
+    const selectedPriority = priorityValue || null;
+
+    // Obtiene la prioridad actual de la PQR.
+    const currentPriority = pqr.priority ?? null;
+
+    // Controla si el botón Guardar prioridad debe estar habilitado.
+    const canUpdatePriority =
+        selectedPriority !== null &&
+        selectedPriority !== currentPriority &&
+        pqr.status !== "CERRADA";
+
+    // Obtiene el texto que se muestra para la prioridad.
     const getPriorityLabel = (priority?: PqrPriority | null) => {
         return (
             pqrPriorityOptions.find((option) => option.value === priority)
@@ -98,6 +164,7 @@ const PqrTicketCard = ({
         );
     };
 
+    // Obtiene el texto que se muestra para el estado.
     const getStatusLabel = (status: PqrStatus) => {
         return (
             pqrStatusOptions.find((option) => option.value === status)?.label ||
@@ -355,19 +422,24 @@ const PqrTicketCard = ({
                                 <>
                                     <SupportAgentOutlinedIcon
                                         fontSize="small"
-                                        sx={{ color: theme.palette.success.main }}
+                                        sx={{
+                                            color: theme.palette.success.main,
+                                        }}
                                     />
 
                                     <Typography sx={style.agentText}>
                                         {pqr.assignedTo.name || "Agente"} ·{" "}
-                                        {pqr.assignedTo.email || "Correo no disponible"}
+                                        {pqr.assignedTo.email ||
+                                            "Correo no disponible"}
                                     </Typography>
                                 </>
                             ) : (
                                 <>
                                     <PersonOffOutlinedIcon
                                         fontSize="small"
-                                        sx={{ color: theme.palette.text.disabled }}
+                                        sx={{
+                                            color: theme.palette.text.disabled,
+                                        }}
                                     />
 
                                     <Typography sx={style.noAgentText}>
@@ -434,6 +506,49 @@ const PqrTicketCard = ({
 
                     {activeView === "ASSIGNED" && (
                         <Box sx={style.assignedActions}>
+                            {/* Selector usado por ADMIN para asignar o reasignar una PQR. */}
+                            {onAgentChange && onAssignPqr && (
+                                <Box sx={style.actionRow}>
+                                    <ClearableSelect
+                                        label="Agente responsable"
+                                        value={
+                                            selectedAgentId
+                                                ? String(selectedAgentId)
+                                                : ""
+                                        }
+                                        disabled={pqr.status === "CERRADA"}
+                                        size="small"
+                                        minWidth="100%"
+                                        options={agentOptions}
+                                        onChange={(value) =>
+                                            onAgentChange(pqr.id, value)
+                                        }
+                                    />
+
+                                    <Button
+                                        variant="contained"
+                                        disabled={
+                                            assigningPqrId === pqr.id ||
+                                            !canAssignOrReassign
+                                        }
+                                        onClick={() => onAssignPqr(pqr.id)}
+                                        sx={style.smallButton}
+                                    >
+                                        {assigningPqrId === pqr.id ? (
+                                            <CircularProgress
+                                                size={18}
+                                                color="inherit"
+                                            />
+                                        ) : pqr.assignedToId ? (
+                                            "Reasignar"
+                                        ) : (
+                                            "Asignar"
+                                        )}
+                                    </Button>
+                                </Box>
+                            )}
+
+                            {/* Selector usado para cambiar el estado de una PQR. */}
                             <Box sx={style.actionRow}>
                                 <ClearableSelect
                                     label="Estado"
@@ -455,7 +570,7 @@ const PqrTicketCard = ({
                                     variant="contained"
                                     disabled={
                                         updatingStatusId === pqr.id ||
-                                        pqr.status === "CERRADA"
+                                        !canUpdateStatus
                                     }
                                     onClick={() => onUpdateStatus(pqr.id)}
                                     sx={style.smallButton}
@@ -471,6 +586,7 @@ const PqrTicketCard = ({
                                 </Button>
                             </Box>
 
+                            {/* Selector usado para cambiar la prioridad de una PQR. */}
                             <Box sx={style.actionRow}>
                                 <ClearableSelect
                                     label="Prioridad"
@@ -492,7 +608,7 @@ const PqrTicketCard = ({
                                     variant="contained"
                                     disabled={
                                         updatingPriorityId === pqr.id ||
-                                        pqr.status === "CERRADA"
+                                        !canUpdatePriority
                                     }
                                     onClick={() => onUpdatePriority(pqr.id)}
                                     sx={style.smallButton}
@@ -508,6 +624,7 @@ const PqrTicketCard = ({
                                 </Button>
                             </Box>
 
+                            {/* Abre el chat de la PQR y muestra mensajes no leídos. */}
                             <Button
                                 variant="outlined"
                                 onClick={() => onOpenChat(pqr.id)}

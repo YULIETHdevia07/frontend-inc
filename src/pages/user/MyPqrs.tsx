@@ -31,16 +31,16 @@ import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlin
 import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 
-import type { PqrStatus } from "../../interfaces/pqr.interface";
+import type { PqrStatus } from "../../interfaces/pqrs/pqr.interface";
 
-import { useMyPqrs } from "../../hooks/useMyPqrs";
+import { useMyPqrs } from "../../hooks/pqrs/useMyPqrs";
 import { useAuth } from "../../context/AuthContext";
-import { usePqrChat } from "../../hooks/usePqrChat";
-import { formatDate } from "../../utils/dateUtils";
+import { usePqrChat } from "../../hooks/pqrs/usePqrChat";
+import { formatDate } from "../../utils/common/dateUtils";
 import {
     getCaseTypeLabel,
     getStatusColor,
-} from "../../utils/pqrUtils";
+} from "../../utils/pqrs/pqrUtils";
 
 import PageHeader from "../../components/common/PageHeader";
 import LoadingBox from "../../components/common/LoadingBox";

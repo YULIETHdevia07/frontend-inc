@@ -1,11 +1,11 @@
 import { Chip } from "@mui/material";
 
-import type { UserRole } from "../../interfaces/user.interface";
+import type { UserRole } from "../../interfaces/users/user.interface";
 import {
     getUserRoleColor,
     getUserRoleIcon,
     getUserRoleLabel,
-} from "../../utils/userRoleUtils";
+} from "../../utils/users/userRoleUtils";
 
 interface UserRoleChipProps {
     role: UserRole;

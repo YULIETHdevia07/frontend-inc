@@ -10,7 +10,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-import { useLogin } from "../hooks/useLogin";
+import { useLogin } from "../hooks/auth/useLogin";
 import { appBrand } from "../data/appBrand";
 
 const Login = () => {

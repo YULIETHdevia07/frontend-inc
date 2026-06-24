@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Notification } from "../interfaces/notification.interface";
+import type { Notification } from "../../interfaces/notifications/notification.interface";
 import {
     getNotifications,
     getUnreadNotificationsCount,
     markAllNotificationsAsRead,
     markNotificationAsRead,
-} from "../services/notificationService";
+} from "../../services/notifications/notificationService";
 import {
     listenNewNotification,
     removeNotificationSocketListeners,
-} from "../services/socketService";
+} from "../../services/sockets/socketService";
 
 // Maneja la lógica de las notificaciones del usuario autenticado
 export const useNotifications = () => {

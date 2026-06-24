@@ -1,8 +1,8 @@
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import { theme } from "../theme/theme";
-import { toExcelColor } from "../utils/excelUtils";
-import type { WorksheetWithDataValidations } from "../interfaces/excel.interface";
+import { theme } from "../../theme/theme";
+import { toExcelColor } from "../../utils/common/excelUtils";
+import type { WorksheetWithDataValidations } from "../../interfaces/users/excel.interface";
 
 export const downloadBulkUsersTemplate = async () => {
   const workbook = new ExcelJS.Workbook();

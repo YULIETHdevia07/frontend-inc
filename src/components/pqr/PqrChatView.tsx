@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
     Alert,
     Avatar,
@@ -24,14 +24,14 @@ import AttachFileOutlinedIcon from "@mui/icons-material/AttachFileOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
-import type { Pqr, PqrMessage, UserRole } from "../../interfaces/pqr.interface";
+import type { Pqr, PqrMessage, UserRole } from "../../interfaces/pqrs/pqr.interface";
 import {
     getCaseTypeLabel,
     getStatusColor,
-} from "../../utils/pqrUtils";
+} from "../../utils/pqrs/pqrUtils";
 import { pqrStatusOptions } from "../../data/pqrOptions";
-import { getInitials } from "../../utils/avatarUtils";
-import { formatDate } from "../../utils/dateUtils";
+import { getInitials } from "../../utils/common/avatarUtils";
+import { formatDate } from "../../utils/common/dateUtils";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -74,6 +74,9 @@ export const PqrChatView = ({
     // Referencia al input oculto para seleccionar archivos.
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+    // Referencia del chat para bajar automáticamente al último mensaje.
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
     const isClosed = pqr.status === "CERRADA";
 
     const getStatusLabel = () => {
@@ -101,6 +104,13 @@ export const PqrChatView = ({
     const getAttachmentUrl = (fileUrl: string) => {
         return `${BACKEND_URL}${fileUrl}`;
     };
+
+    // Baja automáticamente al último mensaje cuando cambia el historial del chat.
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    }, [messages]);
 
     const style = {
         chatViewContainer: {
@@ -777,6 +787,8 @@ export const PqrChatView = ({
                             {chatError}
                         </Alert>
                     )}
+
+                    <Box ref={messagesEndRef} />
                 </Box>
 
                 {isClosed ? (

@@ -23,11 +23,11 @@ import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlined";
 import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
 
-import type { PqrPriority, PqrStatus } from "../../interfaces/pqr.interface";
+import type { PqrPriority, PqrStatus } from "../../interfaces/pqrs/pqr.interface";
 
-import { useAgentPqrs } from "../../hooks/useAgentPqrs";
+import { useAgentPqrs } from "../../hooks/pqrs/useAgentPqrs";
 import { useAuth } from "../../context/AuthContext";
-import { usePqrChat } from "../../hooks/usePqrChat";
+import { usePqrChat } from "../../hooks/pqrs/usePqrChat";
 
 import PageHeader from "../../components/common/PageHeader";
 import LoadingBox from "../../components/common/LoadingBox";
@@ -39,7 +39,7 @@ import { PqrChatView } from "../../components/pqr/PqrChatView";
 import StatsSummary from "../../components/common/StatsSummary";
 import PqrTicketCard from "../../components/pqr/PqrTicketCard";
 import ViewToggleButtons from "../../components/common/ViewToggleButtons";
-import { getCaseTypeLabel } from "../../utils/pqrUtils";
+import { getCaseTypeLabel } from "../../utils/pqrs/pqrUtils";
 
 // Página del agente para tomar PQR, responderlas por chat y cambiar su estado y prioridad.
 const AgentPqrs = () => {

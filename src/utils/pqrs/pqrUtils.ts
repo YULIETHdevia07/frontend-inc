@@ -1,5 +1,5 @@
 import type { ChipProps } from "@mui/material";
-import type { PqrStatus } from "../interfaces/pqr.interface";
+import type { PqrStatus } from "../../interfaces/pqrs/pqr.interface";
 
 // Devuelve el color del estado para el Chip.
 export const getStatusColor = (

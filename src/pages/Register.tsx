@@ -11,7 +11,7 @@ import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
 import { appBrand } from "../data/appBrand";
-import { useRegister } from "../hooks/useRegister";
+import { useRegister } from "../hooks/auth/useRegister";
 import CustomSnackbar from "../components/common/CustomSnackbar";
 
 const Register = () => {

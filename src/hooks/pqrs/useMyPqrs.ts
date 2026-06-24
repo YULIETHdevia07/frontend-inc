@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import type { MessageType, Pqr } from "../interfaces/pqr.interface";
-import { getMyPqrs, ratePqr } from "../services/pqrService";
+import type { MessageType, Pqr } from "../../interfaces/pqrs/pqr.interface";
+import { getMyPqrs, ratePqr } from "../../services/pqrs/pqrService";
 import {
   getSocket,
   listenPqrUnreadCountUpdated,
-} from "../services/socketService";
-import { getErrorMessage } from "../utils/getErrorMessage";
+} from "../../services/sockets/socketService";
+import { getErrorMessage } from "../../utils/common/getErrorMessage";
 
 // Hook encargado de manejar las PQR del usuario autenticado.
 export const useMyPqrs = () => {

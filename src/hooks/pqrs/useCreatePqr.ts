@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ValidationError } from "yup";
-import { createPqr } from "../services/pqrService";
-import { createPqrSchema } from "../validations/pqrValidation";
-import type { CreatePqrFormErrors } from "../interfaces/pqr.interface";
-import { getErrorMessage } from "../utils/getErrorMessage";
+import { createPqr } from "../../services/pqrs/pqrService";
+import { createPqrSchema } from "../../validations/pqrs/pqrValidation";
+import type { CreatePqrFormErrors } from "../../interfaces/pqrs/pqr.interface";
+import { getErrorMessage } from "../../utils/common/getErrorMessage";
 
 // Estado inicial de los errores del formulario.
 const initialFormErrors: CreatePqrFormErrors = {

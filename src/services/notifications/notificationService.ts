@@ -1,10 +1,10 @@
-import api from "../api/axios";
+import api from "../../api/axios";
 import type {
     MarkAllNotificationsAsReadResponse,
     MarkNotificationAsReadResponse,
     NotificationsResponse,
     UnreadNotificationsCountResponse,
-} from "../interfaces/notification.interface";
+} from "../../interfaces/notifications/notification.interface";
 
 // Obtiene las notificaciones del usuario autenticado
 export const getNotifications = async () => {

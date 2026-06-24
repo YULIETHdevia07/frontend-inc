@@ -19,14 +19,14 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 
-import type { PqrPriority, PqrStatus } from "../../interfaces/pqr.interface";
+import type { PqrPriority, PqrStatus } from "../../interfaces/pqrs/pqr.interface";
 
-import { useAdminPqrs } from "../../hooks/useAdminPqrs";
-import { usePqrChat } from "../../hooks/usePqrChat";
+import { useAdminPqrs } from "../../hooks/pqrs/useAdminPqrs";
+import { usePqrChat } from "../../hooks/pqrs/usePqrChat";
 
 import {
     getCaseTypeLabel,
-} from "../../utils/pqrUtils";
+} from "../../utils/pqrs/pqrUtils";
 
 import PageHeader from "../../components/common/PageHeader";
 import LoadingBox from "../../components/common/LoadingBox";
@@ -45,14 +45,17 @@ const AdminPqrs = () => {
 
     const {
         pqrs,
+        agents,
         loading,
         error,
 
         updatingStatusId,
         updatingPriorityId,
+        assigningPqrId,
 
         statusChanges,
         priorityChanges,
+        agentChanges,
 
         message,
         messageType,
@@ -64,6 +67,8 @@ const AdminPqrs = () => {
         handleUpdateStatus,
         handlePriorityChange,
         handleUpdatePriority,
+        handleAgentChange,
+        handleAssignPqr,
     } = useAdminPqrs();
 
     // Controla el texto escrito en el buscador.
@@ -554,21 +559,26 @@ const AdminPqrs = () => {
                             key={pqr.id}
                             pqr={pqr}
                             activeView="ASSIGNED"
-
-                            // Admin no usa la acción de tomar PQR.
                             takingPqrId={null}
                             onTakePqr={() => { }}
-
                             updatingStatusId={updatingStatusId}
                             updatingPriorityId={updatingPriorityId}
                             statusValue={statusChanges[pqr.id] || pqr.status}
-                            priorityValue={priorityChanges[pqr.id] || pqr.priority || ""}
-
+                            priorityValue={
+                                priorityChanges[pqr.id] || pqr.priority || ""
+                            }
                             onStatusChange={handleStatusChange}
                             onUpdateStatus={handleUpdateStatus}
                             onPriorityChange={handlePriorityChange}
                             onUpdatePriority={handleUpdatePriority}
                             onOpenChat={openPqrChat}
+                            agents={agents}
+                            selectedAgentId={
+                                agentChanges[pqr.id] || pqr.assignedToId || ""
+                            }
+                            assigningPqrId={assigningPqrId}
+                            onAgentChange={handleAgentChange}
+                            onAssignPqr={handleAssignPqr}
                         />
                     ))}
                 </Box>

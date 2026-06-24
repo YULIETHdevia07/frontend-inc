@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import api from "../../api/axios";
 import type {
   CreatePqrData,
   PqrMessagesResponse,
@@ -10,7 +10,7 @@ import type {
   RatePqrResponse,
   SinglePqrResponse,
   TakePqrResponse,
-} from "../interfaces/pqr.interface";
+} from "../../interfaces/pqrs/pqr.interface";
 
 // Crea una nueva PQR. Endpoint usado por USER.
 export const createPqr = async (
@@ -126,6 +126,32 @@ export const getAvailablePqrs = async (): Promise<PqrResponse> => {
 // Permite que un AGENT tome una PQR.
 export const takePqr = async (pqrId: number): Promise<TakePqrResponse> => {
   const response = await api.patch<TakePqrResponse>(`/pqrs/${pqrId}/take`);
+  return response.data;
+};
+
+// Permite que un ADMIN asigne o reasigne una PQR a un AGENT.
+export const assignPqr = async (
+  pqrId: number,
+  agentId: number
+): Promise<SinglePqrResponse> => {
+  const response = await api.patch<SinglePqrResponse>(
+    `/pqrs/${pqrId}/assign`,
+    {
+      agentId,
+    }
+  );
+
+  return response.data;
+};
+
+// Permite que un ADMIN desasigne una PQR.
+export const unassignPqr = async (
+  pqrId: number
+): Promise<SinglePqrResponse> => {
+  const response = await api.patch<SinglePqrResponse>(
+    `/pqrs/${pqrId}/unassign`
+  );
+
   return response.data;
 };
 

@@ -1,10 +1,10 @@
-import api from "../api/axios";
+import api from "../../api/axios";
 import type {
     LoginData,
     LoginResponse,
     RegisterData,
     RegisterResponse,
-} from "../interfaces/auth.interface";
+} from "../../interfaces/auth/auth.interface";
 
 // Inicia sesión con correo y contraseña.
 export const loginUser = async (

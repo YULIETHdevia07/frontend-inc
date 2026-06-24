@@ -20,8 +20,8 @@ import {
 import { alpha, useTheme } from "@mui/material/styles";
 import { useMemo, useState } from "react";
 
-import { useNotifications } from "../../hooks/useNotifications";
-import { formatDate } from "../../utils/dateUtils";
+import { useNotifications } from "../../hooks/notifications/useNotifications";
+import { formatDate } from "../../utils/common/dateUtils";
 
 type NotificationCategory = "ALL" | "UNREAD";
 

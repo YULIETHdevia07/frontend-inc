@@ -4,7 +4,7 @@ import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettin
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 
-import type { UserRole } from "../interfaces/user.interface";
+import type { UserRole } from "../../interfaces/users/user.interface";
 
 // Define el color visual del rol del usuario
 export const getUserRoleColor = (role: UserRole): ChipProps["color"] => {

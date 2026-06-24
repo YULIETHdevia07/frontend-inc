@@ -1,6 +1,6 @@
 import { io, type Socket } from "socket.io-client";
-import type { Notification } from "../interfaces/notification.interface";
-import type { PqrMessage, PqrUnreadCountUpdatedData } from "../interfaces/pqr.interface";
+import type { PqrMessage, PqrUnreadCountUpdatedData } from "../../interfaces/pqrs/pqr.interface";
+import type { Notification } from "../../interfaces/notifications/notification.interface";
 
 const SOCKET_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -80,7 +80,6 @@ export const listenSocketError = (
 // Limpia los listeners del chat para evitar duplicados
 export const removePqrSocketListeners = (): void => {
     socket?.off("new_pqr_message");
-    socket?.off("pqr_unread_count_updated");
     socket?.off("socket_error");
     socket?.off("joined_pqr");
 };

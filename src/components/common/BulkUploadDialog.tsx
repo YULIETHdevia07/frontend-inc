@@ -26,7 +26,7 @@ import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutli
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
-import type { BulkUploadDialogProps } from "../../interfaces/bulkUpload.interface";
+import type { BulkUploadDialogProps } from "../../interfaces/users/bulkUpload.interface";
 
 // Componente reutilizable para cargas masivas con archivo Excel.
 const BulkUploadDialog = <T,>({
