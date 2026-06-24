@@ -282,6 +282,7 @@ Ejemplos:
 data/
 ├── appBrand.ts
 ├── menuItems.ts
+├── pqrOptions.ts
 └── userRoles.ts
 ```
 
@@ -335,62 +336,135 @@ Centralizar las opciones de navegación del sistema.
 ```
 ---
 
-#### `userRoles.ts`
+#### `pqrOptions.ts`
 
-Este archivo contiene la información relacionada con los roles disponibles en el sistema.
+El archivo `pqrOptions.ts` contiene las opciones estáticas utilizadas en el módulo de PQR.
 
-Puede utilizarse para definir listas de roles, etiquetas visibles para el usuario o valores utilizados en formularios y filtros.
+Su objetivo principal es centralizar las listas que se usan en formularios, filtros y controles de selección relacionados con las solicitudes PQR. De esta manera, los tipos de caso, estados y prioridades no se escriben repetidamente dentro de los componentes o páginas.
 
-
-Responsabilidad principal:
-
-```txt
-Centralizar los roles del sistema para reutilizarlos en formularios, tablas, filtros y componentes visuales.
-```
+| Constante            | Descripción                                                               | Uso dentro del proyecto                                                                                        |
+| -------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `pqrCaseTypes`       | Contiene los tipos de caso disponibles al momento de crear una nueva PQR. | Se utiliza en formularios donde el usuario selecciona el tipo de solicitud que desea crear.                    |
+| `pqrStatusOptions`   | Contiene los estados disponibles para una PQR.                            | Se utiliza en filtros, selectores o acciones administrativas para consultar o cambiar el estado de una PQR.    |
+| `pqrPriorityOptions` | Contiene las prioridades disponibles para una PQR.                        | Se utiliza en filtros o selectores donde el administrador o agente define la prioridad de atención de una PQR. |
 
 ---
 
+#### `userRoles.ts`
+
+El archivo `userRoles.ts` contiene la lista de roles disponibles dentro del sistema.
+
+Su objetivo principal es centralizar los roles que pueden asignarse a los usuarios, evitando escribirlos manualmente en diferentes componentes, formularios o filtros.
+
+Este archivo importa el tipo `UserRole` desde la interfaz de usuario para asegurar que los roles definidos correspondan con los valores permitidos por el sistema.
+
+| Constante   | Descripción                                         | Uso dentro del proyecto                                                                                    |
+| ----------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `userRoles` | Contiene la lista de roles disponibles del sistema. | Se utiliza en formularios, filtros y componentes donde se necesita seleccionar o mostrar roles de usuario. |
+
+---
 ### `src/hooks/`
 
-Esta carpeta contiene hooks personalizados.
+Los hooks permiten separar la lógica de una página o componente, dejando los componentes visuales más limpios, organizados y fáciles de mantener.
 
-Los hooks permiten separar la lógica de una página o componente, dejando el componente visual más limpio y fácil de entender.
+En lugar de manejar toda la lógica directamente dentro de las páginas, los hooks se encargan de procesos como consultar datos, enviar formularios, manejar estados de carga, controlar errores, escuchar eventos en tiempo real y ejecutar acciones relacionadas con cada módulo.
 
-Ejemplos:
+---
+
+#### Estructura
 
 ```txt
 hooks/
-├── useAdminPqrs.ts
-├── useAdminUsers.ts
-├── useAgentPqrs.ts
-├── useCreatePqr.ts
-├── useLogin.ts
-├── useMyPqrs.ts
-├── useNotifications.ts
-├── usePqrChat.ts
-└── useRegister.ts
+│
+├── auth/
+│   ├── useLogin.ts
+│   └── useRegister.ts
+│
+├── notifications/
+│   └── useNotifications.ts
+│
+├── pqrs/
+│   ├── useAdminPqrs.ts
+│   ├── useAgentPqrs.ts
+│   ├── useCreatePqr.ts
+│   ├── useMyPqrs.ts
+│   └── usePqrChat.ts
+│
+└── users/
+    └── useAdminUsers.ts
 ```
-| Hook                  | Descripción                                                                                                                                                                                                                                      | Uso dentro del proyecto                             |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
-| `useAdminPqrs.ts`     | Maneja la lógica relacionada con la administración de PQR, consulta de solicitudes, cambio de estados, prioridades, asignación de agentes y acciones administrativas.                                                                            | Se utiliza en el módulo administrativo de PQR.      |
-| `useAdminUsers.ts`    | Maneja la lógica relacionada con la administración de usuarios, carga de usuarios, cambio de roles, carga masiva y mensajes de respuesta.                                                                                                        | Se utiliza en el módulo administrativo de usuarios. |
-| `useAgentPqrs.ts`     | Maneja la lógica de las PQR disponibles y asignadas a los agentes, permitiendo consultar solicitudes, tomar casos y gestionar la atención de las PQR. También actualiza en tiempo real el contador de mensajes sin revisar en las PQR asignadas. | Se utiliza en el módulo de agente.                  |
-| `useCreatePqr.ts`     | Maneja la lógica del formulario para crear una nueva PQR, incluyendo datos del formulario, archivo adjunto, validaciones, mensajes de éxito y errores.                                                                                           | Se utiliza en la página `CreatePqr.tsx`.            |
-| `useLogin.ts`         | Maneja la lógica del inicio de sesión, validación del formulario, mensajes de error, estado de carga y redirección del usuario.                                                                                                                  | Se utiliza en la página `Login.tsx`.                |
-| `useMyPqrs.ts`        | Maneja la lógica para consultar y mostrar las PQR creadas por el usuario autenticado, incluyendo sus estados, detalles, chat, calificación cuando aplica y contador de mensajes sin revisar.                                                     | Se utiliza en la página `MyPqrs.tsx`.               |
-| `useNotifications.ts` | Maneja la lógica de notificaciones del usuario autenticado, contador de no leídas, marcado de notificaciones y escucha de nuevas notificaciones por Socket.IO.                                                                                   | Se utiliza en `NotificationBell.tsx`.               |
-| `usePqrChat.ts`       | Maneja la lógica del chat de una PQR, carga de mensajes, envío de mensajes, archivos adjuntos, escucha de nuevos mensajes en tiempo real por Socket.IO y marcado del chat como leído cuando el usuario lo abre.                                  | Se utiliza en `PqrChatView.tsx`.                    |
-| `useRegister.ts`      | Maneja la lógica del registro de usuarios, validación del formulario, mensajes de éxito o error, estado de carga y redirección al inicio de sesión.                                                                                              | Se utiliza en la página `Register.tsx`.             |
 
 ---
 
 #### Responsabilidad principal
 
 ```txt
-Separar la lógica del componente visual.
+Separar la lógica de negocio, estado y eventos de los componentes visuales.
 ```
 
-Los hooks permiten que los componentes se enfoquen en mostrar la interfaz, mientras que la carga de datos, conexión con servicios, manejo de estados y eventos queda centralizada en archivos reutilizables.
+Los hooks permiten que las páginas y componentes se enfoquen principalmente en mostrar la interfaz, mientras que la lógica de consulta, validación, envío de datos y manejo de respuestas queda centralizada en archivos reutilizables.
+
+---
+
+#### Hooks del módulo de autenticación
+
+```txt
+hooks/auth/
+├── useLogin.ts
+└── useRegister.ts
+```
+
+| Hook             | Descripción                                                                                                                                         | Uso dentro del proyecto                 |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `useLogin.ts`    | Maneja la lógica del inicio de sesión, validación del formulario, mensajes de error, estado de carga y redirección del usuario.                     | Se utiliza en la página `Login.tsx`.    |
+| `useRegister.ts` | Maneja la lógica del registro de usuarios, validación del formulario, mensajes de éxito o error, estado de carga y redirección al inicio de sesión. | Se utiliza en la página `Register.tsx`. |
+
+---
+
+#### Hooks del módulo de notificaciones
+
+```txt
+hooks/notifications/
+└── useNotifications.ts
+```
+
+| Hook                  | Descripción                                                                                                                                                                   | Uso dentro del proyecto               |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `useNotifications.ts` | Maneja la lógica de notificaciones del usuario autenticado, contador de notificaciones no leídas, marcado de notificaciones y escucha de nuevas notificaciones por Socket.IO. | Se utiliza en `NotificationBell.tsx`. |
+
+---
+
+#### Hooks del módulo de PQR
+
+```txt
+hooks/pqrs/
+├── useAdminPqrs.ts
+├── useAgentPqrs.ts
+├── useCreatePqr.ts
+├── useMyPqrs.ts
+└── usePqrChat.ts
+```
+
+| Hook              | Descripción                                                                                                                                                                                                                                      | Uso dentro del proyecto                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `useAdminPqrs.ts` | Maneja la lógica relacionada con la administración de PQR, consulta de solicitudes, cambio de estados, prioridades, asignación de agentes y acciones administrativas.                                                                            | Se utiliza en el módulo administrativo de PQR. |
+| `useAgentPqrs.ts` | Maneja la lógica de las PQR disponibles y asignadas a los agentes, permitiendo consultar solicitudes, tomar casos y gestionar la atención de las PQR. También actualiza en tiempo real el contador de mensajes sin revisar en las PQR asignadas. | Se utiliza en el módulo de agente.             |
+| `useCreatePqr.ts` | Maneja la lógica del formulario para crear una nueva PQR, incluyendo datos del formulario, archivo adjunto, validaciones, mensajes de éxito y errores.                                                                                           | Se utiliza en la página `CreatePqr.tsx`.       |
+| `useMyPqrs.ts`    | Maneja la lógica para consultar y mostrar las PQR creadas por el usuario autenticado, incluyendo estados, detalles, chat, calificación cuando aplica y contador de mensajes sin revisar.                                                         | Se utiliza en la página `MyPqrs.tsx`.          |
+| `usePqrChat.ts`   | Maneja la lógica del chat de una PQR, carga de mensajes, envío de mensajes, archivos adjuntos, escucha de nuevos mensajes en tiempo real por Socket.IO y marcado del chat como leído cuando el usuario lo abre.                                  | Se utiliza en `PqrChatView.tsx`.               |
+
+---
+
+#### Hooks del módulo de usuarios
+
+```txt
+hooks/users/
+└── useAdminUsers.ts
+```
+
+| Hook               | Descripción                                                                                                                               | Uso dentro del proyecto                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `useAdminUsers.ts` | Maneja la lógica relacionada con la administración de usuarios, carga de usuarios, cambio de roles, carga masiva y mensajes de respuesta. | Se utiliza en el módulo administrativo de usuarios. |
 
 ---
 
@@ -398,38 +472,87 @@ Los hooks permiten que los componentes se enfoquen en mostrar la interfaz, mient
 
 Esta carpeta contiene las interfaces y tipos de TypeScript que definen la estructura de los datos utilizados en el proyecto.
 
-Aquí se declaran los tipos que representan entidades como usuarios, roles, PQR, mensajes, notificaciones, respuestas del backend o datos que se envían desde formularios.
+Aquí se declaran los tipos que representan entidades como usuarios, roles, autenticación, PQR, mensajes, archivos adjuntos, notificaciones, respuestas del backend, carga masiva y datos enviados desde formularios.
 
-Ejemplos:
-
-```txt
-interfaces/
-├── auth.interface.ts
-├── bulkUpload.interface.ts
-├── excel.interface.ts
-├── notification.interface.ts
-├── pqr.interface.ts
-└── user.interface.ts
-```
-
-| Archivo                     | Descripción                                                                                                                                                                                    | Uso dentro del proyecto                                                                                                                                                                     |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.interface.ts`         | Define los tipos relacionados con autenticación, login, registro, respuestas del backend y errores de validación de los formularios.                                                           | Se utiliza en servicios, hooks, contexto y páginas relacionadas con inicio de sesión y registro.                                                                                            |
-| `bulkUpload.interface.ts`   | Define los tipos relacionados con la carga masiva de datos, archivos seleccionados, resultados del proceso y posibles errores de importación.                                                  | Se utiliza en componentes, hooks o servicios relacionados con la carga masiva de usuarios u otros registros.                                                                                |
-| `excel.interface.ts`        | Define los tipos relacionados con la estructura y manejo de archivos Excel dentro del frontend.                                                                                                | Se utiliza en funciones o plantillas encargadas de generar, leer o preparar archivos de Excel.                                                                                              |
-| `notification.interface.ts` | Define los tipos e interfaces relacionados con las notificaciones del sistema.                                                                                                                 | Se utiliza en `notificationService.ts`, `useNotifications.ts`, `NotificationBell.tsx` y eventos de Socket.IO.                                                                               |
-| `pqr.interface.ts`          | Define los tipos relacionados con PQR, mensajes del chat, archivos adjuntos, estados, prioridades, tipos de caso, contador de mensajes sin revisar y datos usados en el módulo de solicitudes. | Se utiliza en servicios, hooks, componentes y páginas del módulo PQR para tipar solicitudes, mensajes, adjuntos, respuestas del backend y eventos relacionados con el contador de mensajes. |
-| `user.interface.ts`         | Define los tipos relacionados con usuarios, roles y datos utilizados en la administración de usuarios.                                                                                         | Se utiliza en administración de usuarios, servicios, hooks y componentes relacionados con roles.                                                                                            |
+Las interfaces permiten que el frontend tenga un tipado más seguro, claro y fácil de mantener, evitando repetir estructuras de datos en diferentes archivos.
 
 ---
 
-#### Responsabilidad principal
+#### Estructura
 
 ```txt
-Centralizar los tipos e interfaces para evitar repetir estructuras en diferentes archivos.
+interfaces/
+│
+├── auth/
+│   └── auth.interface.ts
+│
+├── notifications/
+│   └── notification.interface.ts
+│
+├── pqrs/
+│   └── pqr.interface.ts
+│
+└── users/
+    ├── user.interface.ts
+    ├── bulkUpload.interface.ts
+    └── excel.interface.ts
 ```
 
-Esta carpeta ayuda a que el código sea más seguro, claro y fácil de mantener, ya que permite reutilizar los mismos tipos en páginas, componentes, hooks y servicios.
+---
+
+#### Interfaces del módulo de autenticación
+
+```txt
+interfaces/auth/
+└── auth.interface.ts
+```
+
+| Archivo             | Descripción                                                                                                                          | Uso dentro del proyecto                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `auth.interface.ts` | Define los tipos relacionados con autenticación, inicio de sesión, registro, respuestas del backend y datos del usuario autenticado. | Se utiliza en servicios, hooks, contexto y páginas relacionadas con login, registro y sesión. |
+
+---
+
+#### Interfaces del módulo de notificaciones
+
+```txt
+interfaces/notifications/
+└── notification.interface.ts
+```
+
+| Archivo                     | Descripción                                                                             | Uso dentro del proyecto                                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `notification.interface.ts` | Define los tipos e interfaces relacionados con las notificaciones internas del sistema. | Se utiliza en `notificationService.ts`, `useNotifications.ts`, `NotificationBell.tsx` y eventos de Socket.IO. |
+
+---
+
+#### Interfaces del módulo de PQR
+
+```txt
+interfaces/pqrs/
+└── pqr.interface.ts
+```
+
+| Archivo            | Descripción                                                                                                                                                        | Uso dentro del proyecto                                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pqr.interface.ts` | Define los tipos relacionados con PQR, mensajes del chat, archivos adjuntos, estados, prioridades, tipos de caso, calificación y contador de mensajes sin revisar. | Se utiliza en servicios, hooks, componentes y páginas del módulo PQR para tipar solicitudes, mensajes, adjuntos, respuestas del backend y eventos relacionados. |
+
+---
+
+#### Interfaces del módulo de usuarios
+
+```txt
+interfaces/users/
+├── user.interface.ts
+├── bulkUpload.interface.ts
+└── excel.interface.ts
+```
+
+| Archivo                   | Descripción                                                                                                                          | Uso dentro del proyecto                                                                                                     |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `user.interface.ts`       | Define los tipos relacionados con usuarios, roles, agentes, administradores y datos de perfil.                                       | Se utiliza en administración de usuarios, servicios, hooks, componentes relacionados con roles y contexto de autenticación. |
+| `bulkUpload.interface.ts` | Define los tipos relacionados con carga masiva de usuarios, archivos seleccionados, resultados del proceso y errores de importación. | Se utiliza en componentes, hooks y servicios relacionados con la carga masiva de usuarios.                                  |
+| `excel.interface.ts`      | Define los tipos relacionados con la estructura y manejo de archivos Excel dentro del frontend.                                      | Se utiliza en funciones o plantillas encargadas de generar, leer o preparar archivos de Excel.                              |
 
 ---
 
@@ -496,30 +619,61 @@ Centralizar la navegación del sistema.
 
 Esta carpeta contiene las funciones encargadas de comunicarse con el backend.
 
-Aquí se centralizan tanto las peticiones HTTP realizadas con Axios como la comunicación en tiempo real mediante Socket.IO.
+Aquí se centralizan las peticiones HTTP realizadas con Axios y la comunicación en tiempo real mediante Socket.IO. Su objetivo principal es evitar que los componentes, páginas o hooks llamen directamente a la API o configuren manualmente la conexión con sockets.
 
-Estructura:
-
-```txt
-services/
-├── authService.ts
-├── notificationService.ts
-├── pqrService.ts
-├── socketService.ts
-└── userService.ts
-```
-
-| Archivo                  | Descripción                                                                              | Uso dentro del proyecto                                                                                                                                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `authService.ts`         | Contiene las funciones relacionadas con la autenticación del usuario.                    | Se utiliza para iniciar sesión, registrar usuarios y manejar procesos relacionados con el acceso al sistema.                                                                                                         |
-| `notificationService.ts` | Contiene las funciones HTTP relacionadas con las notificaciones del usuario autenticado. | Se utiliza para consultar notificaciones, obtener el contador de no leídas y marcar notificaciones como leídas.                                                                                                      |
-| `pqrService.ts`          | Contiene las funciones HTTP relacionadas con las PQR.                                    | Se utiliza para crear PQR, consultar solicitudes, cambiar estados, asignar agentes, cambiar prioridad, calificar el servicio, cargar el historial de mensajes, enviar archivos adjuntos y marcar el chat como leído. |
-| `socketService.ts`       | Contiene la configuración y funciones generales de Socket.IO para el frontend.           | Se utiliza para conectar el socket, desconectarlo, manejar el chat de PQR, escuchar notificaciones en tiempo real y actualizar el contador de mensajes sin revisar.                                                  |
-| `userService.ts`         | Contiene las funciones relacionadas con la administración de usuarios.                   | Se utiliza para consultar usuarios, actualizar roles y realizar carga masiva de usuarios.                                                                                                                            |
+Los servicios permiten mantener separada la lógica de comunicación con el backend, dejando que las páginas y componentes se enfoquen en mostrar la información y manejar la interacción del usuario.
 
 ---
 
-#### Funciones en `authService.ts`
+#### Estructura
+
+```txt
+services/
+│
+├── auth/
+│   └── authService.ts
+│
+├── notifications/
+│   └── notificationService.ts
+│
+├── pqrs/
+│   └── pqrService.ts
+│
+├── sockets/
+│   └── socketService.ts
+│
+└── users/
+    └── userService.ts
+```
+
+---
+
+#### Responsabilidad principal de `services/`
+
+```txt
+Separar las peticiones HTTP y la comunicación en tiempo real de los componentes visuales.
+```
+
+Los componentes no deberían llamar directamente a Axios ni configurar directamente Socket.IO.
+
+Lo ideal es que usen funciones centralizadas en los servicios. Esto permite que páginas, hooks y componentes se enfoquen en mostrar información y manejar la interacción del usuario, mientras que los servicios se encargan de la comunicación con el backend.
+
+---
+
+#### Servicios del módulo de autenticación
+
+```txt
+services/auth/
+└── authService.ts
+```
+
+| Archivo          | Descripción                                                           | Uso dentro del proyecto                                                            |
+| ---------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `authService.ts` | Contiene las funciones relacionadas con la autenticación del usuario. | Se utiliza para iniciar sesión, registrar usuarios y manejar el acceso al sistema. |
+
+---
+
+##### Funciones en `authService.ts`
 
 ```txt
 login()
@@ -530,7 +684,20 @@ Estas funciones permiten enviar los datos del usuario al backend para iniciar se
 
 ---
 
-#### Funciones en `notificationService.ts`
+#### Servicios del módulo de notificaciones
+
+```txt
+services/notifications/
+└── notificationService.ts
+```
+
+| Archivo                  | Descripción                                                                              | Uso dentro del proyecto                                                                                         |
+| ------------------------ | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `notificationService.ts` | Contiene las funciones HTTP relacionadas con las notificaciones del usuario autenticado. | Se utiliza para consultar notificaciones, obtener el contador de no leídas y marcar notificaciones como leídas. |
+
+---
+
+##### Funciones en `notificationService.ts`
 
 ```txt
 getNotifications()
@@ -552,7 +719,20 @@ Marcar todas las notificaciones como leídas.
 
 ---
 
-#### Funciones en `pqrService.ts`
+#### Servicios del módulo de PQR
+
+```txt
+services/pqrs/
+└── pqrService.ts
+```
+
+| Archivo         | Descripción                                           | Uso dentro del proyecto                                                                                                                                                                                              |
+| --------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pqrService.ts` | Contiene las funciones HTTP relacionadas con las PQR. | Se utiliza para crear PQR, consultar solicitudes, cambiar estados, asignar agentes, cambiar prioridad, calificar el servicio, cargar el historial de mensajes, enviar archivos adjuntos y marcar el chat como leído. |
+
+---
+
+##### Funciones en `pqrService.ts`
 
 ```txt
 createPqr()
@@ -565,15 +745,49 @@ markPqrChatAsRead()
 sendPqrMessageWithAttachment()
 getAvailablePqrs()
 takePqr()
+assignPqr()
+unassignPqr()
 getMyAssignedPqrs()
 ratePqr()
 ```
 
 Estas funciones permiten manejar las operaciones principales del módulo de PQR mediante peticiones HTTP al backend.
 
+Se utilizan para:
+
+```txt
+Crear solicitudes PQR.
+Consultar PQR del usuario autenticado.
+Consultar todas las PQR desde administración.
+Consultar PQR disponibles para agentes.
+Consultar PQR asignadas al agente autenticado.
+Tomar una PQR disponible.
+Asignar o reasignar una PQR.
+Desasignar una PQR.
+Cambiar estado de una PQR.
+Cambiar prioridad de una PQR.
+Obtener mensajes del chat.
+Marcar el chat como leído.
+Enviar mensajes con archivo adjunto.
+Calificar una PQR cerrada.
+```
+
 ---
 
-#### Funciones en `socketService.ts`
+#### Servicios de Socket.IO
+
+```txt
+services/sockets/
+└── socketService.ts
+```
+
+| Archivo            | Descripción                                                                    | Uso dentro del proyecto                                                                                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `socketService.ts` | Contiene la configuración y funciones generales de Socket.IO para el frontend. | Se utiliza para conectar y desconectar el socket, manejar el chat de PQR, escuchar notificaciones en tiempo real y actualizar contadores de mensajes sin revisar. |
+
+---
+
+##### Funciones en `socketService.ts`
 
 ```txt
 connectSocket()
@@ -592,38 +806,43 @@ removeNotificationSocketListeners()
 
 Estas funciones permiten manejar la comunicación en tiempo real mediante Socket.IO.
 
-El archivo `socketService.ts` es general porque el socket ahora se utiliza para dos funcionalidades:
+El archivo `socketService.ts` es general porque el socket se utiliza para varias funcionalidades del sistema:
 
 ```txt
-1. Chat en tiempo real de PQR.
-2. Notificaciones internas en tiempo real.
+Chat en tiempo real de PQR.
+Notificaciones internas en tiempo real.
+Actualización de contadores de mensajes sin revisar.
 ```
 
 En el chat de PQR, Socket.IO se utiliza para enviar mensajes de texto y recibir nuevos mensajes en tiempo real.
 
 Los archivos adjuntos no se envían directamente por Socket.IO. Primero se suben mediante HTTP usando `FormData`, y luego el backend emite el evento `new_pqr_message` para actualizar el chat en tiempo real.
+
 ---
 
-#### Funciones en `userService.ts`
+#### Servicios del módulo de usuarios
+
+```txt
+services/users/
+└── userService.ts
+```
+
+| Archivo          | Descripción                                                            | Uso dentro del proyecto                                                                                    |
+| ---------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `userService.ts` | Contiene las funciones relacionadas con la administración de usuarios. | Se utiliza para consultar usuarios, obtener agentes, actualizar roles y realizar carga masiva de usuarios. |
+
+---
+
+##### Funciones en `userService.ts`
 
 ```txt
 getAllUsers()
+getAgents()
 updateUserRole()
 uploadUsersBulk()
 ```
 
-Estas funciones permiten consultar los usuarios registrados y actualizar el rol de un usuario desde el módulo administrativo.
-
----
-#### Responsabilidad principal de `services/`
-
-```txt
-Separar las peticiones HTTP y la comunicación en tiempo real de los componentes visuales.
-```
-
-Los componentes no deberían llamar directamente a Axios ni configurar directamente Socket.IO.
-
-Lo ideal es que usen funciones centralizadas en los servicios. Esto permite que páginas, hooks y componentes se enfoquen en mostrar información y manejar la interacción del usuario, mientras que los servicios se encargan de la comunicación con el backend.
+Estas funciones permiten consultar los usuarios registrados, obtener los agentes disponibles, actualizar el rol de un usuario y realizar carga masiva desde un archivo Excel.
 
 ---
 
@@ -708,24 +927,51 @@ downloadBulkUsersTemplate()
 
 Esta carpeta contiene funciones auxiliares reutilizables del proyecto.
 
-Los archivos ubicados en `utils/` no representan componentes visuales, páginas ni servicios. Su función es guardar lógica pequeña y reutilizable que puede usarse en diferentes partes del sistema.
+Los archivos ubicados en `utils/` no representan componentes visuales, páginas, hooks ni servicios. Su función principal es guardar lógica pequeña, reutilizable y fácil de mantener, que puede usarse en diferentes partes del sistema.
+
+---
+
+#### Estructura
 
 ```txt
 utils/
 │
+├── common/
+│   ├── avatarUtils.ts
+│   ├── dateUtils.ts
+│   ├── excelUtils.ts
+│   ├── fileUtils.ts
+│   ├── formatText.ts
+│   └── getErrorMessage.ts
+│
+├── pqrs/
+│   └── pqrUtils.ts
+│
+└── users/
+    └── userRoleUtils.tsx
+```
+
+---
+
+#### Utilidades comunes
+
+Los archivos ubicados en `utils/common/` contienen funciones generales que pueden utilizarse en diferentes módulos del sistema.
+
+Estas utilidades no pertenecen exclusivamente a PQR, usuarios, notificaciones o créditos, ya que pueden reutilizarse en varias partes del frontend.
+
+```txt
+utils/common/
 ├── avatarUtils.ts
 ├── dateUtils.ts
 ├── excelUtils.ts
 ├── fileUtils.ts
 ├── formatText.ts
-├── getErrorMessage.ts
-├── pqrUtils.ts
-└── userRoleUtils.tsx
+└── getErrorMessage.ts
 ```
 
 ---
 
-#### `avatarUtils.ts`
+##### `avatarUtils.ts`
 
 Este archivo contiene funciones auxiliares relacionadas con la visualización de nombres o avatares dentro del sistema.
 
@@ -739,7 +985,7 @@ getInitials()
 
 ---
 
-#### `dateUtils.ts`
+##### `dateUtils.ts`
 
 Este archivo contiene funciones auxiliares relacionadas con el formato de fechas.
 
@@ -751,11 +997,11 @@ formatDate()
 | ------------------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `formatDate(date)` | Convierte una fecha en formato legible en español de Colombia. | Se utiliza para mostrar fechas de creación, actualización, mensajes, registros o cualquier dato temporal dentro del sistema. |
 
-Este archivo se separó de `pqrUtils.ts` porque el formato de fechas no pertenece exclusivamente al módulo de PQR. De esta manera, puede reutilizarse en otros módulos como usuarios, dashboard, reportes o solicitudes.
+Este archivo se ubica en `utils/common/` porque el formato de fechas puede utilizarse en diferentes módulos como PQR, usuarios, notificaciones, dashboard o futuros módulos como créditos.
 
 ---
 
-#### `excelUtils.ts`
+##### `excelUtils.ts`
 
 Este archivo contiene funciones auxiliares relacionadas con el manejo de datos o formatos utilizados en archivos de Excel.
 
@@ -769,7 +1015,7 @@ toExcelColor()
 
 ---
 
-#### `fileUtils.ts`
+##### `fileUtils.ts`
 
 Este archivo contiene funciones auxiliares relacionadas con la visualización y formato de información de archivos.
 
@@ -783,7 +1029,7 @@ formatFileSize()
 
 ---
 
-#### `formatText.ts`
+##### `formatText.ts`
 
 Este archivo contiene funciones auxiliares para transformar textos antes de mostrarlos en la interfaz.
 
@@ -795,11 +1041,9 @@ capitalizeText()
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `capitalizeText(text)` | Convierte un texto a formato capitalizado, dejando solo la primera letra en mayúscula y el resto en minúscula. Por ejemplo, transforma `ADMIN` en `Admin`. | Se utiliza para mostrar textos técnicos del sistema de una forma más amigable para el usuario, como roles, estados u otros valores que vienen en mayúscula desde el backend. |
 
-Este archivo se ubica en `utils/` porque contiene una función pequeña y reutilizable de formato de texto.
-
 ---
 
-#### `getErrorMessage.ts`
+##### `getErrorMessage.ts`
 
 Este archivo contiene una función auxiliar encargada de extraer mensajes de error enviados por el backend.
 
@@ -813,7 +1057,18 @@ getErrorMessage()
 
 ---
 
-#### `pqrUtils.ts`
+#### Utilidades del módulo PQR
+
+Los archivos ubicados en `utils/pqrs/` contienen funciones específicas del módulo de PQR.
+
+```txt
+utils/pqrs/
+└── pqrUtils.ts
+```
+
+---
+
+##### `pqrUtils.ts`
 
 Este archivo contiene funciones auxiliares relacionadas con la visualización de información del módulo de PQR.
 
@@ -827,9 +1082,22 @@ getCaseTypeLabel()
 | `getStatusColor(status)`     | Devuelve el color que debe mostrarse en un componente `Chip` de Material UI según el estado de la PQR. | Se utiliza para representar visualmente estados como `PENDIENTE`, `EN_PROCESO` o `CERRADA`.                                                                                 |
 | `getCaseTypeLabel(caseType)` | Convierte el tipo de caso de una PQR en un texto más claro y legible para el usuario.                  | Se utiliza para mostrar tipos como `SAP`, `BEAS`, `Terminal`, `Correo`, `Intranet`, `Soporte Equipos`, `Soporte Red`, `Mi Portal SAP`, `LegalisApp` o `Nuevas Solicitudes`. |
 
+Este archivo se ubica en `utils/pqrs/` porque contiene funciones específicas del módulo de PQR.
+
 ---
 
-#### `userRoleUtils.tsx`
+#### Utilidades del módulo de usuarios
+
+Los archivos ubicados en `utils/users/` contienen funciones específicas del módulo de usuarios.
+
+```txt
+utils/users/
+└── userRoleUtils.tsx
+```
+
+---
+
+##### `userRoleUtils.tsx`
 
 Este archivo contiene funciones auxiliares relacionadas con la visualización de los roles de usuario dentro del sistema.
 
@@ -839,25 +1107,13 @@ getUserRoleIcon()
 getUserRoleLabel()
 ```
 
-| Función                  | Descripción                                                                                          | Uso dentro del proyecto                                                             |
-| ------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Función                  | Descripción                                                                                          | Uso dentro del proyecto                                                            |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | `getUserRoleColor(role)` | Devuelve el color visual que debe tener un rol de usuario en componentes como `Chip` de Material UI. | Se utiliza para diferenciar visualmente roles como administrador, agente o usuario. |
-| `getUserRoleIcon(role)`  | Retorna el ícono correspondiente según el rol del usuario.                                           | Se utiliza en componentes visuales donde se muestra el rol acompañado de un ícono.  |
-| `getUserRoleLabel(role)` | Convierte el rol técnico del sistema en un texto más claro para mostrar al usuario.                  | Se utiliza para mostrar etiquetas como `Administrador`, `Agente` o `Usuario`.       |
+| `getUserRoleIcon(role)`  | Retorna el ícono correspondiente según el rol del usuario.                                           | Se utiliza en componentes visuales donde se muestra el rol acompañado de un ícono. |
+| `getUserRoleLabel(role)` | Convierte el rol técnico del sistema en un texto más claro para mostrar al usuario.                  | Se utiliza para mostrar etiquetas como `Administrador`, `Agente` o `Usuario`.      |
 
 Este archivo conserva la extensión `.tsx` porque una de sus funciones retorna íconos de Material UI como componentes JSX.
-
----
-
-#### Regla de organización de `utils/`
-
-```txt
-Si una función transforma, formatea o adapta datos pequeños, puede ir en utils/.
-Si una función genera un archivo completo o una plantilla descargable, debe ir en templates/.
-Si una función se comunica con el backend, debe ir en services/.
-Si una función maneja estado o lógica de una vista, debe ir en hooks/.
-Si una función contiene validaciones de formularios, debe ir en validations/.
-```
 
 ---
 
@@ -865,45 +1121,73 @@ Si una función contiene validaciones de formularios, debe ir en validations/.
 
 Esta carpeta contiene los esquemas de validación del proyecto, normalmente creados con Yup.
 
-Las validaciones permiten controlar que los datos ingresados en los formularios cumplan con las reglas necesarias antes de ser enviados al backend.
+Las validaciones permiten controlar que los datos ingresados en los formularios cumplan con las reglas necesarias antes de ser enviados al backend. De esta manera, se evitan envíos incompletos, datos inválidos o errores que pueden prevenirse desde el frontend.
 
-Ejemplos:
+---
+
+#### Estructura
 
 ```txt
 validations/
-├── authValidation.ts
-└── pqrValidation.ts
+│
+├── auth/
+│   └── authValidation.ts
+│
+└── pqrs/
+    └── pqrValidation.ts
 ```
-
-| Archivo             | Descripción                                                                                        | Uso dentro del proyecto                                          |
-| ------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `authValidation.ts` | Contiene las reglas de validación para los formularios de inicio de sesión y registro de usuarios. | Se utiliza en `useLogin.ts` y `useRegister.ts`.                  |
-| `pqrValidation.ts`  | Contiene las reglas de validación relacionadas con la creación de  una solicitud PQR.              | Se utiliza en hooks y páginas relacionadas con el módulo de PQR. |
 
 ---
 
-#### Responsabilidad principal
+#### Validaciones del módulo de autenticación
 
 ```txt
-Centralizar reglas de validación de formularios.
+validations/auth/
+└── authValidation.ts
 ```
 
----
+##### `authValidation.ts`
 
-#### `authValidation.ts`
+Este archivo contiene las reglas de validación relacionadas con los formularios de autenticación del sistema.
+
+Se utiliza para validar los datos ingresados por el usuario antes de iniciar sesión o registrarse.
 
 ```txt
 loginSchema()
 registerSchema()
 ```
 
+| Esquema            | Descripción                                                                                    | Uso dentro del proyecto         |
+| ------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------- |
+| `loginSchema()`    | Valida los datos necesarios para iniciar sesión, como correo y contraseña.                     | Se utiliza en `useLogin.ts`.    |
+| `registerSchema()` | Valida los datos necesarios para registrar un nuevo usuario, como nombre, correo y contraseña. | Se utiliza en `useRegister.ts`. |
+
+Este archivo permite mantener las reglas de autenticación centralizadas y evita repetir validaciones directamente en las páginas `Login.tsx` o `Register.tsx`.
+
 ---
 
-#### `pqrValidation.ts`
+#### Validaciones del módulo de PQR
+
+```txt
+validations/pqrs/
+└── pqrValidation.ts
+```
+
+##### `pqrValidation.ts`
+
+Este archivo contiene las reglas de validación relacionadas con el módulo de PQR.
+
+Se utiliza principalmente para validar los datos del formulario de creación de una solicitud, antes de enviarla al backend.
 
 ```txt
 createPqrSchema()
 ```
+
+| Esquema             | Descripción                                                                            | Uso dentro del proyecto                             |
+| ------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `createPqrSchema()` | Valida los datos necesarios para crear una nueva PQR, como tipo de caso y descripción. | Se utiliza en hooks y páginas relacionadas con PQR. |
+
+Este archivo permite validar que la información ingresada por el usuario sea correcta antes de crear una solicitud PQR.
 
 ---
 
