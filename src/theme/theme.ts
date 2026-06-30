@@ -3,35 +3,35 @@ import { createTheme } from "@mui/material/styles";
 export const theme = createTheme({
   palette: {
     primary: {
-      main: "#044D9E",   // Azul principal del logo
-      light: "#E6F0FF",  // Azul claro suave para fondos
-      dark: "#073F84",   // Azul oscuro para hover
+      main: "#1f2a7a",   // Azul oscuro del logo, menos morado
+      light: "#e6e9ff",  // Azul claro suave
+      dark: "#141a4d",   // Azul más oscuro para hover
       contrastText: "#ffffff",
     },
 
     secondary: {
-      main: "#1AAD46",   // Verde principal del logo
-      light: "#DFF8E8",  // Verde claro suave
-      dark: "#0C9E40",   // Verde oscuro para hover
-      contrastText: "#ffffff",
+      main: "#f2d31b",   // Amarillo del logo
+      light: "#fff7b0",
+      dark: "#c6a900",
+      contrastText: "#141a4d",
     },
 
     background: {
-      default: "#F5F9FF", // Fondo general claro con tono azul
+      default: "#f7f8ff",
       paper: "#ffffff",
     },
 
     text: {
-      primary: "#073F84",   // Azul oscuro del logo
-      secondary: "#5F6478",
+      primary: "#141a4d",
+      secondary: "#5f6478",
     },
 
     error: {
-      main: "#D32F2F",
+      main: "#d32f2f",
     },
 
     success: {
-      main: "#1AAD46", // Verde del logo
+      main: "#2e7d32",
     },
 
     warning: {

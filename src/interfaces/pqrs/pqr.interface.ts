@@ -10,9 +10,6 @@ export type UserRole = "USER" | "ADMIN" | "AGENT";
 // Vistas disponibles en la página del agente.
 export type AgentPqrView = "AVAILABLE" | "ASSIGNED";
 
-// Tipos de mensajes usados en alertas o snackbar.
-export type MessageType = "success" | "error" | "info" | "warning";
-
 // Tipos de archivos adjuntos permitidos en el chat de PQR.
 export type PqrAttachmentType = "IMAGE" | "DOCUMENT";
 

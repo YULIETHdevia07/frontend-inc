@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type {
     AgentPqrView,
-    MessageType,
     Pqr,
     PqrPriority,
     PqrStatus,
@@ -18,6 +17,7 @@ import {
     listenPqrUnreadCountUpdated,
 } from "../../services/sockets/socketService";
 import { getErrorMessage } from "../../utils/common/getErrorMessage";
+import type { MessageType } from "../../interfaces/common/message.interface";
 
 // Hook encargado de manejar la lógica principal de las PQR del agente.
 export const useAgentPqrs = () => {

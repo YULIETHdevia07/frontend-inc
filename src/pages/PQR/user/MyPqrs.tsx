@@ -31,26 +31,26 @@ import PendingActionsOutlinedIcon from "@mui/icons-material/PendingActionsOutlin
 import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 
-import type { PqrStatus } from "../../interfaces/pqrs/pqr.interface";
+import type { PqrStatus } from "../../../interfaces/pqrs/pqr.interface";
 
-import { useMyPqrs } from "../../hooks/pqrs/useMyPqrs";
-import { useAuth } from "../../context/AuthContext";
-import { usePqrChat } from "../../hooks/pqrs/usePqrChat";
-import { formatDate } from "../../utils/common/dateUtils";
+import { useMyPqrs } from "../../../hooks/pqrs/useMyPqrs";
+import { useAuth } from "../../../context/AuthContext";
+import { usePqrChat } from "../../../hooks/pqrs/usePqrChat";
+import { formatDate } from "../../../utils/common/dateUtils";
 import {
     getCaseTypeLabel,
     getStatusColor,
-} from "../../utils/pqrs/pqrUtils";
+} from "../../../utils/pqrs/pqrUtils";
 
-import PageHeader from "../../components/common/PageHeader";
-import LoadingBox from "../../components/common/LoadingBox";
-import EmptyState from "../../components/common/EmptyState";
-import CustomSnackbar from "../../components/common/CustomSnackbar";
-import StatsSummary from "../../components/common/StatsSummary";
-import { getFilterStyles } from "../../styles/filterStyles";
-import { pqrStatusOptions } from "../../data/pqrOptions";
-import PqrRatingSummary from "../../components/pqr/PqrRatingSummary";
-import { PqrChatView } from "../../components/pqr/PqrChatView";
+import PageHeader from "../../../components/common/PageHeader";
+import LoadingBox from "../../../components/common/LoadingBox";
+import EmptyState from "../../../components/common/EmptyState";
+import CustomSnackbar from "../../../components/common/CustomSnackbar";
+import StatsSummary from "../../../components/common/StatsSummary";
+import { getFilterStyles } from "../../../styles/filterStyles";
+import { pqrStatusOptions } from "../../../data/pqrOptions";
+import PqrRatingSummary from "../../../components/pqr/PqrRatingSummary";
+import { PqrChatView } from "../../../components/pqr/PqrChatView";
 
 // Página donde el usuario consulta las PQR que ha creado.
 const MyPqrs = () => {

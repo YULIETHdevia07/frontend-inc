@@ -4,16 +4,16 @@ export const menuItems = [
     roles: ["USER"],
     submodules: [
       {
-        name: "Solicitudes",
+        name: "Mis solicitudes PQR",
         roles: ["USER"],
         options: [
           {
-            label: "Mis PQR",
+            label: "Ver mis PQR",
             path: "/dashboard/pqrs/my",
             roles: ["USER"],
           },
           {
-            label: "Crear PQR",
+            label: "Crear nueva PQR",
             path: "/dashboard/pqrs/create",
             roles: ["USER"],
           },
@@ -23,15 +23,15 @@ export const menuItems = [
   },
 
   {
-    module: "AGENT",
+    module: "PQR",
     roles: ["AGENT"],
     submodules: [
       {
-        name: "Gestión de PQR",
+        name: "Atención de solicitudes PQR",
         roles: ["AGENT"],
         options: [
           {
-            label: "Lista de PQR",
+            label: "PQR asignadas",
             path: "/agent/pqrs",
             roles: ["AGENT"],
           },
@@ -41,11 +41,11 @@ export const menuItems = [
   },
 
   {
-    module: "Gestión Administrativa",
+    module: "PQR",
     roles: ["ADMIN"],
     submodules: [
       {
-        name: "Administrar PQR",
+        name: "Administración de PQR",
         roles: ["ADMIN"],
         options: [
           {
@@ -55,12 +55,37 @@ export const menuItems = [
           },
         ],
       },
+    ],
+  },
+
+  {
+    module: "Talento Humano",
+    roles: ["USER", "ADMIN", "AGENT"],
+    submodules: [
       {
-        name: "Usuarios",
+        name: "Requisiciones de personal",
+        roles: ["USER", "ADMIN", "AGENT"],
+        options: [
+          {
+            label: "Crear requisición",
+            path: "/dashboard/human-talent/requisitions/create",
+            roles: ["USER", "ADMIN", "AGENT"],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    module: "Usuarios",
+    roles: ["ADMIN"],
+    submodules: [
+      {
+        name: "Gestión de usuarios",
         roles: ["ADMIN"],
         options: [
           {
-            label: "Gestionar usuarios",
+            label: "Administrar usuarios",
             path: "/users",
             roles: ["ADMIN"],
           },

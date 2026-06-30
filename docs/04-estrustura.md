@@ -125,6 +125,8 @@ components/
 │   ├── CustomSnackbar.tsx
 │   ├── DataTable.tsx
 │   ├── EmptyState.tsx
+│   ├── FormGrid.tsx
+│   ├── FormSection.tsx
 │   ├── Header.tsx
 │   ├── LoadingBox.tsx
 │   ├── NotificationBell.tsx
@@ -161,6 +163,8 @@ Estos componentes no pertenecen exclusivamente a un módulo, por lo tanto, puede
 | `CustomSnackbar.tsx`    | Componente reutilizable para mostrar mensajes temporales al usuario, como acciones exitosas, errores, advertencias o información.                                                                         | Puede utilizarse en cualquier vista que necesite notificar resultados de acciones realizadas.                                                                                 |
 | `DataTable.tsx`         | Componente reutilizable para mostrar información en formato de tabla. Puede recibir columnas, filas y acciones configuradas desde la vista donde se use.                                                  | Puede utilizarse para listar usuarios, PQR, roles, reportes u otros registros del sistema.                                                                                    |
 | `EmptyState.tsx`        | Componente reutilizable para mostrar un mensaje cuando no existen datos disponibles en una vista.                                                                                                         | Puede utilizarse cuando no hay usuarios, PQR, resultados de búsqueda o registros para mostrar.                                                                                |
+| `FormGrid.tsx`          | Componente reutilizable que organiza campos de formularios mediante CSS Grid. Permite definir columnas responsivas según el tamaño de pantalla.                                                           | Puede utilizarse en formularios de PQR, Talento Humano, usuarios, reportes u otros módulos que requieran distribuir campos de manera ordenada.                                |
+| `FormSection.tsx`       | Componente reutilizable que agrupa campos dentro de una sección visual con título y contenedor.                                                                                                           | Puede utilizarse para dividir formularios en secciones como información principal, motivo, contratación, datos adicionales o resultados.                                      |
 | `Header.tsx`            | Componente reutilizable que representa el encabezado superior del sistema. Puede mostrar información del usuario autenticado, acciones rápidas o el botón para abrir y cerrar el menú lateral.            | Se utiliza principalmente dentro del layout principal de las vistas protegidas.                                                                                               |
 | `LoadingBox.tsx`        | Componente reutilizable para mostrar un estado de carga mientras se obtiene información del backend.                                                                                                      | Puede utilizarse en tablas, formularios, vistas de detalle o cualquier módulo que cargue datos.                                                                               |
 | `NotificationBell.tsx`  | Componente reutilizable que muestra la campana de notificaciones, el contador de notificaciones no leídas y el listado de notificaciones del usuario autenticado.                                         | Se utiliza dentro de `Header.tsx` para mostrar novedades importantes del sistema, como creación, asignación, cierre o calificación de PQR.                                    |
@@ -281,6 +285,7 @@ Ejemplos:
 ```txt
 data/
 ├── appBrand.ts
+├── humanTalentOptions.ts
 ├── menuItems.ts
 ├── pqrOptions.ts
 └── userRoles.ts
@@ -320,6 +325,20 @@ Su objetivo principal es centralizar los datos relacionados con el nombre de la 
 | `logoIcon`      | Contiene la ruta del ícono del logo a color.            | Se utiliza cuando se necesita una versión más pequeña del logo, por ejemplo en menús contraídos o vistas responsive. |
 | `logoIconWhite` | Contiene la ruta del ícono del logo en color blanco.    | Se utiliza en fondos oscuros, barras laterales o encabezados institucionales.                                        |
 | `logoAlt`       | Contiene el texto alternativo de la imagen.             | Mejora la accesibilidad y sirve como descripción si la imagen no carga.                                              |
+
+---
+
+#### `humanTalentOptions.ts`
+
+El archivo `humanTalentOptions.ts` contiene las opciones estáticas utilizadas en el módulo de Talento Humano.
+
+| Constante                   | Descripción                                                                     | Uso dentro del proyecto                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `requisitionReasonOptions`  | Contiene los motivos permitidos para crear una requisición de personal.         | Se utiliza en el formulario de creación de requisición para seleccionar el motivo de la solicitud.            |
+| `contractTypeOptions`       | Contiene los tipos principales de contratación disponibles.                     | Se utiliza para seleccionar si la contratación será directa, temporal o practicante.                          |
+| `directContractTypeOptions` | Contiene las opciones permitidas cuando el tipo de contratación es directa.     | Se utiliza para seleccionar si el contrato directo será indefinido o fijo.                                    |
+| `internContractTypeOptions` | Contiene las opciones permitidas cuando el tipo de contratación es practicante. | Se utiliza para seleccionar si el practicante será aprendiz, pasante o rotante.                               |
+| `requisitionStatusOptions`  | Contiene los estados disponibles para una requisición de personal.              | Se utilizará en listados, filtros o vistas donde se necesite mostrar o consultar el estado de la requisición. |
 
 ---
 
@@ -380,6 +399,9 @@ hooks/
 │   ├── useLogin.ts
 │   └── useRegister.ts
 │
+├── humanTalent/
+│   └── useCreatePersonnelRequisition.ts
+│
 ├── notifications/
 │   └── useNotifications.ts
 │
@@ -418,6 +440,19 @@ hooks/auth/
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | `useLogin.ts`    | Maneja la lógica del inicio de sesión, validación del formulario, mensajes de error, estado de carga y redirección del usuario.                     | Se utiliza en la página `Login.tsx`.    |
 | `useRegister.ts` | Maneja la lógica del registro de usuarios, validación del formulario, mensajes de éxito o error, estado de carga y redirección al inicio de sesión. | Se utiliza en la página `Register.tsx`. |
+
+---
+
+#### Hooks del módulo de Talento Humano
+
+```txt
+hooks/humanTalent/
+└── useCreatePersonnelRequisition.ts
+```
+
+| Hook                               | Descripción                                                                                                                                                                                                                                                            | Uso dentro del proyecto                                   |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `useCreatePersonnelRequisition.ts` | Maneja la lógica del formulario para crear una requisición de personal. Controla los estados del formulario, carga áreas, perfiles de cargo y ciudades, valida los datos con Yup, limpia errores, muestra mensajes de éxito o error y envía la información al backend. | Se utiliza en la página `CreatePersonnelRequisition.tsx`. |
 
 ---
 
@@ -486,6 +521,13 @@ interfaces/
 ├── auth/
 │   └── auth.interface.ts
 │
+├── common/
+│   ├── city.interface.ts
+│   └── message.interface.ts
+│
+├── humanTalent/
+│   └── personnelRequisition.interface.ts
+│
 ├── notifications/
 │   └── notification.interface.ts
 │
@@ -510,6 +552,34 @@ interfaces/auth/
 | Archivo             | Descripción                                                                                                                          | Uso dentro del proyecto                                                                       |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
 | `auth.interface.ts` | Define los tipos relacionados con autenticación, inicio de sesión, registro, respuestas del backend y datos del usuario autenticado. | Se utiliza en servicios, hooks, contexto y páginas relacionadas con login, registro y sesión. |
+
+---
+
+#### Interfaces comunes
+
+```txt
+interfaces/common/
+├── city.interface.ts
+└── message.interface.ts
+```
+
+| Archivo                | Descripción                                                                                                    | Uso dentro del proyecto                                                                                           |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `city.interface.ts`    | Define los tipos relacionados con las ciudades activas del sistema y la respuesta del backend al consultarlas. | Se utiliza en servicios y formularios que necesitan cargar ciudades, como Talento Humano u otros módulos futuros. |
+| `message.interface.ts` | Define el tipo común `MessageType`, usado para mensajes visuales como alertas o snackbar.                      | Se utiliza en diferentes módulos para evitar repetir tipos como `success`, `error`, `info` y `warning`.           |
+
+---
+
+#### Interfaces del módulo de Talento Humano
+
+```txt
+interfaces/humanTalent/
+└── personnelRequisition.interface.ts
+```
+
+| Archivo                             | Descripción                                                                                                                                                                                                                                     | Uso dentro del proyecto                                                                                        |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `personnelRequisition.interface.ts` | Define los tipos e interfaces relacionados con la requisición de personal, incluyendo motivos, tipos de contratación, contrato directo, practicantes, estados, formulario, errores de validación, payload de creación y respuestas del backend. | Se utiliza en servicios, hooks y páginas relacionadas con la creación y consulta de requisiciones de personal. |
 
 ---
 
@@ -567,20 +637,22 @@ Ejemplo:
 ```txt
 pages/
 │
+├── Dashboard.tsx
 ├── Login.tsx
 ├── Register.tsx
-├── Dashboard.tsx
 │
-├── admin/
-│   ├── AdminUsers.tsx
-│   └── AdminPqrs.tsx
+├── humanTalent/
+│   └── CreatePersonnelRequisition.tsx
 │
-├── agent/
-│   └── AgentPqrs.tsx
-│
-└── user/
-    ├── CreatePqr.tsx
-    └── MyPqrs.tsx
+├── PQR/
+│   ├── admin/
+│   │   ├── AdminPqrs.tsx
+│   │   └── AdminUser.tsx
+│   ├── agent/
+│   │   └── AgentPqrs.tsx
+│   └── user/
+│       ├── CreatePqr.tsx
+│       └── MyPqrs.tsx
 ```
 
 Responsabilidad principal:
@@ -633,6 +705,12 @@ services/
 ├── auth/
 │   └── authService.ts
 │
+├── common/
+│   └── cityService.ts
+│
+├── humanTalent/
+│   └── personnelRequisitionService.ts
+│
 ├── notifications/
 │   └── notificationService.ts
 │
@@ -681,6 +759,53 @@ register()
 ```
 
 Estas funciones permiten enviar los datos del usuario al backend para iniciar sesión o crear una nueva cuenta.
+
+---
+
+#### Servicios comunes
+
+```txt
+services/common/
+└── cityService.ts
+```
+
+| Archivo          | Descripción                                                                       | Uso dentro del proyecto                                                             |
+| ---------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `cityService.ts` | Contiene la función HTTP encargada de consultar las ciudades activas del sistema. | Se utiliza en formularios o módulos que necesitan cargar ciudades desde el backend. |
+
+---
+
+#### Servicios del módulo de Talento Humano
+
+```txt
+services/humanTalent/
+└── personnelRequisitionService.ts
+```
+
+| Archivo                          | Descripción                                                                                        | Uso dentro del proyecto                                                                          |
+| -------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `personnelRequisitionService.ts` | Contiene las funciones HTTP relacionadas con áreas, perfiles de cargo y requisiciones de personal. | Se utiliza para cargar datos del formulario y crear requisiciones de personal desde el frontend. |
+
+
+##### Funciones en `personnelRequisitionService.ts`
+
+```txt
+getDepartments()
+getPositionProfiles()
+createPersonnelRequisition()
+getPersonnelRequisitions()
+```
+
+Estas funciones permiten comunicarse con los endpoints del módulo de Talento Humano.
+
+Se utilizan para:
+
+```txt
+Consultar las áreas activas disponibles.
+Consultar los perfiles de cargo activos.
+Crear una nueva requisición de personal.
+Consultar las requisiciones de personal registradas.
+```
 
 ---
 
@@ -942,7 +1067,8 @@ utils/
 │   ├── excelUtils.ts
 │   ├── fileUtils.ts
 │   ├── formatText.ts
-│   └── getErrorMessage.ts
+│   ├── getErrorMessage.ts
+│   └── numberUtils.ts
 │
 ├── pqrs/
 │   └── pqrUtils.ts
@@ -966,7 +1092,8 @@ utils/common/
 ├── excelUtils.ts
 ├── fileUtils.ts
 ├── formatText.ts
-└── getErrorMessage.ts
+├── getErrorMessage.ts
+└── numberUtils.ts
 ```
 
 ---
@@ -1057,6 +1184,24 @@ getErrorMessage()
 
 ---
 
+##### `numberUtils.ts`
+
+Este archivo contiene funciones auxiliares relacionadas con la limpieza y el formato de valores numéricos.
+
+```txt
+cleanNumberInput()
+formatNumberInput()
+```
+
+| Función               | Descripción                                                               | Uso dentro del proyecto                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `cleanNumberInput()`  | Elimina todos los caracteres que no sean números dentro de un texto.      | Se utiliza en campos numéricos formateados para guardar valores limpios, sin puntos, comas, letras o símbolos.                 |
+| `formatNumberInput()` | Formatea un número con separadores de miles usando el formato colombiano. | Se utiliza para mostrar valores numéricos de forma más legible en formularios, como salarios, montos, cuotas, abonos o saldos. |
+
+
+
+---
+
 #### Utilidades del módulo PQR
 
 Los archivos ubicados en `utils/pqrs/` contienen funciones específicas del módulo de PQR.
@@ -1107,11 +1252,11 @@ getUserRoleIcon()
 getUserRoleLabel()
 ```
 
-| Función                  | Descripción                                                                                          | Uso dentro del proyecto                                                            |
-| ------------------------ | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Función                  | Descripción                                                                                          | Uso dentro del proyecto                                                             |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | `getUserRoleColor(role)` | Devuelve el color visual que debe tener un rol de usuario en componentes como `Chip` de Material UI. | Se utiliza para diferenciar visualmente roles como administrador, agente o usuario. |
-| `getUserRoleIcon(role)`  | Retorna el ícono correspondiente según el rol del usuario.                                           | Se utiliza en componentes visuales donde se muestra el rol acompañado de un ícono. |
-| `getUserRoleLabel(role)` | Convierte el rol técnico del sistema en un texto más claro para mostrar al usuario.                  | Se utiliza para mostrar etiquetas como `Administrador`, `Agente` o `Usuario`.      |
+| `getUserRoleIcon(role)`  | Retorna el ícono correspondiente según el rol del usuario.                                           | Se utiliza en componentes visuales donde se muestra el rol acompañado de un ícono.  |
+| `getUserRoleLabel(role)` | Convierte el rol técnico del sistema en un texto más claro para mostrar al usuario.                  | Se utiliza para mostrar etiquetas como `Administrador`, `Agente` o `Usuario`.       |
 
 Este archivo conserva la extensión `.tsx` porque una de sus funciones retorna íconos de Material UI como componentes JSX.
 
@@ -1132,6 +1277,9 @@ validations/
 │
 ├── auth/
 │   └── authValidation.ts
+│
+├── humanTalent/
+│   └── personnelRequisitionValidation.ts
 │
 └── pqrs/
     └── pqrValidation.ts
@@ -1163,6 +1311,27 @@ registerSchema()
 | `registerSchema()` | Valida los datos necesarios para registrar un nuevo usuario, como nombre, correo y contraseña. | Se utiliza en `useRegister.ts`. |
 
 Este archivo permite mantener las reglas de autenticación centralizadas y evita repetir validaciones directamente en las páginas `Login.tsx` o `Register.tsx`.
+
+---
+
+#### Validaciones del módulo de Talento Humano
+
+```txt
+validations/humanTalent/
+└── personnelRequisitionValidation.ts
+```
+
+##### personnelRequisitionValidation.ts
+
+Este archivo contiene las reglas de validación relacionadas con el formulario de creación de requisición de personal.
+
+```txt
+createPersonnelRequisitionSchema()
+```
+
+| Esquema                              | Descripción                                                                                                                                                                                                                                     | Uso dentro del proyecto                           |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `createPersonnelRequisitionSchema()` | Valida los datos necesarios para crear una requisición de personal, como área, cargo, motivo, ciudad, tipo de contratación y salario propuesto. También valida campos condicionales como motivo `OTROS`, contrato fijo, temporal o practicante. | Se utiliza en `useCreatePersonnelRequisition.ts`. |
 
 ---
 
@@ -1228,7 +1397,7 @@ Inicializar la aplicación.
 
 ---
 
-## 8. Conclusión
+## Conclusión
 
 Esta estructura permite que el proyecto crezca de forma organizada, clara y profesional.  
 Al separar páginas, componentes, servicios, hooks, datos, validaciones y utilidades, el código se vuelve más fácil de mantener, reutilizar y escalar.

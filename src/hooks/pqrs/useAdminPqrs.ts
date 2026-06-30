@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import type {
-    MessageType,
     Pqr,
     PqrPriority,
     PqrStatus,
 } from "../../interfaces/pqrs/pqr.interface";
+import type { MessageType } from "../../interfaces/common/message.interface";
 import type { User } from "../../interfaces/users/user.interface";
 import {
     assignPqr,

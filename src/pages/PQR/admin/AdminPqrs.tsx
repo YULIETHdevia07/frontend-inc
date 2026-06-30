@@ -19,24 +19,24 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 
-import type { PqrPriority, PqrStatus } from "../../interfaces/pqrs/pqr.interface";
+import type { PqrPriority, PqrStatus } from "../../../interfaces/pqrs/pqr.interface";
 
-import { useAdminPqrs } from "../../hooks/pqrs/useAdminPqrs";
-import { usePqrChat } from "../../hooks/pqrs/usePqrChat";
+import { useAdminPqrs } from "../../../hooks/pqrs/useAdminPqrs";
+import { usePqrChat } from "../../../hooks/pqrs/usePqrChat";
 
 import {
     getCaseTypeLabel,
-} from "../../utils/pqrs/pqrUtils";
+} from "../../../utils/pqrs/pqrUtils";
 
-import PageHeader from "../../components/common/PageHeader";
-import LoadingBox from "../../components/common/LoadingBox";
-import EmptyState from "../../components/common/EmptyState";
-import CustomSnackbar from "../../components/common/CustomSnackbar";
-import { getFilterStyles } from "../../styles/filterStyles";
-import { pqrPriorityOptions, pqrStatusOptions } from "../../data/pqrOptions";
-import { PqrChatView } from "../../components/pqr/PqrChatView";
-import { useAuth } from "../../context/AuthContext";
-import PqrTicketCard from "../../components/pqr/PqrTicketCard";
+import PageHeader from "../../../components/common/PageHeader";
+import LoadingBox from "../../../components/common/LoadingBox";
+import EmptyState from "../../../components/common/EmptyState";
+import CustomSnackbar from "../../../components/common/CustomSnackbar";
+import { getFilterStyles } from "../../../styles/filterStyles";
+import { pqrPriorityOptions, pqrStatusOptions } from "../../../data/pqrOptions";
+import { PqrChatView } from "../../../components/pqr/PqrChatView";
+import { useAuth } from "../../../context/AuthContext";
+import PqrTicketCard from "../../../components/pqr/PqrTicketCard";
 
 // Página administrativa para consultar, cambiar estados, prioridades y dar seguimiento a las PQR.
 const AdminPqrs = () => {

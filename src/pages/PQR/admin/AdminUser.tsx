@@ -22,22 +22,22 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FilterListOutlinedIcon from "@mui/icons-material/FilterListOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
-import type { DataTableColumn } from "../../components/common/DataTable";
-import type { User, UserRole } from "../../interfaces/users/user.interface";
+import type { DataTableColumn } from "../../../components/common/DataTable";
+import type { User, UserRole } from "../../../interfaces/users/user.interface";
 
-import { useAdminUsers } from "../../hooks/users/useAdminUsers";
-import { userRoles } from "../../data/userRoles";
-import { getUserRoleLabel } from "../../utils/users/userRoleUtils";
+import { useAdminUsers } from "../../../hooks/users/useAdminUsers";
+import { userRoles } from "../../../data/userRoles";
+import { getUserRoleLabel } from "../../../utils/users/userRoleUtils";
 
-import LoadingBox from "../../components/common/LoadingBox";
-import EmptyState from "../../components/common/EmptyState";
-import CustomSnackbar from "../../components/common/CustomSnackbar";
-import DataTable from "../../components/common/DataTable";
-import UserRoleChip from "../../components/users/UserRoleChip";
-import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
-import { getFilterStyles } from "../../styles/filterStyles";
-import BulkUploadDialog from "../../components/common/BulkUploadDialog";
-import { downloadBulkUsersTemplate } from "../../template/users/downloadBulkUsersTemplate";
+import LoadingBox from "../../../components/common/LoadingBox";
+import EmptyState from "../../../components/common/EmptyState";
+import CustomSnackbar from "../../../components/common/CustomSnackbar";
+import DataTable from "../../../components/common/DataTable";
+import UserRoleChip from "../../../components/users/UserRoleChip";
+import ChangeUserRoleDialog from "../../../components/users/ChangeUserRoleDialog";
+import { getFilterStyles } from "../../../styles/filterStyles";
+import BulkUploadDialog from "../../../components/common/BulkUploadDialog";
+import { downloadBulkUsersTemplate } from "../../../template/users/downloadBulkUsersTemplate";
 
 // Página principal para administrar usuarios y roles
 const AdminUsers = () => {
