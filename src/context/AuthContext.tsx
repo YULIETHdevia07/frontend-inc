@@ -9,7 +9,15 @@ interface User {
     id: number;
     name: string;
     email: string;
-    role: "ADMIN" | "USER" | "AGENT";
+    role:
+    | "ADMIN"
+    | "USER"
+    | "AGENT"
+    | "JEFE_AREA"
+    | "JEFE_DEPARTAMENTO"
+    | "GERENTE_GENERAL"
+    | "ANALISTA_TALENTO_HUMANO"
+    | "JEFE_TALENTO_HUMANO";
 }
 
 interface AuthContextType {

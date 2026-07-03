@@ -13,6 +13,7 @@ import AdminUser from "../pages/PQR/admin/AdminUser";
 import AgentPqrs from "../pages/PQR/agent/AgentPqrs";
 
 import CreatePersonnelRequisition from "../pages/humanTalen/CreatePersonnelRequisition";
+import PersonnelRequisitions from "../pages/humanTalen/PersonnelRequisitions";
 
 const AppRoutes = () => {
   return (
@@ -31,6 +32,11 @@ const AppRoutes = () => {
           <Route path="/dashboard/pqrs" element={<AdminPqrs />} />
 
           {/* Talento Humano */}
+          <Route
+            path="/dashboard/human-talent/requisitions"
+            element={<PersonnelRequisitions />}
+          />
+
           <Route
             path="/dashboard/human-talent/requisitions/create"
             element={<CreatePersonnelRequisition />}

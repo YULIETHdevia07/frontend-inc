@@ -60,16 +60,42 @@ export const menuItems = [
 
   {
     module: "Talento Humano",
-    roles: ["USER", "ADMIN", "AGENT"],
+    roles: [
+      "ADMIN",
+      "JEFE_AREA",
+      "JEFE_DEPARTAMENTO",
+      "GERENTE_GENERAL",
+      "ANALISTA_TALENTO_HUMANO",
+      "JEFE_TALENTO_HUMANO",
+    ],
     submodules: [
       {
         name: "Requisiciones de personal",
-        roles: ["USER", "ADMIN", "AGENT"],
+        roles: [
+          "ADMIN",
+          "JEFE_AREA",
+          "JEFE_DEPARTAMENTO",
+          "GERENTE_GENERAL",
+          "ANALISTA_TALENTO_HUMANO",
+          "JEFE_TALENTO_HUMANO",
+        ],
         options: [
+          {
+            label: "Ver requisiciones",
+            path: "/dashboard/human-talent/requisitions",
+            roles: [
+              "ADMIN",
+              "JEFE_AREA",
+              "JEFE_DEPARTAMENTO",
+              "GERENTE_GENERAL",
+              "ANALISTA_TALENTO_HUMANO",
+              "JEFE_TALENTO_HUMANO",
+            ],
+          },
           {
             label: "Crear requisición",
             path: "/dashboard/human-talent/requisitions/create",
-            roles: ["USER", "ADMIN", "AGENT"],
+            roles: ["JEFE_AREA"],
           },
         ],
       },

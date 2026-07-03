@@ -1,7 +1,13 @@
 import api from "../../api/axios";
 import type {
+    CreatePersonnelHiringConfirmationData,
+    CreatePersonnelHiringConfirmationResponse,
     CreatePersonnelRequisitionData,
     CreatePersonnelRequisitionResponse,
+    DecidePersonnelHiringConfirmationData,
+    DecidePersonnelHiringConfirmationResponse,
+    DecidePersonnelRequisitionData,
+    DecidePersonnelRequisitionResponse,
     DepartmentsResponse,
     PersonnelRequisitionResponse,
     PositionProfilesResponse,
@@ -47,3 +53,42 @@ export const getPersonnelRequisitions =
 
         return response.data;
     };
+
+// Aprueba, rechaza o cancela una requisición de personal.
+export const decidePersonnelRequisition = async (
+    requisitionId: number,
+    data: DecidePersonnelRequisitionData
+): Promise<DecidePersonnelRequisitionResponse> => {
+    const response = await api.patch<DecidePersonnelRequisitionResponse>(
+        `/human-talent/requisitions/${requisitionId}/decision`,
+        data
+    );
+
+    return response.data;
+};
+
+// Registra la confirmación final de contratación de una requisición.
+export const createPersonnelHiringConfirmation = async (
+    requisitionId: number,
+    data: CreatePersonnelHiringConfirmationData
+): Promise<CreatePersonnelHiringConfirmationResponse> => {
+    const response = await api.post<CreatePersonnelHiringConfirmationResponse>(
+        `/human-talent/requisitions/${requisitionId}/hiring-confirmation`,
+        data
+    );
+
+    return response.data;
+};
+
+// Aprueba, rechaza o cancela una confirmación de contratación.
+export const decidePersonnelHiringConfirmation = async (
+    hiringConfirmationId: number,
+    data: DecidePersonnelHiringConfirmationData
+): Promise<DecidePersonnelHiringConfirmationResponse> => {
+    const response = await api.patch<DecidePersonnelHiringConfirmationResponse>(
+        `/human-talent/hiring-confirmations/${hiringConfirmationId}/decision`,
+        data
+    );
+
+    return response.data;
+};
