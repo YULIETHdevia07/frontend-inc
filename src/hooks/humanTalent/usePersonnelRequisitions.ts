@@ -101,6 +101,30 @@ export const usePersonnelRequisitions = () => {
         return formatNumberInput(cleanValue);
     };
 
+    // Obtiene la aprobación actual de la requisición.
+    const getCurrentRequisitionApproval = (requisition: PersonnelRequisition) => {
+        return requisition.approvals?.find((approval) => {
+            return approval.isCurrent && approval.decision === null;
+        });
+    };
+
+    // Obtiene la aprobación actual de la confirmación de contratación.
+    const getCurrentHiringConfirmationApproval = (
+        requisition: PersonnelRequisition
+    ) => {
+        return requisition.hiringConfirmation?.approvals?.find((approval) => {
+            return approval.isCurrent && approval.decision === null;
+        });
+    };
+
+    // Valida si la requisición está lista para que Talento Humano registre la confirmación.
+    const canCreateHiringConfirmation = (requisition: PersonnelRequisition) => {
+        return (
+            requisition.status === "PENDIENTE_CONFIRMACION_TALENTO_HUMANO" &&
+            !requisition.hiringConfirmation
+        );
+    };
+
     // Carga el listado de requisiciones.
     const loadRequisitions = async () => {
         try {
@@ -526,6 +550,10 @@ export const usePersonnelRequisitions = () => {
         openRejectHiringConfirmationDialog,
         closeDecisionDialog,
         confirmDecisionDialog,
+
+        getCurrentRequisitionApproval,
+        getCurrentHiringConfirmationApproval,
+        canCreateHiringConfirmation,
 
         closeMessage,
     };

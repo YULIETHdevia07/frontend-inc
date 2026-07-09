@@ -61,13 +61,11 @@ const PersonnelRequisitionListItem = ({
 
     const getStatusLabel = (status: RequisitionStatus) => {
         const labels: Record<RequisitionStatus, string> = {
-            PENDIENTE_JEFE_AREA: "Pendiente jefe de área",
-            PENDIENTE_JEFE_DEPARTAMENTO: "Pendiente jefe departamento",
-            PENDIENTE_GERENCIA_GENERAL: "Pendiente gerencia",
+            EN_APROBACION: "En aprobación",
             PENDIENTE_CONFIRMACION_TALENTO_HUMANO:
                 "Pendiente confirmación TH",
-            PENDIENTE_ANALISTA_TALENTO_HUMANO: "Pendiente analista TH",
-            PENDIENTE_JEFE_TALENTO_HUMANO: "Pendiente jefe TH",
+            PENDIENTE_APROBACION_TALENTO_HUMANO:
+                "Pendiente aprobación TH",
             APROBADA: "Aprobada",
             RECHAZADA: "Rechazada",
             CANCELADA: "Cancelada",
@@ -194,6 +192,45 @@ const PersonnelRequisitionListItem = ({
                             Solicitado por: {requisition.createdBy.name}
                         </Typography>
                     )}
+                    {requisition.approvals?.some(
+                        (approval) => approval.isCurrent && approval.decision === null
+                    ) && (
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "text.secondary",
+                                    mt: 1,
+                                }}
+                            >
+                                Pendiente por:{" "}
+                                {
+                                    requisition.approvals.find(
+                                        (approval) =>
+                                            approval.isCurrent && approval.decision === null
+                                    )?.approverUser?.name
+                                }
+                            </Typography>
+                        )}
+
+                    {requisition.hiringConfirmation?.approvals?.some(
+                        (approval) => approval.isCurrent && approval.decision === null
+                    ) && (
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "text.secondary",
+                                    mt: 1,
+                                }}
+                            >
+                                Pendiente TH por:{" "}
+                                {
+                                    requisition.hiringConfirmation.approvals.find(
+                                        (approval) =>
+                                            approval.isCurrent && approval.decision === null
+                                    )?.approverUser?.name
+                                }
+                            </Typography>
+                        )}
                 </Box>
 
                 <Stack

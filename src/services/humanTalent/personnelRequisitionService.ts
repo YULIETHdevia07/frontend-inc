@@ -44,7 +44,7 @@ export const createPersonnelRequisition = async (
     return response.data;
 };
 
-// Obtiene las requisiciones de personal registradas en el sistema.
+// Obtiene las requisiciones donde el usuario autenticado participa.
 export const getPersonnelRequisitions =
     async (): Promise<PersonnelRequisitionResponse> => {
         const response = await api.get<PersonnelRequisitionResponse>(

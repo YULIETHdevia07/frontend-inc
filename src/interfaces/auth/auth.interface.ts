@@ -4,10 +4,32 @@ export interface LoginData {
     password: string;
 }
 
+// Cargo activo del usuario autenticado.
+export interface UserPosition {
+    id: number;
+    code: string;
+    name: string;
+}
+
+// Usuario autenticado en la aplicación.
+export interface AuthUser {
+    id: number;
+    name: string;
+    email: string;
+    role: "ADMIN" | "USER" | "AGENT";
+    positions?: UserPosition[];
+}
+
 // Respuesta del login.
 export interface LoginResponse {
     message: string;
     token: string;
+    user: AuthUser;
+}
+
+// Respuesta del perfil.
+export interface ProfileResponse {
+    user: AuthUser;
 }
 
 // Datos necesarios para registrar un usuario.

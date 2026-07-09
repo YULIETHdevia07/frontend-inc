@@ -50,41 +50,39 @@ const PersonnelRequisitions = () => {
         closeDecisionDialog,
         confirmDecisionDialog,
 
+        getCurrentRequisitionApproval,
+        getCurrentHiringConfirmationApproval,
+        canCreateHiringConfirmation,
+
         closeMessage,
     } = usePersonnelRequisitions();
 
-    // Valida si el usuario puede aprobar o rechazar una requisición.
+    // Valida si el usuario puede aprobar o rechazar la requisición actual.
     const canDecideRequisition = (requisition: PersonnelRequisition) => {
-        if (
-            user?.role === "JEFE_DEPARTAMENTO" &&
-            requisition.status === "PENDIENTE_JEFE_DEPARTAMENTO"
-        ) {
-            return true;
-        }
+        const currentApproval = getCurrentRequisitionApproval(requisition);
 
-        if (
-            user?.role === "GERENTE_GENERAL" &&
-            requisition.status === "PENDIENTE_GERENCIA_GENERAL"
-        ) {
-            return true;
-        }
+        return currentApproval?.approverUserId === user?.id;
+    };
 
-        return false;
+    // Valida si el usuario puede aprobar o rechazar la confirmación de contratación actual.
+    const canDecideHiringConfirmation = (requisition: PersonnelRequisition) => {
+        const currentApproval = getCurrentHiringConfirmationApproval(requisition);
+
+        return currentApproval?.approverUserId === user?.id;
+    };
+
+    // Valida si el usuario tiene un cargo activo específico.
+    const userHasPosition = (positionCode: string) => {
+        return user?.positions?.some((position) => position.code === positionCode);
     };
 
     // Valida si el usuario puede registrar la confirmación de contratación.
-    const canCreateHiringConfirmation = (requisition: PersonnelRequisition) => {
+    const canCreateHiringConfirmationForUser = (
+        requisition: PersonnelRequisition
+    ) => {
         return (
-            user?.role === "ANALISTA_TALENTO_HUMANO" &&
-            requisition.status === "PENDIENTE_CONFIRMACION_TALENTO_HUMANO"
-        );
-    };
-
-    // Valida si el usuario puede aprobar o rechazar la confirmación de contratación.
-    const canDecideHiringConfirmation = (requisition: PersonnelRequisition) => {
-        return (
-            user?.role === "JEFE_TALENTO_HUMANO" &&
-            requisition.status === "PENDIENTE_JEFE_TALENTO_HUMANO"
+            userHasPosition("DPC-TH-0080") &&
+            canCreateHiringConfirmation(requisition)
         );
     };
 
@@ -181,7 +179,7 @@ const PersonnelRequisitions = () => {
                             canDecideRequisition={canDecideRequisition(
                                 requisition
                             )}
-                            canCreateHiringConfirmation={canCreateHiringConfirmation(
+                            canCreateHiringConfirmation={canCreateHiringConfirmationForUser(
                                 requisition
                             )}
                             canDecideHiringConfirmation={canDecideHiringConfirmation(

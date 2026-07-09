@@ -4,24 +4,10 @@ import {
     connectSocket,
     disconnectSocket,
 } from "../services/sockets/socketService";
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    role:
-    | "ADMIN"
-    | "USER"
-    | "AGENT"
-    | "JEFE_AREA"
-    | "JEFE_DEPARTAMENTO"
-    | "GERENTE_GENERAL"
-    | "ANALISTA_TALENTO_HUMANO"
-    | "JEFE_TALENTO_HUMANO";
-}
+import type { AuthUser, ProfileResponse } from "../interfaces/auth/auth.interface";
 
 interface AuthContextType {
-    user: User | null;
+    user: AuthUser | null;
     token: string | null;
     loading: boolean;
     login: (token: string) => Promise<void>;
@@ -32,7 +18,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [token, setToken] = useState<string | null>(
         localStorage.getItem("token")
     );
@@ -40,7 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const getProfile = async () => {
         try {
-            const response = await api.get("/profile");
+            const response = await api.get<ProfileResponse>("/profile");
             setUser(response.data.user);
         } catch (error) {
             console.error("Error al obtener el perfil:", error);

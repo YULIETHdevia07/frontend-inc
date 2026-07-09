@@ -20,19 +20,23 @@ export type InternContractType = "APRENDIZ" | "PASANTE" | "ROTANTE";
 // Decisiones permitidas en el flujo de aprobación.
 export type ApprovalDecision = "APROBADA" | "RECHAZADA" | "CANCELADA";
 
-// Estados calculados para una requisición de personal.
+// Estados actuales de una requisición de personal.
 export type RequisitionStatus =
-    | "PENDIENTE_JEFE_AREA"
-    | "PENDIENTE_JEFE_DEPARTAMENTO"
-    | "PENDIENTE_GERENCIA_GENERAL"
+    | "EN_APROBACION"
     | "PENDIENTE_CONFIRMACION_TALENTO_HUMANO"
-    | "PENDIENTE_ANALISTA_TALENTO_HUMANO"
-    | "PENDIENTE_JEFE_TALENTO_HUMANO"
+    | "PENDIENTE_APROBACION_TALENTO_HUMANO"
     | "APROBADA"
     | "RECHAZADA"
     | "CANCELADA";
 
-// Área solicitante relacionada con una requisición de personal.
+// Estados de la confirmación final de contratación.
+export type HiringConfirmationStatus =
+    | "PENDIENTE_APROBACION"
+    | "APROBADA"
+    | "RECHAZADA"
+    | "CANCELADA";
+
+// Área relacionada con una requisición de personal.
 export interface Department {
     id: number;
     code: string;
@@ -54,28 +58,37 @@ export interface RequisitionUser {
     role: string;
 }
 
-// Paso de aprobación de una requisición.
-export interface RequisitionApprovalStep {
-    id: number;
-    name: string;
-    stepOrder: number;
-    requiredRole: string;
-    isActive: boolean;
-}
-
-// Aprobación realizada sobre una requisición.
+// Aprobación jerárquica de una requisición.
 export interface PersonnelRequisitionApproval {
     id: number;
     requisitionId: number;
-    stepId: number;
-    decision: ApprovalDecision;
-    decidedById: number;
-    decidedAt: string;
+
+    approvalOrder: number;
+
+    departmentId: number;
+    department?: Department;
+
+    approverPositionId: number;
+    approverPosition?: PositionProfile;
+
+    approverAssignmentId: number;
+
+    approverUserId: number;
+    approverUser?: RequisitionUser;
+
+    decision: ApprovalDecision | null;
+
+    decidedById: number | null;
+    decidedBy?: RequisitionUser | null;
+
+    assignedAt: string;
+    decidedAt: string | null;
+
     comment: string | null;
+    isCurrent: boolean;
+
     createdAt: string;
     updatedAt: string;
-    step?: RequisitionApprovalStep;
-    decidedBy?: RequisitionUser;
 }
 
 // Confirmación final de contratación registrada por Talento Humano.
@@ -89,6 +102,7 @@ export interface PersonnelHiringConfirmation {
     internContractType: InternContractType | null;
 
     approvedSalary: string;
+    status: HiringConfirmationStatus;
 
     createdById: number;
     createdBy?: RequisitionUser;
@@ -99,19 +113,34 @@ export interface PersonnelHiringConfirmation {
     updatedAt: string;
 }
 
-// Aprobación realizada sobre la confirmación de contratación.
+// Aprobación de la confirmación de contratación.
 export interface PersonnelHiringConfirmationApproval {
     id: number;
     hiringConfirmationId: number;
-    stepId: number;
-    decision: ApprovalDecision;
-    decidedById: number;
-    decidedAt: string;
+
+    approvalOrder: number;
+
+    approverPositionId: number;
+    approverPosition?: PositionProfile;
+
+    approverAssignmentId: number;
+
+    approverUserId: number;
+    approverUser?: RequisitionUser;
+
+    decision: ApprovalDecision | null;
+
+    decidedById: number | null;
+    decidedBy?: RequisitionUser | null;
+
+    assignedAt: string;
+    decidedAt: string | null;
+
     comment: string | null;
+    isCurrent: boolean;
+
     createdAt: string;
     updatedAt: string;
-    step?: RequisitionApprovalStep;
-    decidedBy?: RequisitionUser;
 }
 
 // Estructura principal de una requisición de personal.

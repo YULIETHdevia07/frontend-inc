@@ -212,22 +212,46 @@ const SidebarMenu = ({ openSidebar, onClose }: SidebarMenuProps) => {
         }));
     };
 
-    // Verifica si el rol del usuario tiene permiso
+    // Códigos de cargos activos del usuario.
+    const userPositionCodes = user?.positions?.map((position) => position.code) || [];
+
+    // Verifica si el rol del usuario tiene permiso.
     const hasRole = (roles: string[]) => {
         return roles.includes(userRole);
     };
 
-    // Filtra el menú según el rol del usuario
+    // Verifica si el usuario tiene alguno de los cargos permitidos.
+    const hasPosition = (positionCodes?: string[]) => {
+        if (userRole === "ADMIN") {
+            return true;
+        }
+
+        if (!positionCodes || positionCodes.length === 0) {
+            return true;
+        }
+
+        return positionCodes.some((code) => userPositionCodes.includes(code));
+    };
+
+    // Verifica si el usuario puede ver un módulo, submódulo u opción.
+    const canShowMenuItem = (item: {
+        roles: string[];
+        positionCodes?: string[];
+    }) => {
+        return hasRole(item.roles) && hasPosition(item.positionCodes);
+    };
+
+    // Filtra el menú según el rol y los cargos activos del usuario.
     const filteredMenuItems = menuItems
-        .filter((module) => hasRole(module.roles))
+        .filter((module) => canShowMenuItem(module))
         .map((module) => ({
             ...module,
             submodules: module.submodules
-                .filter((submodule) => hasRole(submodule.roles))
+                .filter((submodule) => canShowMenuItem(submodule))
                 .map((submodule) => ({
                     ...submodule,
                     options: submodule.options.filter((option) =>
-                        hasRole(option.roles)
+                        canShowMenuItem(option)
                     ),
                 }))
                 .filter((submodule) => submodule.options.length > 0),
