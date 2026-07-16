@@ -14,6 +14,8 @@ import AgentPqrs from "../pages/PQR/agent/AgentPqrs";
 
 import CreatePersonnelRequisition from "../pages/humanTalen/CreatePersonnelRequisition";
 import PersonnelRequisitions from "../pages/humanTalen/PersonnelRequisitions";
+import PersonnelRequisitionDetail from "../pages/humanTalen/PersonnelRequisitionDetail";
+import PersonnelRequisitionFormat from "../pages/humanTalen/PersonnelRequisitionFormat";
 
 const AppRoutes = () => {
   return (
@@ -30,13 +32,21 @@ const AppRoutes = () => {
           <Route path="/dashboard/pqrs/my" element={<MyPqrs />} />
           <Route path="/dashboard/pqrs/create" element={<CreatePqr />} />
           <Route path="/dashboard/pqrs" element={<AdminPqrs />} />
+          <Route path="/agent/pqrs" element={<AgentPqrs />} />
 
           {/* Talento Humano */}
           <Route
             path="/dashboard/human-talent/requisitions"
             element={<PersonnelRequisitions />}
           />
-
+          <Route
+            path="/dashboard/human-talent/requisitions/:id"
+            element={<PersonnelRequisitionDetail />}
+          />
+          <Route
+            path="/dashboard/human-talent/requisitions/:id/format"
+            element={<PersonnelRequisitionFormat />}
+          />
           <Route
             path="/dashboard/human-talent/requisitions/create"
             element={<CreatePersonnelRequisition />}
@@ -45,8 +55,6 @@ const AppRoutes = () => {
           {/* Usuario */}
           <Route path="/users" element={<AdminUser />} />
 
-          {/* Agent */}
-          <Route path="/agent/pqrs" element={<AgentPqrs />} />
         </Route>
       </Route>
     </Routes>

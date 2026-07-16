@@ -56,6 +56,7 @@ export interface RequisitionUser {
     name: string;
     email: string;
     role: string;
+    signatureUrl?: string | null;
 }
 
 // Aprobación jerárquica de una requisición.

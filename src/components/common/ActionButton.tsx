@@ -17,6 +17,8 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
+import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 
 type ActionButtonType =
     | "save"
@@ -29,6 +31,8 @@ type ActionButtonType =
     | "create"
     | "send"
     | "clear"
+    | "back"
+    | "print"
     | "custom";
 
 interface ActionButtonProps extends ButtonProps {
@@ -64,13 +68,19 @@ const ActionButton = ({
         if (actionType === "save") return <SaveOutlinedIcon />;
         if (actionType === "edit") return <EditOutlinedIcon />;
         if (actionType === "cancel") return <CloseOutlinedIcon />;
-        if (actionType === "approve") return <CheckCircleOutlineOutlinedIcon />;
+        if (actionType === "approve") {
+            return <CheckCircleOutlineOutlinedIcon />;
+        }
         if (actionType === "reject") return <CancelOutlinedIcon />;
         if (actionType === "delete") return <DeleteOutlineOutlinedIcon />;
         if (actionType === "view") return <VisibilityOutlinedIcon />;
-        if (actionType === "create") return <AddCircleOutlineOutlinedIcon />;
+        if (actionType === "create") {
+            return <AddCircleOutlineOutlinedIcon />;
+        }
         if (actionType === "send") return <SendOutlinedIcon />;
         if (actionType === "clear") return <RestartAltOutlinedIcon />;
+        if (actionType === "back") return <ArrowBackOutlinedIcon />;
+        if (actionType === "print") return <PrintOutlinedIcon />;
 
         return startIcon;
     };
@@ -82,11 +92,19 @@ const ActionButton = ({
             return "error";
         }
 
-        if (actionType === "approve" || actionType === "save") {
+        if (
+            actionType === "approve" ||
+            actionType === "save" ||
+            actionType === "print"
+        ) {
             return "primary";
         }
 
-        if (actionType === "cancel" || actionType === "clear") {
+        if (
+            actionType === "cancel" ||
+            actionType === "clear" ||
+            actionType === "back"
+        ) {
             return "inherit";
         }
 
@@ -100,7 +118,8 @@ const ActionButton = ({
             actionType === "cancel" ||
             actionType === "reject" ||
             actionType === "delete" ||
-            actionType === "clear"
+            actionType === "clear" ||
+            actionType === "back"
         ) {
             return "outlined";
         }
@@ -135,8 +154,10 @@ const ActionButton = ({
                 whiteSpace: "nowrap",
 
                 "& .MuiButton-startIcon": {
-                    marginRight: iconOnlyOnMobile && isMobile ? 0 : undefined,
-                    marginLeft: iconOnlyOnMobile && isMobile ? 0 : undefined,
+                    marginRight:
+                        iconOnlyOnMobile && isMobile ? 0 : undefined,
+                    marginLeft:
+                        iconOnlyOnMobile && isMobile ? 0 : undefined,
                 },
 
                 ...sx,

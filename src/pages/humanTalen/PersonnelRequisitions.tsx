@@ -1,4 +1,5 @@
 import { Alert, Box, CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import PageContainer from "../../components/common/PageContainer";
 import PageHeader from "../../components/common/PageHeader";
@@ -17,6 +18,7 @@ import type { PersonnelRequisition } from "../../interfaces/humanTalent/personne
 // Página para listar, aprobar, rechazar y confirmar requisiciones de personal.
 const PersonnelRequisitions = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const {
         requisitions,
@@ -135,6 +137,11 @@ const PersonnelRequisitions = () => {
         );
     };
 
+    // Navega al detalle de una requisición.
+    const goToRequisitionDetail = (requisitionId: number) => {
+        navigate(`/dashboard/human-talent/requisitions/${requisitionId}`);
+    };
+
     return (
         <PageContainer>
             <PageHeader
@@ -200,6 +207,7 @@ const PersonnelRequisitions = () => {
                             onRejectHiringConfirmation={
                                 openRejectHiringConfirmationDialog
                             }
+                            onViewDetail={goToRequisitionDetail}
                         />
                     ))}
                 </Box>

@@ -65,23 +65,3 @@ export const internContractTypeOptions = [
         value: "ROTANTE",
     },
 ];
-
-// Opciones disponibles para los estados de una requisición de personal.
-export const requisitionStatusOptions = [
-    {
-        label: "Pendiente",
-        value: "PENDIENTE",
-    },
-    {
-        label: "Aprobada",
-        value: "APROBADA",
-    },
-    {
-        label: "Rechazada",
-        value: "RECHAZADA",
-    },
-    {
-        label: "Cancelada",
-        value: "CANCELADA",
-    },
-];

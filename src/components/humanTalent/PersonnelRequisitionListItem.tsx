@@ -6,14 +6,15 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import type { ChipProps } from "@mui/material";
 
 import ActionButton from "../common/ActionButton";
 
 import type {
     PersonnelRequisition,
-    RequisitionStatus,
 } from "../../interfaces/humanTalent/personnelRequisition.interface";
+import { formatDate } from "../../utils/common/dateUtils";
+import { formatMoney } from "../../utils/common/numberUtils";
+import { getStatusColor, getStatusLabel } from "../../utils/humanTalent/humanTalentUtils";
 
 interface PersonnelRequisitionListItemProps {
     requisition: PersonnelRequisition;
@@ -28,6 +29,7 @@ interface PersonnelRequisitionListItemProps {
     onCreateHiringConfirmation?: (requisition: PersonnelRequisition) => void;
     onApproveHiringConfirmation?: (requisition: PersonnelRequisition) => void;
     onRejectHiringConfirmation?: (requisition: PersonnelRequisition) => void;
+    onViewDetail?: (requisitionId: number) => void;
 }
 
 // Muestra una requisición de personal en formato de lista.
@@ -42,46 +44,8 @@ const PersonnelRequisitionListItem = ({
     onCreateHiringConfirmation,
     onApproveHiringConfirmation,
     onRejectHiringConfirmation,
+    onViewDetail,
 }: PersonnelRequisitionListItemProps) => {
-    const formatMoney = (value: string | number) => {
-        return new Intl.NumberFormat("es-CO", {
-            style: "currency",
-            currency: "COP",
-            maximumFractionDigits: 0,
-        }).format(Number(value));
-    };
-
-    const formatDate = (value: string) => {
-        return new Date(value).toLocaleDateString("es-CO", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-    };
-
-    const getStatusLabel = (status: RequisitionStatus) => {
-        const labels: Record<RequisitionStatus, string> = {
-            EN_APROBACION: "En aprobación",
-            PENDIENTE_CONFIRMACION_TALENTO_HUMANO:
-                "Pendiente confirmación TH",
-            PENDIENTE_APROBACION_TALENTO_HUMANO:
-                "Pendiente aprobación TH",
-            APROBADA: "Aprobada",
-            RECHAZADA: "Rechazada",
-            CANCELADA: "Cancelada",
-        };
-
-        return labels[status];
-    };
-
-    const getStatusColor = (
-        status: RequisitionStatus
-    ): ChipProps["color"] => {
-        if (status === "APROBADA") return "success";
-        if (status === "RECHAZADA" || status === "CANCELADA") return "error";
-
-        return "warning";
-    };
 
     return (
         <Paper
@@ -247,6 +211,16 @@ const PersonnelRequisitionListItem = ({
                         justifyContent: "flex-end",
                     }}
                 >
+                    <ActionButton
+                        actionType="view"
+                        loading={false}
+                        fullWidthOnMobile
+                        tooltip="Ver detalle de la requisición"
+                        onClick={() => onViewDetail?.(requisition.id)}
+                    >
+                        Ver detalle
+                    </ActionButton>
+
                     {canDecideRequisition && (
                         <>
                             <ActionButton

@@ -9,6 +9,7 @@ import type {
     DecidePersonnelRequisitionData,
     DecidePersonnelRequisitionResponse,
     DepartmentsResponse,
+    PersonnelRequisition,
     PersonnelRequisitionResponse,
     PositionProfilesResponse,
 } from "../../interfaces/humanTalent/personnelRequisition.interface";
@@ -53,6 +54,16 @@ export const getPersonnelRequisitions =
 
         return response.data;
     };
+
+export const getPersonnelRequisitionById = async (
+    requisitionId: number
+): Promise<{ requisition: PersonnelRequisition }> => {
+    const response = await api.get<{ requisition: PersonnelRequisition }>(
+        `/human-talent/requisitions/${requisitionId}`
+    );
+
+    return response.data;
+};
 
 // Aprueba, rechaza o cancela una requisición de personal.
 export const decidePersonnelRequisition = async (
