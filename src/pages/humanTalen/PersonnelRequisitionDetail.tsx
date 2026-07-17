@@ -24,6 +24,7 @@ import type {
 import { formatDate } from "../../utils/common/dateUtils";
 import { getOptionLabel } from "../../utils/common/formatText";
 import { formatMoney } from "../../utils/common/numberUtils";
+import { buildFileUrl } from "../../utils/common/fileUrl";
 
 import {
     contractTypeOptions,
@@ -124,8 +125,10 @@ const PersonnelRequisitionDetail = () => {
         | PersonnelRequisitionApproval
         | PersonnelHiringConfirmationApproval;
     }) => {
-        const signatureUrl =
-            approval?.decidedBy?.signatureUrl;
+        const signatureUrl = buildFileUrl(
+            approval?.decidedBy?.signatureUrl ||
+            approval?.approverUser?.signatureUrl
+        );
 
         const approverName =
             approval?.decidedBy?.name ||

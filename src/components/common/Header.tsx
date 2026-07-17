@@ -15,7 +15,10 @@ import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
+
 import NotificationBell from "./NotificationBell";
+import SettingsMenu from "./SettingsMenu";
+
 import { getUserRoleLabel } from "../../utils/users/userRoleUtils";
 import { appBrand } from "../../data/appBrand";
 
@@ -29,6 +32,7 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
     const navigate = useNavigate();
     const theme = useTheme();
 
+    // Cierra la sesión del usuario.
     const handleLogout = () => {
         logout();
         navigate("/dashboard");
@@ -37,7 +41,6 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
     const style = {
         appBar: {
             backgroundColor: theme.palette.background.paper,
-            // backgroundColor: "red",
             color: theme.palette.text.primary,
             borderBottom: `1px solid ${theme.palette.divider}`,
         },
@@ -214,7 +217,10 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
         <AppBar position="static" elevation={0} sx={style.appBar}>
             <Toolbar sx={style.toolbar}>
                 <Box sx={style.leftContent}>
-                    <Tooltip title={openSidebar ? "Cerrar menú" : "Abrir menú"} arrow>
+                    <Tooltip
+                        title={openSidebar ? "Cerrar menú" : "Abrir menú"}
+                        arrow
+                    >
                         <IconButton
                             onClick={() => setOpenSidebar((prev) => !prev)}
                             sx={style.menuButton}
@@ -243,7 +249,9 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
                 <Box sx={style.rightContent}>
                     <Box sx={style.titleBox}>
                         <Typography sx={style.title}>
-                            {user ? `${getUserRoleLabel(user.role)}, ${user.name}` : "Usuario"}
+                            {user
+                                ? `${getUserRoleLabel(user.role)}, ${user.name}`
+                                : "Usuario"}
                         </Typography>
 
                         <Typography sx={style.subtitle}>
@@ -252,6 +260,8 @@ const Header = ({ openSidebar, setOpenSidebar }: HeaderProps) => {
                     </Box>
 
                     <NotificationBell />
+
+                    <SettingsMenu />
 
                     <Avatar sx={style.avatar}>
                         {user ? userInitial : <PersonIcon />}

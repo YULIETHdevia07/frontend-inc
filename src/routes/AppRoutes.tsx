@@ -16,6 +16,7 @@ import CreatePersonnelRequisition from "../pages/humanTalen/CreatePersonnelRequi
 import PersonnelRequisitions from "../pages/humanTalen/PersonnelRequisitions";
 import PersonnelRequisitionDetail from "../pages/humanTalen/PersonnelRequisitionDetail";
 import PersonnelRequisitionFormat from "../pages/humanTalen/PersonnelRequisitionFormat";
+import UserSignaturePage from "../pages/users/UserSignaturePage";
 
 const AppRoutes = () => {
   return (
@@ -54,6 +55,10 @@ const AppRoutes = () => {
 
           {/* Usuario */}
           <Route path="/users" element={<AdminUser />} />
+          <Route
+            path="my-signature"
+            element={<UserSignaturePage />}
+          />
 
         </Route>
       </Route>

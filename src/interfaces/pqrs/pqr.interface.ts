@@ -1,11 +1,10 @@
+import type { UserRole } from "../users/user.interface";
+
 // Estados permitidos para una PQR.
 export type PqrStatus = "PENDIENTE" | "EN_PROCESO" | "CERRADA";
 
 // Prioridades permitidas para una PQR.
 export type PqrPriority = "BAJA" | "MEDIA" | "ALTA" | "URGENTE";
-
-// Roles permitidos en el sistema.
-export type UserRole = "USER" | "ADMIN" | "AGENT";
 
 // Vistas disponibles en la página del agente.
 export type AgentPqrView = "AVAILABLE" | "ASSIGNED";

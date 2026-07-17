@@ -40,6 +40,21 @@ export const updateUserRole = async (
   return response.data;
 };
 
+// Sube la firma del usuario autenticado.
+export const uploadUserSignature = async (file: File) => {
+    const formData = new FormData();
+
+    formData.append("signature", file);
+
+    const response = await api.patch("/users/signature", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+
+    return response.data;
+};
+
 // Registra usuarios mediante carga masiva desde archivo Excel. Endpoint usado por ADMIN.
 export const uploadUsersBulk = async (
   file: File

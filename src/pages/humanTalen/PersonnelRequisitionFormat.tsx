@@ -28,6 +28,7 @@ import {
 
 import { formatDate } from "../../utils/common/dateUtils";
 import { formatMoney } from "../../utils/common/numberUtils";
+import { buildFileUrl } from "../../utils/common/fileUrl";
 import ActionButton from "../../components/common/ActionButton";
 
 type ApprovalType =
@@ -239,10 +240,9 @@ const PersonnelRequisitionFormat = () => {
             }
             | undefined;
 
-        const signatureUrl =
-            approval?.decidedBy?.signatureUrl ||
+        const signatureUrl = buildFileUrl(approval?.decidedBy?.signatureUrl ||
             approverUserWithSignature?.signatureUrl ||
-            "";
+            "");
 
         const userName =
             approval?.decidedBy?.name ||

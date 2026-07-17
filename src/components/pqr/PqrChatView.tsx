@@ -24,7 +24,8 @@ import AttachFileOutlinedIcon from "@mui/icons-material/AttachFileOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
-import type { Pqr, PqrMessage, UserRole } from "../../interfaces/pqrs/pqr.interface";
+import type { Pqr, PqrMessage } from "../../interfaces/pqrs/pqr.interface";
+import type { UserRole } from "../../interfaces/users/user.interface";
 import {
     getCaseTypeLabel,
     getStatusColor,
@@ -32,8 +33,7 @@ import {
 import { pqrStatusOptions } from "../../data/pqrOptions";
 import { getInitials } from "../../utils/common/avatarUtils";
 import { formatDate } from "../../utils/common/dateUtils";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { buildFileUrl } from "../../utils/common/fileUrl";
 
 interface PqrChatViewProps {
     pqr: Pqr;
@@ -98,11 +98,6 @@ export const PqrChatView = ({
         onSelectFile(file);
 
         event.target.value = "";
-    };
-
-    // Construye la URL completa del archivo.
-    const getAttachmentUrl = (fileUrl: string) => {
-        return `${BACKEND_URL}${fileUrl}`;
     };
 
     // Baja automáticamente al último mensaje cuando cambia el historial del chat.
@@ -695,7 +690,7 @@ export const PqrChatView = ({
                                                 {msg.attachments?.map(
                                                     (attachment) => {
                                                         const attachmentUrl =
-                                                            getAttachmentUrl(
+                                                            buildFileUrl(
                                                                 attachment.fileUrl
                                                             );
 
