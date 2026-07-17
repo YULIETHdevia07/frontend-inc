@@ -179,6 +179,7 @@ const CreatePersonnelRequisition = () => {
                             clearable
                             options={positionProfileOptions}
                             error={formErrors.positionId}
+                            disabled={!departmentId}
                             onChange={handlePositionChange}
                         />
 

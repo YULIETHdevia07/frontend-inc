@@ -30,6 +30,7 @@ import {
     directContractTypeOptions,
     internContractTypeOptions,
     requisitionReasonOptions,
+    requisitionStatusOptions,
 } from "../../data/humanTalentOptions";
 
 // Página que muestra el detalle completo de una requisición de personal.
@@ -535,11 +536,12 @@ const PersonnelRequisitionDetail = () => {
 
                             <InfoItem
                                 label="Estado de confirmación"
-                                value={
+                                value={getOptionLabel(
                                     requisition
                                         .hiringConfirmation
-                                        .status
-                                }
+                                        .status,
+                                    requisitionStatusOptions
+                                )}
                             />
                         </Box>
                     </SectionCard>

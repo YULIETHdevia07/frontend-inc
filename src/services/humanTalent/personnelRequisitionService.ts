@@ -23,15 +23,16 @@ export const getDepartments = async (): Promise<DepartmentsResponse> => {
     return response.data;
 };
 
-// Obtiene los perfiles de cargo activos disponibles para crear una requisición.
-export const getPositionProfiles =
-    async (): Promise<PositionProfilesResponse> => {
-        const response = await api.get<PositionProfilesResponse>(
-            "/human-talent/position-profiles"
-        );
+// Obtiene los cargos activos según el departamento seleccionado.
+export const getPositionProfiles = async (
+    departmentId: number
+): Promise<PositionProfilesResponse> => {
+    const response = await api.get<PositionProfilesResponse>(
+        `/human-talent/position-profiles?departmentId=${departmentId}`
+    );
 
-        return response.data;
-    };
+    return response.data;
+};
 
 // Crea una nueva requisición de personal.
 export const createPersonnelRequisition = async (

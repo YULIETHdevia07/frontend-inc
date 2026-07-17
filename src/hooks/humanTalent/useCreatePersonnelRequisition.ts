@@ -121,16 +121,14 @@ export const useCreatePersonnelRequisition = () => {
             setLoadingData(true);
             setError("");
 
-            const [departmentsResponse, positionProfilesResponse, citiesResponse] =
-                await Promise.all([
-                    getDepartments(),
-                    getPositionProfiles(),
-                    getCities(),
-                ]);
+            const [departmentsResponse, citiesResponse] = await Promise.all([
+                getDepartments(),
+                getCities(),
+            ]);
 
             setDepartments(departmentsResponse.departments);
-            setPositionProfiles(positionProfilesResponse.positionProfiles);
             setCities(citiesResponse.cities);
+            setPositionProfiles([]);
         } catch (error: unknown) {
             console.error(error);
             setError(
@@ -144,10 +142,35 @@ export const useCreatePersonnelRequisition = () => {
         }
     };
 
-    // Actualiza el área solicitante.
-    const handleDepartmentChange = (value: string) => {
+    // Actualiza el área solicitante y carga los cargos relacionados.
+    const handleDepartmentChange = async (value: string) => {
         setDepartmentId(value);
+        setPositionId("");
+        setPositionProfiles([]);
+
         clearFieldError("departmentId");
+        clearFieldError("positionId");
+
+        if (!value) {
+            return;
+        }
+
+        try {
+            const response = await getPositionProfiles(Number(value));
+
+            setPositionProfiles(response.positionProfiles);
+        } catch (error: unknown) {
+            console.error(error);
+
+            setError(
+                getErrorMessage(
+                    error,
+                    "Error al cargar los cargos del área seleccionada."
+                )
+            );
+
+            setPositionProfiles([]);
+        }
     };
 
     // Actualiza el cargo requerido.
