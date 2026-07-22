@@ -947,15 +947,6 @@ const PersonnelRequisitionFormat = () => {
                                         ?.approvedSalary
                                 )}
                             />
-
-                            <FormatLine
-                                label="Confirmado por"
-                                value={
-                                    requisition
-                                        .hiringConfirmation
-                                        ?.createdBy?.name
-                                }
-                            />
                         </Box>
 
                         {/* VoBo Talento Humano */}

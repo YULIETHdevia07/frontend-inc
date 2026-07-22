@@ -125,10 +125,9 @@ const PersonnelRequisitionDetail = () => {
         | PersonnelRequisitionApproval
         | PersonnelHiringConfirmationApproval;
     }) => {
-        const signatureUrl = buildFileUrl(
-            approval?.decidedBy?.signatureUrl ||
-            approval?.approverUser?.signatureUrl
-        );
+        const signatureUrl = approval?.decidedBy
+            ? buildFileUrl(approval.decidedBy.signatureUrl)
+            : "";
 
         const approverName =
             approval?.decidedBy?.name ||
@@ -526,15 +525,6 @@ const PersonnelRequisitionDetail = () => {
                                         .hiringConfirmation
                                         .approvedSalary
                                 )}
-                            />
-
-                            <InfoItem
-                                label="Confirmado por"
-                                value={
-                                    requisition
-                                        .hiringConfirmation
-                                        .createdBy?.name
-                                }
                             />
 
                             <InfoItem
