@@ -129,13 +129,9 @@ const PersonnelRequisitionDetail = () => {
             ? buildFileUrl(approval.decidedBy.signatureUrl)
             : "";
 
-        const approverName =
-            approval?.decidedBy?.name ||
-            approval?.approverUser?.name;
+        const approverName = approval?.decidedBy?.name || "";
 
-        const positionName =
-            approval?.approverPosition?.name ||
-            title;
+
 
         return (
             <Paper
@@ -201,37 +197,25 @@ const PersonnelRequisitionDetail = () => {
                         <Typography
                             variant="body2"
                             sx={{
-                                fontWeight: 700,
+                                fontWeight: 800,
                             }}
                         >
-                            {positionName}
+                            {title}
                         </Typography>
 
                         <Typography
-                            variant="body2"
+                            variant="caption"
                             sx={{
+                                display: "block",
                                 mt: 0.3,
+                                color: "text.secondary",
                             }}
                         >
-                            {approverName ||
-                                "Pendiente por aprobar"}
+                            Fecha:{" "}
+                            {formatDate(
+                                approval?.decidedAt
+                            )}
                         </Typography>
-
-                        {approval?.decidedAt && (
-                            <Typography
-                                variant="caption"
-                                sx={{
-                                    display: "block",
-                                    mt: 0.3,
-                                    color: "text.secondary",
-                                }}
-                            >
-                                Fecha:{" "}
-                                {formatDate(
-                                    approval.decidedAt
-                                )}
-                            </Typography>
-                        )}
                     </Box>
 
                     {approval?.comment && (
@@ -285,6 +269,96 @@ const PersonnelRequisitionDetail = () => {
             </PageContainer>
         );
     }
+
+    // Organiza las aprobaciones en los espacios fijos del formato.
+    const getRequisitionApprovalSlots = (
+        approvals?: PersonnelRequisitionApproval[]
+    ) => {
+        const sortedApprovals = [...(approvals || [])].sort((a, b) => {
+            return a.approvalOrder - b.approvalOrder;
+        });
+
+        if (sortedApprovals.length >= 3) {
+            return [
+                {
+                    title: "Jefe de área",
+                    approval: sortedApprovals[0],
+                },
+                {
+                    title: "Jefe de departamento",
+                    approval: sortedApprovals[1],
+                },
+                {
+                    title: "Gerente general",
+                    approval: sortedApprovals[2],
+                },
+            ];
+        }
+
+        if (sortedApprovals.length === 2) {
+            return [
+                {
+                    title: "Jefe de área",
+                    approval: undefined,
+                },
+                {
+                    title: "Jefe de departamento",
+                    approval: sortedApprovals[0],
+                },
+                {
+                    title: "Gerente General",
+                    approval: sortedApprovals[1],
+                },
+            ];
+        }
+
+        if (sortedApprovals.length === 1) {
+            return [
+                {
+                    title: "Jefe de área",
+                    approval: undefined,
+                },
+                {
+                    title: "Jefe de departamento",
+                    approval: undefined,
+                },
+                {
+                    title: "Gerente General",
+                    approval: sortedApprovals[0],
+                },
+            ];
+        }
+
+        return [
+            {
+                title: "Jefe de área",
+                approval: undefined,
+            },
+            {
+                title: "Jefe de departamento",
+                approval: undefined,
+            },
+            {
+                title: "Gerente General",
+                approval: undefined,
+            },
+        ];
+    };
+
+    const requisitionApprovalSlots = getRequisitionApprovalSlots(
+        requisition.approvals
+    );
+
+    const hiringApprovalSlots = [
+        {
+            title: "Analista de Talento Humano",
+            approval: requisition.hiringConfirmation?.approvals?.[0],
+        },
+        {
+            title: "Jefe de Talento Humano",
+            approval: requisition.hiringConfirmation?.approvals?.[1],
+        },
+    ];
 
     return (
         <PageContainer>
@@ -448,20 +522,13 @@ const PersonnelRequisitionDetail = () => {
                             gap: 2,
                         }}
                     >
-                        {requisition.approvals?.map(
-                            (approval) => (
-                                <ApprovalCard
-                                    key={approval.id}
-                                    title={
-                                        approval
-                                            .approverPosition
-                                            ?.name ||
-                                        `Aprobación ${approval.approvalOrder}`
-                                    }
-                                    approval={approval}
-                                />
-                            )
-                        )}
+                        {requisitionApprovalSlots.map((slot, index) => (
+                            <ApprovalCard
+                                key={slot.approval?.id || index}
+                                title={slot.title}
+                                approval={slot.approval}
+                            />
+                        ))}
                     </Box>
                 </SectionCard>
 
@@ -552,22 +619,13 @@ const PersonnelRequisitionDetail = () => {
                                 gap: 2,
                             }}
                         >
-                            {requisition
-                                .hiringConfirmation
-                                .approvals?.map(
-                                    (approval) => (
-                                        <ApprovalCard
-                                            key={approval.id}
-                                            title={
-                                                approval
-                                                    .approverPosition
-                                                    ?.name ||
-                                                `VoBo ${approval.approvalOrder}`
-                                            }
-                                            approval={approval}
-                                        />
-                                    )
-                                )}
+                            {hiringApprovalSlots.map((slot, index) => (
+                                <ApprovalCard
+                                    key={slot.approval?.id || index}
+                                    title={slot.title}
+                                    approval={slot.approval}
+                                />
+                            ))}
                         </Box>
                     </SectionCard>
                 )}

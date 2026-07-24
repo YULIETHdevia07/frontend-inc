@@ -224,34 +224,12 @@ const PersonnelRequisitionFormat = () => {
         title: string;
         approval?: ApprovalType;
     }) => {
-        /*
-         * decidedBy normalmente contiene la persona que realizó
-         * la aprobación y su firma.
-         *
-         * El cast permite revisar también approverUser.signatureUrl
-         * sin producir error si esa propiedad no está declarada
-         * directamente en la interfaz.
-         */
-        const approverUserWithSignature =
-            approval?.approverUser as
-            | {
-                name?: string | null;
-                signatureUrl?: string | null;
-            }
-            | undefined;
 
-        const signatureUrl = buildFileUrl(approval?.decidedBy?.signatureUrl ||
-            approverUserWithSignature?.signatureUrl ||
-            "");
+        const signatureUrl = approval?.decidedBy
+            ? buildFileUrl(approval.decidedBy.signatureUrl)
+            : "";
 
-        const userName =
-            approval?.decidedBy?.name ||
-            approval?.approverUser?.name ||
-            "";
-
-        const positionName =
-            approval?.approverPosition?.name ||
-            title;
+        const userName = approval?.decidedBy?.name || "";
 
         return (
             <Box
@@ -278,7 +256,7 @@ const PersonnelRequisitionFormat = () => {
                         <Box
                             component="img"
                             src={signatureUrl}
-                            alt={`Firma ${userName || positionName}`}
+                            alt={`Firma ${userName || title}`}
                             sx={{
                                 display: "block",
                                 width: "auto",
@@ -314,11 +292,7 @@ const PersonnelRequisitionFormat = () => {
                         fontWeight: 700,
                     }}
                 >
-                    {positionName}
-                </Typography>
-
-                <Typography sx={{ fontSize: "10px" }}>
-                    {userName || "Pendiente por aprobar"}
+                    {title}
                 </Typography>
 
                 <Typography sx={{ fontSize: "10px" }}>
@@ -370,25 +344,104 @@ const PersonnelRequisitionFormat = () => {
      * Conserva tres espacios para las aprobaciones de requisición,
      * aunque todavía no existan registros.
      */
-    const requisitionApprovalSlots: Array<
-        PersonnelRequisitionApproval | undefined
-    > = Array.from(
-        { length: 3 },
-        (_, index) => requisition.approvals?.[index]
+    const getRequisitionApprovalSlots = (
+        approvals?: PersonnelRequisitionApproval[]
+    ) => {
+        const sortedApprovals = [...(approvals || [])].sort((a, b) => {
+            return a.approvalOrder - b.approvalOrder;
+        });
+
+        if (sortedApprovals.length >= 3) {
+            return [
+                {
+                    title: "Jefe de área",
+                    approval: sortedApprovals[0],
+                },
+                {
+                    title: "Jefe de departamento",
+                    approval: sortedApprovals[1],
+                },
+                {
+                    title: "Gerente General",
+                    approval: sortedApprovals[2],
+                },
+            ];
+        }
+
+        if (sortedApprovals.length === 2) {
+            return [
+                {
+                    title: "Jefe de área",
+                    approval: undefined,
+                },
+                {
+                    title: "Jefe de departamento",
+                    approval: sortedApprovals[0],
+                },
+                {
+                    title: "Gerente General",
+                    approval: sortedApprovals[1],
+                },
+            ];
+        }
+
+        if (sortedApprovals.length === 1) {
+            return [
+                {
+                    title: "Jefe de área",
+                    approval: undefined,
+                },
+                {
+                    title: "Jefe de departamento",
+                    approval: undefined,
+                },
+                {
+                    title: "Gerente General",
+                    approval: sortedApprovals[0],
+                },
+            ];
+        }
+
+        return [
+            {
+                title: "Jefe de área",
+                approval: undefined,
+            },
+            {
+                title: "Jefe de departamento",
+                approval: undefined,
+            },
+            {
+                title: "Gerente General",
+                approval: undefined,
+            },
+        ];
+    };
+
+    const requisitionApprovalSlots = getRequisitionApprovalSlots(
+        requisition.approvals
     );
 
     /*
      * Conserva dos espacios para los VoBo de Talento Humano,
      * aunque todavía no exista confirmación o aprobación.
      */
-    const hiringApprovalSlots: Array<
-        PersonnelHiringConfirmationApproval | undefined
-    > = Array.from(
-        { length: 2 },
-        (_, index) =>
-            requisition.hiringConfirmation
-                ?.approvals?.[index]
-    );
+    const sortedHiringApprovals = [
+        ...(requisition.hiringConfirmation?.approvals || []),
+    ].sort((a, b) => {
+        return a.approvalOrder - b.approvalOrder;
+    });
+
+    const hiringApprovalSlots = [
+        {
+            title: "Analista de Talento Humano",
+            approval: sortedHiringApprovals[0],
+        },
+        {
+            title: "Jefe de Talento Humano",
+            approval: sortedHiringApprovals[1],
+        },
+    ];
 
     return (
         <>
@@ -819,23 +872,13 @@ const PersonnelRequisitionFormat = () => {
                                 p: 1,
                             }}
                         >
-                            {requisitionApprovalSlots.map(
-                                (approval, index) => (
-                                    <SignatureBox
-                                        key={
-                                            approval?.id ??
-                                            `approval-${index}`
-                                        }
-                                        title={
-                                            approval
-                                                ?.approverPosition
-                                                ?.name ||
-                                            `Aprobación ${index + 1}`
-                                        }
-                                        approval={approval}
-                                    />
-                                )
-                            )}
+                            {requisitionApprovalSlots.map((slot, index) => (
+                                <SignatureBox
+                                    key={slot.approval?.id ?? `approval-${index}`}
+                                    title={slot.title}
+                                    approval={slot.approval}
+                                />
+                            ))}
                         </Box>
 
                         {/* Confirmación */}
@@ -961,25 +1004,13 @@ const PersonnelRequisitionFormat = () => {
                                 p: 1,
                             }}
                         >
-                            {hiringApprovalSlots.map(
-                                (approval, index) => (
-                                    <SignatureBox
-                                        key={
-                                            approval?.id ??
-                                            `vobo-${index}`
-                                        }
-                                        title={
-                                            approval
-                                                ?.approverPosition
-                                                ?.name ||
-                                            (index === 0
-                                                ? "Auxiliar de Talento Humano"
-                                                : "Jefe de Talento Humano")
-                                        }
-                                        approval={approval}
-                                    />
-                                )
-                            )}
+                            {hiringApprovalSlots.map((slot, index) => (
+                                <SignatureBox
+                                    key={slot.approval?.id ?? `vobo-${index}`}
+                                    title={slot.title}
+                                    approval={slot.approval}
+                                />
+                            ))}
                         </Box>
                     </Box>
                 </Box>
