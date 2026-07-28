@@ -27,9 +27,10 @@ const PersonnelRequisitions = () => {
         loadingDecision,
         selectedRequisitionId,
 
+        loadError,
         message,
         openMessage,
-        error,
+        messageSeverity,
 
         openHiringDialog,
         selectedHiringRequisition,
@@ -149,9 +150,9 @@ const PersonnelRequisitions = () => {
                 subtitle="Consulta, aprueba, rechaza o confirma requisiciones según el proceso."
             />
 
-            {error && (
+            {loadError && (
                 <Alert severity="error" sx={{ mb: 2 }}>
-                    {error}
+                    {loadError}
                 </Alert>
             )}
 
@@ -247,7 +248,7 @@ const PersonnelRequisitions = () => {
             <CustomSnackbar
                 open={openMessage}
                 message={message}
-                severity="success"
+                severity={messageSeverity}
                 onClose={closeMessage}
             />
         </PageContainer>

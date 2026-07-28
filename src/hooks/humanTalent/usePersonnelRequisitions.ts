@@ -21,6 +21,7 @@ import type {
     InternContractType,
     PersonnelRequisition,
 } from "../../interfaces/humanTalent/personnelRequisition.interface";
+import type { MessageType } from "../../interfaces/common/message.interface";
 
 // Estado inicial del formulario de confirmación de contratación.
 const initialHiringForm = {
@@ -63,14 +64,18 @@ export const usePersonnelRequisitions = () => {
         number | null
     >(null);
 
-    // Mensaje de éxito.
+    // Error exclusivo al consultar el listado de requisiciones mediante GET.
+    const [loadError, setLoadError] = useState("");
+
+    // Mensaje mostrado en el CustomSnackbar.
     const [message, setMessage] = useState("");
 
-    // Controla si se muestra el snackbar.
+    // Controla si se muestra el CustomSnackbar.
     const [openMessage, setOpenMessage] = useState(false);
 
-    // Mensaje de error general.
-    const [error, setError] = useState("");
+    // Define si el Snackbar será de éxito, error, advertencia o información.
+    const [messageSeverity, setMessageSeverity] =
+        useState<MessageType>("success");
 
     // Controla el modal de confirmación de contratación.
     const [openHiringDialog, setOpenHiringDialog] = useState(false);
@@ -125,18 +130,29 @@ export const usePersonnelRequisitions = () => {
         );
     };
 
+    // Muestra un mensaje mediante el CustomSnackbar.
+    const showMessage = (
+        text: string,
+        severity: MessageType = "success"
+    ) => {
+        setMessage(text);
+        setMessageSeverity(severity);
+        setOpenMessage(true);
+    };
+
     // Carga el listado de requisiciones.
     const loadRequisitions = async () => {
         try {
             setLoading(true);
-            setError("");
+            setLoadError("");
 
             const response = await getPersonnelRequisitions();
 
             setRequisitions(response.requisitions);
         } catch (error: unknown) {
             console.error(error);
-            setError(
+
+            setLoadError(
                 getErrorMessage(
                     error,
                     "Error al cargar las requisiciones de personal."
@@ -156,7 +172,7 @@ export const usePersonnelRequisitions = () => {
         try {
             setLoadingDecision(true);
             setSelectedRequisitionId(requisitionId);
-            setError("");
+
             setMessage("");
             setOpenMessage(false);
 
@@ -165,19 +181,23 @@ export const usePersonnelRequisitions = () => {
                 comment: comment?.trim() || null,
             });
 
-            setMessage(response.message || "Decisión registrada correctamente.");
-            setOpenMessage(true);
+            showMessage(
+                response.message || "Decisión registrada correctamente.",
+                "success"
+            );
 
             await loadRequisitions();
 
             return true;
         } catch (error: unknown) {
             console.error(error);
-            setError(
+
+            showMessage(
                 getErrorMessage(
                     error,
                     "Error al registrar la decisión de la requisición."
-                )
+                ),
+                "error"
             );
 
             return false;
@@ -206,13 +226,18 @@ export const usePersonnelRequisitions = () => {
         setOpenHiringDialog(true);
     };
 
+    // Limpia y cierra internamente el modal de contratación.
+    const resetHiringDialog = () => {
+        setOpenHiringDialog(false);
+        setSelectedHiringRequisition(null);
+        setHiringForm(initialHiringForm);
+    };
+
     // Cierra el modal de confirmación de contratación.
     const closeCreateHiringDialog = () => {
         if (loadingDecision) return;
 
-        setOpenHiringDialog(false);
-        setSelectedHiringRequisition(null);
-        setHiringForm(initialHiringForm);
+        resetHiringDialog();
     };
 
     // Actualiza los campos del formulario de confirmación.
@@ -292,7 +317,7 @@ export const usePersonnelRequisitions = () => {
         try {
             setLoadingDecision(true);
             setSelectedRequisitionId(selectedHiringRequisition.id);
-            setError("");
+
             setMessage("");
             setOpenMessage(false);
 
@@ -319,22 +344,25 @@ export const usePersonnelRequisitions = () => {
                 }
             );
 
-            setMessage(
+            showMessage(
                 response.message ||
-                "Confirmación de contratación registrada correctamente."
+                "Confirmación de contratación registrada correctamente.",
+                "success"
             );
-            setOpenMessage(true);
 
-            closeCreateHiringDialog();
+            // Se utiliza resetHiringDialog porque loadingDecision todavía es true.
+            resetHiringDialog();
 
             await loadRequisitions();
         } catch (error: unknown) {
             console.error(error);
-            setError(
+
+            showMessage(
                 getErrorMessage(
                     error,
                     "Error al registrar la confirmación de contratación."
-                )
+                ),
+                "error"
             );
         } finally {
             setLoadingDecision(false);
@@ -352,7 +380,7 @@ export const usePersonnelRequisitions = () => {
         try {
             setLoadingDecision(true);
             setSelectedRequisitionId(requisitionId);
-            setError("");
+
             setMessage("");
             setOpenMessage(false);
 
@@ -364,22 +392,24 @@ export const usePersonnelRequisitions = () => {
                 }
             );
 
-            setMessage(
+            showMessage(
                 response.message ||
-                "Decisión de Talento Humano registrada correctamente."
+                "Decisión de Talento Humano registrada correctamente.",
+                "success"
             );
-            setOpenMessage(true);
 
             await loadRequisitions();
 
             return true;
         } catch (error: unknown) {
             console.error(error);
-            setError(
+
+            showMessage(
                 getErrorMessage(
                     error,
                     "Error al registrar la decisión de Talento Humano."
-                )
+                ),
+                "error"
             );
 
             return false;
@@ -471,8 +501,10 @@ export const usePersonnelRequisitions = () => {
                 decisionDialog.requisition.hiringConfirmation?.id;
 
             if (!hiringConfirmationId) {
-                setError("La requisición no tiene confirmación de contratación.");
-                setOpenMessage(true);
+                showMessage(
+                    "La requisición no tiene confirmación de contratación.",
+                    "error"
+                );
                 return;
             }
 
@@ -488,8 +520,10 @@ export const usePersonnelRequisitions = () => {
                 decisionDialog.requisition.hiringConfirmation?.id;
 
             if (!hiringConfirmationId) {
-                setError("La requisición no tiene confirmación de contratación.");
-                setOpenMessage(true);
+                showMessage(
+                    "La requisición no tiene confirmación de contratación.",
+                    "error"
+                );
                 return;
             }
 
@@ -523,9 +557,10 @@ export const usePersonnelRequisitions = () => {
         loadingDecision,
         selectedRequisitionId,
 
+        loadError,
         message,
         openMessage,
-        error,
+        messageSeverity,
 
         openHiringDialog,
         selectedHiringRequisition,

@@ -137,13 +137,6 @@ const CreatePersonnelRequisition = () => {
                 }
             />
 
-            {/* Mensaje para errores generales del backend. */}
-            {error && (
-                <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-                    {error}
-                </Alert>
-            )}
-
             {/* Formulario de creación de requisición de personal. */}
             <Box
                 id="create-personnel-requisition-form"
@@ -322,9 +315,9 @@ const CreatePersonnelRequisition = () => {
             </Box>
 
             <CustomSnackbar
-                open={openMessage}
-                message={message}
-                severity="success"
+                open={openMessage || Boolean(error)}
+                message={error || message}
+                severity={error ? "error" : "success"}
                 onClose={closeMessage}
             />
         </Box>

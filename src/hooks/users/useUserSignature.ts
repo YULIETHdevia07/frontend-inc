@@ -38,7 +38,7 @@ export const useUserSignature = () => {
     // Sube la firma seleccionada.
     const handleUploadSignature = async () => {
         if (!selectedFile) {
-            setError("Debes seleccionar una imagen para la firma.");
+             setError(getErrorMessage(error, "Debes seleccionar una imagen para la firma."));
             return;
         }
 
